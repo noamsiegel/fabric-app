@@ -5,15 +5,8 @@
 
   // svelte components
   import { Button } from "$lib/components/ui/button";
-  import { Input } from "$lib/components/ui/input";
   import { Label } from "$lib/components/ui/label";
-  import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-  } from "$lib/components/ui/select";
+  import * as Select from "$lib/components/ui/select";
   import { Settings, Home, FileText, PlayCircle } from "lucide-svelte";
   import {
     Collapsible,
@@ -22,21 +15,24 @@
   } from "$lib/components/ui/collapsible";
   // tauri plugins
   import { Command } from "@tauri-apps/plugin-shell";
-  import { readDir, BaseDirectory } from "@tauri-apps/plugin-fs";
-  import fabricFolderStore from "./settings/+page.svelte";
 
-  let selectedPattern = "";
+  // let selectedPattern = "";
+  let selectedPattern = { value: "", label: "" };
   let showAdvancedSettings = false;
 
   let patterns: string[] = [];
-  let errorMessage = "";
+  let errorMessage: string = "";
 
   onMount(async () => {
     try {
       patterns = await invoke("get_patterns");
     } catch (error) {
       console.error("Error fetching patterns:", error);
-      errorMessage = error.toString();
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      } else {
+        errorMessage = String(error);
+      }
     }
   });
 
@@ -45,16 +41,12 @@
     patterns = await invoke("get_patterns");
   });
 
-  function handlePatternChange(event) {
-    selectedPattern = event.detail;
-    // TODO: Fetch variables based on selected pattern
-  }
-
   async function runPattern() {
     try {
+      console.log("Running pattern:", selectedPattern);
       const result = await Command.create("fabric", [
         "--pattern",
-        "summarize",
+        selectedPattern.value,
       ]).execute();
       console.log("Test command result:", result);
       alert(`Command executed successfully. Output: ${result.stdout}`);
@@ -65,20 +57,6 @@
       } else {
         alert(`An unexpected error occurred: ${String(error)}`);
       }
-    }
-  }
-
-  async function getPatterns() {
-    try {
-      const entries = await readDir("fabric/patterns", {
-        dir: BaseDirectory.App,
-      });
-      return entries
-        .filter((entry) => entry.isDirectory)
-        .map((entry) => entry.name);
-    } catch (error) {
-      console.error("Error reading patterns directory:", error);
-      return [];
     }
   }
 </script>
@@ -113,30 +91,22 @@
       </div>
       <div class="mb-6">
         <Label for="pattern-select">Select Pattern</Label>
-        <Select onValueChange={handlePatternChange}>
-          <SelectTrigger id="pattern-select">
-            <SelectValue placeholder="Choose a pattern" />
-          </SelectTrigger>
-          <SelectContent>
-            <!-- <SelectItem value="pattern1">Pattern 1</SelectItem>
-            <SelectItem value="pattern2">Pattern 2</SelectItem>
-            <SelectItem value="pattern3">Pattern 3</SelectItem> -->
+        <Select.Root bind:selected={selectedPattern}>
+          <Select.Trigger id="pattern-select">
+            <Select.Value placeholder="Choose a pattern" />
+          </Select.Trigger>
+          <Select.Content>
             {#each patterns as pattern}
-              <SelectItem value={pattern}>{pattern}</SelectItem>
+              <Select.Item value={pattern}>{pattern}</Select.Item>
             {/each}
-          </SelectContent>
-        </Select>
+          </Select.Content>
+        </Select.Root>
       </div>
 
       {#if selectedPattern}
         <div class="mb-6">
           <h2 class="text-xl font-semibold mb-4">Variables</h2>
-          {#each variables as variable}
-            <div class="mb-4">
-              <Label for={variable.name}>{variable.name}</Label>
-              <Input id={variable.name} bind:value={variable.value} />
-            </div>
-          {/each}
+          <!-- TODO: Add variables fields here -->
         </div>
 
         <Collapsible>
