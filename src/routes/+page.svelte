@@ -1,4 +1,9 @@
 <script lang="ts">
+  // svelte stores
+  import { onMount } from "svelte";
+  import { invoke } from "@tauri-apps/api/core";
+
+  // svelte components
   import { Button } from "$lib/components/ui/button";
   import { Input } from "$lib/components/ui/input";
   import { Label } from "$lib/components/ui/label";
@@ -15,19 +20,34 @@
     CollapsibleContent,
     CollapsibleTrigger,
   } from "$lib/components/ui/collapsible";
+  // tauri plugins
   import { Command } from "@tauri-apps/plugin-shell";
+  import { readDir, BaseDirectory } from "@tauri-apps/plugin-fs";
+  import fabricFolderStore from "./settings/+page.svelte";
 
   let selectedPattern = "";
-  let variables = [];
   let showAdvancedSettings = false;
+
+  let patterns: string[] = [];
+  let errorMessage = "";
+
+  onMount(async () => {
+    try {
+      patterns = await invoke("get_patterns");
+    } catch (error) {
+      console.error("Error fetching patterns:", error);
+      errorMessage = error.toString();
+    }
+  });
+
+  onMount(async () => {
+    // Fetch patterns based on the fabric folder path
+    patterns = await invoke("get_patterns");
+  });
 
   function handlePatternChange(event) {
     selectedPattern = event.detail;
     // TODO: Fetch variables based on selected pattern
-    variables = [
-      { name: "Variable 1", value: "" },
-      { name: "Variable 2", value: "" },
-    ];
   }
 
   async function runPattern() {
@@ -47,12 +67,27 @@
       }
     }
   }
+
+  async function getPatterns() {
+    try {
+      const entries = await readDir("fabric/patterns", {
+        dir: BaseDirectory.App,
+      });
+      return entries
+        .filter((entry) => entry.isDirectory)
+        .map((entry) => entry.name);
+    } catch (error) {
+      console.error("Error reading patterns directory:", error);
+      return [];
+    }
+  }
 </script>
 
 <div class="flex flex-col h-screen">
   <header class="flex justify-between items-center p-4 border-b">
     <div class="flex items-center">
-      <img src="/logo.png" alt="Fabric Logo" class="h-8 w-8 mr-2" />
+      <!-- TODO add fabric logo -->
+      <!-- <img src="/logo.png" alt="Fabric Logo" class="h-8 w-8 mr-2" /> -->
       <h1 class="text-2xl font-bold">Fabric</h1>
     </div>
     <nav class="flex space-x-4">
@@ -83,9 +118,12 @@
             <SelectValue placeholder="Choose a pattern" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="pattern1">Pattern 1</SelectItem>
+            <!-- <SelectItem value="pattern1">Pattern 1</SelectItem>
             <SelectItem value="pattern2">Pattern 2</SelectItem>
-            <SelectItem value="pattern3">Pattern 3</SelectItem>
+            <SelectItem value="pattern3">Pattern 3</SelectItem> -->
+            {#each patterns as pattern}
+              <SelectItem value={pattern}>{pattern}</SelectItem>
+            {/each}
           </SelectContent>
         </Select>
       </div>

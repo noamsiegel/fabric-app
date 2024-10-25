@@ -1,14 +1,21 @@
 <script lang="ts">
+  // svelte components
   import { Button } from "$lib/components/ui/button";
   import { Switch } from "$lib/components/ui/switch";
   import { Label } from "$lib/components/ui/label";
+
+  // svelte stores
+  import { writable } from "svelte/store";
+  import { onMount } from "svelte";
+
+  // tauri plugins
   import { open } from "@tauri-apps/plugin-dialog";
-  import { appConfigDir, join } from "@tauri-apps/api/path";
-  import { writeTextFile, readTextFile, exists } from "@tauri-apps/plugin-fs";
+  import { invoke } from "@tauri-apps/api/core";
 
   let darkMode = false;
   let notifications = true;
   let fabricFolderPath = "";
+  export const fabricFolderStore = writable("");
 
   async function selectFabricFolder() {
     try {
@@ -20,24 +27,20 @@
 
       if (selected) {
         fabricFolderPath = selected as string;
-        await saveFabricFolderPath();
+        await saveFabricFolderPath(fabricFolderPath);
       }
     } catch (err) {
       console.error("Failed to select folder:", err);
     }
   }
 
-  async function saveFabricFolderPath() {
+  async function saveFabricFolderPath(path: string) {
     try {
-      const configDir = await appConfigDir();
-      const configPath = await join(configDir, "fabric_config.json");
+      // Set the fabric folder path in the Tauri app state
+      await invoke("set_fabric_folder", { path });
 
-      // Ensure the config directory exists
-      if (!(await exists(configDir))) {
-        await createDir(configDir, { recursive: true });
-      }
-
-      await writeTextFile(configPath, JSON.stringify({ fabricFolderPath }));
+      // Update the Svelte store
+      fabricFolderStore.set(path);
     } catch (err) {
       console.error("Failed to save fabric folder path:", err);
     }
@@ -45,21 +48,19 @@
 
   async function loadFabricFolderPath() {
     try {
-      const configDir = await appConfigDir();
-      const configPath = await join(configDir, "fabric_config.json");
-
-      if (await exists(configPath)) {
-        const configContent = await readTextFile(configPath);
-        const config = JSON.parse(configContent);
-        fabricFolderPath = config.fabricFolderPath || "";
-      }
+      // Get the fabric folder path from the Tauri app state
+      const path = await invoke("get_fabric_folder");
+      fabricFolderPath = path as string;
+      fabricFolderStore.set(fabricFolderPath);
     } catch (err) {
       console.error("Failed to load fabric folder path:", err);
     }
   }
 
   // Load the fabric folder path when the component mounts
-  loadFabricFolderPath();
+  onMount(() => {
+    loadFabricFolderPath();
+  });
 </script>
 
 <div class="p-4">
@@ -80,6 +81,8 @@
       <Button on:click={selectFabricFolder}>Select Fabric Folder</Button>
       {#if fabricFolderPath}
         <p class="text-sm">Selected Fabric folder: {fabricFolderPath}</p>
+      {:else}
+        <p class="text-sm">No Fabric folder selected</p>
       {/if}
     </div>
   </div>
