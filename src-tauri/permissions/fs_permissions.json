@@ -1,0 +1,24 @@
+{
+	"identifier": "fs-access",
+	"description": "Permissions for file system access",
+	"permissions": [
+	  "fs:read-app-specific-dirs-recursive",
+	  "fs:write-app-specific-dirs-recursive",
+	  {
+		"identifier": "fs:allow-open",
+		"allow": [{ "path": "$HOME/**" }]
+	  },
+	  {
+		"identifier": "fs:allow-read-dir",
+		"allow": [{ "path": "$HOME/**" }]
+	  },
+	  {
+		"identifier": "fs:allow-exists",
+		"allow": [{ "path": "$HOME/**" }]
+	  },
+	  {
+		"identifier": "fs:allow-write-file",
+		"allow": [{ "path": "$APPCONFIG/**" }]
+	  }
+	]
+  }
