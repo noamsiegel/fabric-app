@@ -2,6 +2,10 @@ import { Command } from "@tauri-apps/plugin-shell";
 import { invoke } from "@tauri-apps/api/core";
 import { platform } from "@tauri-apps/plugin-os";
 
+// base fabric settings
+
+// JinaAI functions
+
 export async function scrapeUrl(urlToScrape: string) {
   try {
     console.log("Scraping URL:", urlToScrape);
@@ -42,6 +46,8 @@ export async function searchQuestion(questionToSearch: string) {
     await invoke("set_is_running", { value: false });
   }
 }
+
+// Run pattern with contexts
 
 export async function clipboardContentsAndRunPattern(): Promise<string> {
   try {
