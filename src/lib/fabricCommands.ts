@@ -93,7 +93,7 @@ export async function scrapeAndRunPattern(
     ]).execute();
 
     console.log("Scrape and pattern execution result:", result);
-    return `Scrape and pattern execution successful. Output: ${result.stdout}`;
+    return `${result.stdout}`;
   } catch (error) {
     console.error("Error in scrapeAndRunPattern:", error);
     if (error instanceof Error) {
