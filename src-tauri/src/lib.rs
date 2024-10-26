@@ -19,6 +19,8 @@ struct AppState {
     selected_pattern: Mutex<String>,
     patterns: Mutex<Vec<String>>,
     is_running: Mutex<bool>,
+    temperature: Mutex<f32>,
+    presence_penalty: Mutex<f32>,
 }
 
 // New command to set the fabric folder
@@ -102,6 +104,34 @@ fn set_is_running(state: tauri::State<AppState>, value: bool) {
     *is_running = value;
 }
 
+// New command to set the temperature
+#[tauri::command]
+fn set_temperature(state: tauri::State<AppState>, value: f32) {
+    let mut temperature = state.temperature.lock().unwrap();
+    *temperature = value;
+}
+
+// New command to get the temperature
+#[tauri::command]
+fn get_temperature(state: tauri::State<AppState>) -> f32 {
+    let temperature = state.temperature.lock().unwrap();
+    *temperature
+}
+
+// New command to set the presence penalty
+#[tauri::command]
+fn set_presence_penalty(state: tauri::State<AppState>, value: f32) {
+    let mut presence_penalty = state.presence_penalty.lock().unwrap();
+    *presence_penalty = value;
+}
+
+// New command to get the presence penalty
+#[tauri::command]
+fn get_presence_penalty(state: tauri::State<AppState>) -> f32 {
+    let presence_penalty = state.presence_penalty.lock().unwrap();
+    *presence_penalty
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -115,6 +145,8 @@ pub fn run() {
                 selected_pattern: Mutex::new(String::new()),
                 patterns: Mutex::new(Vec::new()),
                 is_running: Mutex::new(false),
+                temperature: Mutex::new(0.7),
+                presence_penalty: Mutex::new(0.0),
             });
             Ok(())
         })
@@ -131,6 +163,10 @@ pub fn run() {
             get_is_running,
             set_is_running,
             get_clipboard_contents,
+            set_temperature,
+            get_temperature,
+            set_presence_penalty,
+            get_presence_penalty,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
