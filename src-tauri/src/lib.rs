@@ -7,7 +7,8 @@ use crate::fabric::patterns::{
     set_selected_pattern,
 };
 use crate::fabric::settings::{
-    get_presence_penalty, get_temperature, set_presence_penalty, set_temperature,
+    get_model, get_models, get_presence_penalty, get_temperature, set_model, set_presence_penalty,
+    set_temperature,
 };
 
 pub mod plugins;
@@ -29,8 +30,12 @@ pub fn run() {
                 selected_pattern: Mutex::new(String::new()),
                 patterns: Mutex::new(Vec::new()),
                 is_running: Mutex::new(false),
+                // fabric pattern flags
                 temperature: Mutex::new(0.7),
                 presence_penalty: Mutex::new(0.0),
+                frequency_penalty: Mutex::new(0.0),
+                model: Mutex::new(String::new()),
+                top_p: Mutex::new(0.9),
             });
             Ok(())
         })
@@ -38,19 +43,26 @@ pub fn run() {
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![
+            // fabric folder
             set_fabric_folder,
             get_fabric_folder,
+            // fabric pattern
             get_patterns,
             set_selected_pattern,
             get_selected_pattern,
             set_patterns,
+            // fabric state
             get_is_running,
             set_is_running,
+            // fabric LLM flags
             get_clipboard_contents,
             set_temperature,
             get_temperature,
             set_presence_penalty,
             get_presence_penalty,
+            get_models,
+            get_model,
+            set_model,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

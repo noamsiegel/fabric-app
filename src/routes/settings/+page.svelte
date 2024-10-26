@@ -75,6 +75,16 @@
     await invoke("set_presence_penalty", { value });
   }
 
+  async function showModels() {
+    try {
+      const models: string[] = await invoke("get_models");
+      await alert(`Available Models:\n\n${models.join("\n")}`);
+    } catch (err) {
+      console.error("Failed to fetch models:", err);
+      await alert(`Failed to fetch models: ${err}`);
+    }
+  }
+
   // Load the fabric folder path when the component mounts
   onMount(() => {
     loadFabricFolderPath();
@@ -135,4 +145,5 @@
       }}
     />
   </div>
+  <Button on:click={showModels}>Show Available Models</Button>
 </div>
