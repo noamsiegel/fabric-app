@@ -11,9 +11,16 @@
   import { Label } from "$lib/components/ui/label";
   import * as Select from "$lib/components/ui/select";
   import { Settings, Home, FileText, PlayCircle } from "lucide-svelte";
+  import { Textarea } from "$lib/components/ui/textarea";
+
   // tauri plugins
   import { Command } from "@tauri-apps/plugin-shell";
-  // import { runPattern, scrapeUrl, searchQuestion } from "$lib/fabricCommands";
+  import {
+    runPattern,
+    scrapeUrl,
+    searchQuestion,
+    scrapeAndRunPattern,
+  } from "$lib/fabricCommands";
 
   // let selectedPattern = "";
   let selected: Writable<{ value: string; label: string }> = writable({
@@ -50,65 +57,15 @@
       console.log("Selected pattern:", $selected.value);
     }
   }
+  let scrapeAndRunResult: string = "";
 
-  async function runPattern() {
-    if (!$selected.value) {
-      alert("Please select a pattern first.");
-      return;
-    }
+  async function handleScrapeAndRunPattern(url: string) {
     try {
-      console.log("Running pattern:", $selected.value);
-      const result = await Command.create("fabric", [
-        "--pattern",
-        $selected.value,
-      ]).execute();
-      console.log("Test command result:", result);
-      alert(`Command executed successfully. Output: ${result.stdout}`);
+      scrapeAndRunResult = await scrapeAndRunPattern(url);
     } catch (error) {
-      console.error("Error running test command:", error);
-      if (error instanceof Error) {
-        alert(`Error running command: ${error.message}`);
-      } else {
-        alert(`An unexpected error occurred: ${String(error)}`);
-      }
-    }
-  }
-
-  async function scrapeUrl() {
-    try {
-      console.log("Scraping URL:", urlToScrape);
-      const result = await Command.create("fabric", [
-        "-q",
-        urlToScrape,
-      ]).execute();
-      console.log("Scrape command result:", result);
-      // alert(`URL scraped successfully. Output: ${result.stdout}`);
-    } catch (error) {
-      console.error("Error scraping URL:", error);
-      if (error instanceof Error) {
-        alert(`Error scraping URL: ${error.message}`);
-      } else {
-        alert(`An unexpected error occurred: ${String(error)}`);
-      }
-    }
-  }
-
-  async function searchQuestion() {
-    try {
-      console.log("Searching question:", questionToSearch);
-      const result = await Command.create("fabric", [
-        "-q",
-        questionToSearch,
-      ]).execute();
-      console.log("Search question command result:", result);
-      alert(`Question searched successfully. Output: ${result.stdout}`);
-    } catch (error) {
-      console.error("Error searching question:", error);
-      if (error instanceof Error) {
-        alert(`Error searching question: ${error.message}`);
-      } else {
-        alert(`An unexpected error occurred: ${String(error)}`);
-      }
+      console.error("Error in scrapeAndRunPattern:", error);
+      scrapeAndRunResult =
+        "An error occurred while scraping and running the pattern.";
     }
   }
 </script>
@@ -121,14 +78,8 @@
       <h1 class="text-2xl font-bold">Fabric</h1>
     </div>
     <nav class="flex space-x-4">
-      <a href="/" class="text-gray-600 hover:text-gray-900"
-        ><Home size={24} /></a
-      >
       <a href="/patterns" class="text-gray-600 hover:text-gray-900"
         ><FileText size={24} /></a
-      >
-      <a href="/sessions" class="text-gray-600 hover:text-gray-900"
-        ><PlayCircle size={24} /></a
       >
       <a href="/settings" class="text-gray-600 hover:text-gray-900"
         ><Settings size={24} /></a
@@ -164,7 +115,12 @@
             bind:value={urlToScrape}
             placeholder="https://example.com"
           />
-          <Button on:click={scrapeUrl}>Scrape URL</Button>
+          <Button
+            on:click={() =>
+              urlToScrape && handleScrapeAndRunPattern(urlToScrape)}
+          >
+            Scrape and Run Pattern
+          </Button>
         </div>
       </div>
 
@@ -186,6 +142,18 @@
           <Button on:click={runPattern}>Run</Button>
           <Button variant="outline">Dry Run</Button>
           <Button variant="outline">Save Output</Button>
+        </div>
+      {/if}
+
+      {#if scrapeAndRunResult}
+        <div class="mt-6">
+          <Label for="result-textarea">Scrape and Run Pattern Result</Label>
+          <Textarea
+            id="result-textarea"
+            value={scrapeAndRunResult}
+            rows={10}
+            readonly
+          />
         </div>
       {/if}
     </div>
