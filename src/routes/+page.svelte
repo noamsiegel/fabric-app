@@ -54,6 +54,16 @@
     }
   });
 
+  let isRunning = false;
+
+  onMount(() => {
+    const checkRunningStatus = async () => {
+      isRunning = await invoke("get_is_running");
+      setTimeout(checkRunningStatus, 1000); // Check every 1 second
+    };
+    checkRunningStatus();
+  });
+
   $: {
     if ($selected.value) {
       invoke("set_selected_pattern", { pattern: $selected.value });
@@ -101,6 +111,7 @@
           />
           <Button
             on:click={() => (result = scrapeUrlAndRunPattern(urlToScrape))}
+            disabled={isRunning}
           >
             Scrape and Run Pattern
           </Button>
@@ -119,6 +130,7 @@
           <Button
             on:click={() =>
               (result = scrapeQuestionAndRunPattern(questionToSearch))}
+            disabled={isRunning}
           >
             Search and Run Pattern
           </Button>
