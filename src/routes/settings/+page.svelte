@@ -3,6 +3,7 @@
   import { Button } from "$lib/components/ui/button";
   import { Switch } from "$lib/components/ui/switch";
   import { Label } from "$lib/components/ui/label";
+  import { Slider } from "$lib/components/ui/slider";
 
   // svelte stores
   import { writable } from "svelte/store";
@@ -48,6 +49,7 @@
       fabricFolderStore.set(path);
     } catch (err) {
       console.error("Failed to save fabric folder path:", err);
+      alert(`Failed to save fabric folder path: ${err}`);
     }
   }
 
@@ -60,6 +62,17 @@
     } catch (err) {
       console.error("Failed to load fabric folder path:", err);
     }
+  }
+
+  let temperature = 0.5;
+  let presencePenalty = 0.0;
+
+  async function setTemperature(value: number) {
+    await invoke("set_temperature", { value });
+  }
+
+  async function setPresencePenalty(value: number) {
+    await invoke("set_presence_penalty", { value });
   }
 
   // Load the fabric folder path when the component mounts
@@ -90,5 +103,36 @@
         <p class="text-sm">No Fabric folder selected</p>
       {/if}
     </div>
+  </div>
+  <div class="flex flex-col space-y-2">
+    <Label for="temperature">Temperature: {temperature.toFixed(2)}</Label>
+    <Slider
+      id="temperature"
+      min={0}
+      max={1}
+      step={0.1}
+      value={[temperature]}
+      onValueChange={(values) => {
+        temperature = values[0];
+        setTemperature(temperature);
+      }}
+    />
+  </div>
+
+  <div class="flex flex-col space-y-2">
+    <Label for="presence-penalty"
+      >Presence Penalty: {presencePenalty.toFixed(2)}</Label
+    >
+    <Slider
+      id="presence-penalty"
+      min={0}
+      max={1}
+      step={0.1}
+      value={[presencePenalty]}
+      onValueChange={(values) => {
+        presencePenalty = values[0];
+        setPresencePenalty(presencePenalty);
+      }}
+    />
   </div>
 </div>
