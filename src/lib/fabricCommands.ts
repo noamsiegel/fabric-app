@@ -65,14 +65,12 @@ export async function searchQuestion(questionToSearch: string) {
   }
 }
 
-export async function scrapeAndRunPattern(
+export async function scrapeUrlAndRunPattern(
   urlToScrape: string
 ): Promise<string> {
   try {
-    // Step 1: Get the selected pattern
     const selectedPattern = await invoke("get_selected_pattern");
     if (!selectedPattern) {
-      alert("Please select a pattern first.");
       return "Please select a pattern first.";
     }
 
@@ -82,9 +80,8 @@ export async function scrapeAndRunPattern(
       selectedPattern
     );
 
-    // Step 2: Create a single command that pipes the scrape result to the pattern
     const result = await Command.create("fabric", [
-      "-q",
+      "-u",
       urlToScrape,
       "|",
       "fabric",
@@ -92,14 +89,42 @@ export async function scrapeAndRunPattern(
       selectedPattern as string,
     ]).execute();
 
-    console.log("Scrape and pattern execution result:", result);
-    return `${result.stdout}`;
+    console.log("Execution result:", result);
+    return result.stdout;
   } catch (error) {
-    console.error("Error in scrapeAndRunPattern:", error);
-    if (error instanceof Error) {
-      alert(`Error in scrapeAndRunPattern: ${error.message}`);
-    } else {
-      alert(`An unexpected error occurred: ${String(error)}`);
+    console.error("Error:", error);
+    return `Error: ${error instanceof Error ? error.message : String(error)}`;
+  }
+}
+
+export async function scrapeQuestionAndRunPattern(
+  questionToScrape: string
+): Promise<string> {
+  try {
+    const selectedPattern = await invoke("get_selected_pattern");
+    if (!selectedPattern) {
+      return "Please select a pattern first.";
     }
+
+    console.log(
+      "Scraping question and running pattern:",
+      questionToScrape,
+      selectedPattern
+    );
+
+    const result = await Command.create("fabric", [
+      "-q",
+      questionToScrape,
+      "|",
+      "fabric",
+      "--pattern",
+      selectedPattern as string,
+    ]).execute();
+
+    console.log("Execution result:", result);
+    return result.stdout;
+  } catch (error) {
+    console.error("Error:", error);
+    return `Error: ${error instanceof Error ? error.message : String(error)}`;
   }
 }

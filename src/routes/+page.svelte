@@ -2,7 +2,7 @@
   // svelte stores
   import { onMount } from "svelte";
   import { invoke } from "@tauri-apps/api/core";
-  import { writable, get, derived } from "svelte/store";
+  import { writable } from "svelte/store";
   import type { Writable } from "svelte/store";
 
   // svelte components
@@ -11,28 +11,29 @@
   import { Label } from "$lib/components/ui/label";
   import { Settings, Home, FileText, PlayCircle } from "lucide-svelte";
   import { Textarea } from "$lib/components/ui/textarea";
-  import {
-    runPattern,
-    scrapeUrl,
-    searchQuestion,
-    scrapeAndRunPattern,
-  } from "$lib/fabricCommands";
+
+  // custom svelte components
   import PatternCombobox from "$lib/components/PatternCombobox.svelte";
 
+  // fabric commands
+  import {
+    scrapeUrlAndRunPattern,
+    scrapeQuestionAndRunPattern,
+  } from "$lib/fabricCommands";
   function handlePatternSelect(event: CustomEvent<string>) {
     selected.set({ value: event.detail, label: event.detail });
   }
 
-  // let selectedPattern = "";
-  let selected: Writable<{ value: string; label: string }> = writable({
-    value: "",
-    label: "",
-  });
-
+  // state
   let urlToScrape = "";
   let questionToSearch = "";
   let patterns: string[] = [];
   let errorMessage: string = "";
+  let result: Promise<string> | null = null;
+  let selected: Writable<{ value: string; label: string }> = writable({
+    value: "",
+    label: "",
+  });
 
   onMount(async () => {
     try {
@@ -59,21 +60,6 @@
       console.log("Selected pattern:", $selected.value);
     }
   }
-  let scrapeAndRunResult: string = "";
-
-  async function handleScrapeAndRunPattern(url: string) {
-    try {
-      scrapeAndRunResult = await scrapeAndRunPattern(url);
-    } catch (error) {
-      console.error("Error in scrapeAndRunPattern:", error);
-      scrapeAndRunResult =
-        "An error occurred while scraping and running the pattern.";
-    }
-  }
-
-  $: {
-    console.log("Patterns updated:", patterns);
-  }
 </script>
 
 <div class="flex flex-col h-screen">
@@ -96,9 +82,6 @@
   <main class="flex-grow p-6">
     <div class="max-w-3xl mx-auto">
       <div class="mb-6">
-        <Button on:click={runPattern}>Run Test Command</Button>
-      </div>
-      <div class="mb-6">
         <Label for="pattern-select">Select Pattern</Label>
         <!-- TODO make this  auto refresh the drop down items -->
         <PatternCombobox
@@ -117,8 +100,7 @@
             placeholder="https://example.com"
           />
           <Button
-            on:click={() =>
-              urlToScrape && handleScrapeAndRunPattern(urlToScrape)}
+            on:click={() => (result = scrapeUrlAndRunPattern(urlToScrape))}
           >
             Scrape and Run Pattern
           </Button>
@@ -134,28 +116,26 @@
             bind:value={questionToSearch}
             placeholder="What is the capital of France?"
           />
-          <Button on:click={searchQuestion}>Search Question</Button>
+          <Button
+            on:click={() =>
+              (result = scrapeQuestionAndRunPattern(questionToSearch))}
+          >
+            Search and Run Pattern
+          </Button>
         </div>
       </div>
 
-      {#if $selected}
-        <div class="flex space-x-4">
-          <Button on:click={runPattern}>Run</Button>
-          <Button variant="outline">Dry Run</Button>
-          <Button variant="outline">Save Output</Button>
-        </div>
-      {/if}
-
-      {#if scrapeAndRunResult}
-        <div class="mt-6">
-          <Label for="result-textarea">Scrape and Run Pattern Result</Label>
-          <Textarea
-            id="result-textarea"
-            value={scrapeAndRunResult}
-            rows={10}
-            readonly
-          />
-        </div>
+      {#if result}
+        {#await result}
+          <p>Loading...</p>
+        {:then result}
+          <div class="mt-4">
+            <h3>Result:</h3>
+            <Textarea value={result} readonly rows={30} class="w-full" />
+          </div>
+        {:catch error}
+          <p>Error: {error.message}</p>
+        {/await}
       {/if}
     </div>
   </main>
