@@ -8,6 +8,7 @@
   "permissions": [
     "core:default",
     "shell:allow-open",
+    "shell:allow-spawn",
     "fs:default",
     "fs:read-files",
     "fs:write-files",
@@ -52,10 +53,32 @@
           "name": "fabric",
           "cmd": "fabric",
           "args": true
+        },
+        {
+          "name": "sh",
+          "cmd": "sh",
+          "args": true
+        },
+        {
+          "name": "powershell",
+          "cmd": "powershell.exe",
+          "args": true
+        },
+        {
+          "name": "pbpaste",
+          "cmd": "pbpaste",
+          "args": true
+        },
+        {
+          "name": "xclip",
+          "cmd": "xclip",
+          "args": true
         }
       ]
     },
     "shell:default",
-    "dialog:default"
+    "dialog:default",
+    "clipboard-manager:default",
+    "os:default"
   ]
 }
