@@ -48,6 +48,7 @@ export async function scrapeUrl(urlToScrape: string) {
 
 export async function searchQuestion(questionToSearch: string) {
   try {
+    await invoke("set_is_running", { value: true });
     console.log("Searching question:", questionToSearch);
     const result = await Command.create("fabric", [
       "-q",
@@ -62,6 +63,8 @@ export async function searchQuestion(questionToSearch: string) {
     } else {
       alert(`An unexpected error occurred: ${String(error)}`);
     }
+  } finally {
+    await invoke("set_is_running", { value: false });
   }
 }
 
@@ -69,6 +72,7 @@ export async function scrapeUrlAndRunPattern(
   urlToScrape: string
 ): Promise<string> {
   try {
+    await invoke("set_is_running", { value: true });
     const selectedPattern = await invoke("get_selected_pattern");
     if (!selectedPattern) {
       return "Please select a pattern first.";
@@ -94,6 +98,8 @@ export async function scrapeUrlAndRunPattern(
   } catch (error) {
     console.error("Error:", error);
     return `Error: ${error instanceof Error ? error.message : String(error)}`;
+  } finally {
+    await invoke("set_is_running", { value: false });
   }
 }
 
@@ -101,6 +107,7 @@ export async function scrapeQuestionAndRunPattern(
   questionToScrape: string
 ): Promise<string> {
   try {
+    await invoke("set_is_running", { value: true });
     const selectedPattern = await invoke("get_selected_pattern");
     if (!selectedPattern) {
       return "Please select a pattern first.";
@@ -126,5 +133,7 @@ export async function scrapeQuestionAndRunPattern(
   } catch (error) {
     console.error("Error:", error);
     return `Error: ${error instanceof Error ? error.message : String(error)}`;
+  } finally {
+    await invoke("set_is_running", { value: false });
   }
 }

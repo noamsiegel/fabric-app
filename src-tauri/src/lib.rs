@@ -15,6 +15,7 @@ struct AppState {
     default_pattern: Mutex<String>,
     selected_pattern: Mutex<String>,
     patterns: Mutex<Vec<String>>,
+    is_running: Mutex<bool>,
 }
 
 // New command to set the fabric folder
@@ -86,6 +87,18 @@ fn get_selected_pattern(state: tauri::State<AppState>) -> String {
     selected_pattern.clone()
 }
 
+#[tauri::command]
+fn get_is_running(state: tauri::State<AppState>) -> bool {
+    let is_running = state.is_running.lock().unwrap();
+    *is_running
+}
+
+#[tauri::command]
+fn set_is_running(state: tauri::State<AppState>, value: bool) {
+    let mut is_running = state.is_running.lock().unwrap();
+    *is_running = value;
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -96,6 +109,7 @@ pub fn run() {
                 default_pattern: Mutex::new(String::new()),
                 selected_pattern: Mutex::new(String::new()),
                 patterns: Mutex::new(Vec::new()),
+                is_running: Mutex::new(false),
             });
             Ok(())
         })
@@ -110,6 +124,8 @@ pub fn run() {
             set_selected_pattern,
             get_selected_pattern,
             set_patterns,
+            get_is_running,
+            set_is_running,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
