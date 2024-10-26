@@ -14,6 +14,7 @@ struct AppState {
     fabric_folder: Mutex<String>,
     default_pattern: Mutex<String>,
     selected_pattern: Mutex<String>,
+    patterns: Mutex<Vec<String>>,
 }
 
 // New command to set the fabric folder
@@ -29,8 +30,9 @@ fn get_fabric_folder(state: tauri::State<AppState>) -> String {
     fabric_folder.clone()
 }
 
+// Modify the get_patterns function
 #[tauri::command]
-fn get_patterns(state: tauri::State<AppState>) -> Result<Vec<String>, String> {
+fn set_patterns(state: tauri::State<AppState>) -> Result<(), String> {
     let fabric_folder = state.fabric_folder.lock().unwrap();
 
     if fabric_folder.is_empty() {
@@ -46,7 +48,7 @@ fn get_patterns(state: tauri::State<AppState>) -> Result<Vec<String>, String> {
         ));
     }
 
-    Ok(fs::read_dir(path)
+    let patterns = fs::read_dir(path)
         .map_err(|e| e.to_string())?
         .filter_map(|entry| {
             entry.ok().and_then(|e| {
@@ -57,7 +59,19 @@ fn get_patterns(state: tauri::State<AppState>) -> Result<Vec<String>, String> {
                 }
             })
         })
-        .collect::<Vec<String>>())
+        .collect::<Vec<String>>();
+
+    // Save patterns to the state
+    let mut state_patterns = state.patterns.lock().unwrap();
+    *state_patterns = patterns;
+
+    Ok(())
+}
+
+#[tauri::command]
+fn get_patterns(state: tauri::State<AppState>) -> Vec<String> {
+    let patterns = state.patterns.lock().unwrap();
+    patterns.clone()
 }
 
 #[tauri::command]
@@ -81,6 +95,7 @@ pub fn run() {
                 fabric_folder: Mutex::new(String::new()),
                 default_pattern: Mutex::new(String::new()),
                 selected_pattern: Mutex::new(String::new()),
+                patterns: Mutex::new(Vec::new()),
             });
             Ok(())
         })
@@ -94,6 +109,7 @@ pub fn run() {
             get_patterns,
             set_selected_pattern,
             get_selected_pattern,
+            set_patterns,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

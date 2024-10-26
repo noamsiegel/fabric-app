@@ -15,7 +15,8 @@
   let darkMode = false;
   let notifications = true;
   let fabricFolderPath = "";
-  export const fabricFolderStore = writable("");
+  const fabricFolderStore = writable("");
+  let patterns: string[] = [];
 
   async function selectFabricFolder() {
     try {
@@ -38,6 +39,10 @@
     try {
       // Set the fabric folder path in the Tauri app state
       await invoke("set_fabric_folder", { path });
+      await invoke("set_patterns");
+      // TODO make this into a list that the user can see and check off the ones that they do/don't want to use
+      patterns = await invoke("get_patterns");
+      console.log("Patterns:", patterns);
 
       // Update the Svelte store
       fabricFolderStore.set(path);
