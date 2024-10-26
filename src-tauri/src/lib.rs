@@ -2,11 +2,14 @@ use std::fs;
 use std::path::Path;
 use std::sync::Mutex;
 use tauri::Manager;
+use tauri_plugin_clipboard_manager::ClipboardExt;
 
-// Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
+fn get_clipboard_contents(app_handle: tauri::AppHandle) -> Result<String, String> {
+    app_handle
+        .clipboard()
+        .read_text()
+        .map_err(|e| e.to_string())
 }
 
 // Define the AppState struct
@@ -102,6 +105,8 @@ fn set_is_running(state: tauri::State<AppState>, value: bool) {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_os::init())
+        .plugin(tauri_plugin_clipboard_manager::init())
         .setup(|app| {
             // Initialize the AppState with an empty fabric folder
             app.manage(AppState {
@@ -117,7 +122,6 @@ pub fn run() {
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![
-            greet,
             set_fabric_folder,
             get_fabric_folder,
             get_patterns,
@@ -126,6 +130,7 @@ pub fn run() {
             set_patterns,
             get_is_running,
             set_is_running,
+            get_clipboard_contents,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

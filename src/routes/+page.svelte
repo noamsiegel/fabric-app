@@ -19,21 +19,23 @@
   import {
     scrapeUrlAndRunPattern,
     scrapeQuestionAndRunPattern,
+    clipboardContentsAndRunPattern,
   } from "$lib/fabricCommands";
-  function handlePatternSelect(event: CustomEvent<string>) {
-    selected.set({ value: event.detail, label: event.detail });
-  }
 
   // state
+  let isRunning = false;
   let urlToScrape = "";
   let questionToSearch = "";
   let patterns: string[] = [];
-  let errorMessage: string = "";
   let result: Promise<string> | null = null;
   let selected: Writable<{ value: string; label: string }> = writable({
     value: "",
     label: "",
   });
+
+  function handlePatternSelect(event: CustomEvent<string>) {
+    selected.set({ value: event.detail, label: event.detail });
+  }
 
   onMount(async () => {
     try {
@@ -46,15 +48,8 @@
       }
     } catch (error) {
       console.error("Error fetching patterns or selected pattern:", error);
-      if (error instanceof Error) {
-        errorMessage = error.message;
-      } else {
-        errorMessage = String(error);
-      }
     }
   });
-
-  let isRunning = false;
 
   onMount(() => {
     const checkRunningStatus = async () => {
@@ -133,6 +128,18 @@
             disabled={isRunning}
           >
             Search and Run Pattern
+          </Button>
+        </div>
+      </div>
+
+      <div class="mb-6">
+        <Label for="clipboard-button">Run Pattern on Clipboard Contents</Label>
+        <div class="flex space-x-2">
+          <Button
+            on:click={() => (result = clipboardContentsAndRunPattern())}
+            disabled={isRunning}
+          >
+            Run Pattern on Clipboard
           </Button>
         </div>
       </div>

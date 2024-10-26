@@ -1,31 +1,6 @@
 import { Command } from "@tauri-apps/plugin-shell";
 import { invoke } from "@tauri-apps/api/core";
-
-export async function runPattern() {
-  try {
-    const selectedPattern = await invoke("get_selected_pattern");
-    if (!selectedPattern) {
-      alert("Please select a pattern first.");
-      return;
-    }
-
-    console.log("Running pattern:", selectedPattern);
-    const result = await Command.create("fabric", [
-      "--pattern",
-      selectedPattern as string,
-    ]).execute();
-
-    console.log("Test command result:", result);
-    alert(`Command executed successfully. Output: ${result.stdout}`);
-  } catch (error) {
-    console.error("Error running test command:", error);
-    if (error instanceof Error) {
-      alert(`Error running command: ${error.message}`);
-    } else {
-      alert(`An unexpected error occurred: ${String(error)}`);
-    }
-  }
-}
+import { platform } from "@tauri-apps/plugin-os";
 
 export async function scrapeUrl(urlToScrape: string) {
   try {
@@ -68,8 +43,51 @@ export async function searchQuestion(questionToSearch: string) {
   }
 }
 
-export async function scrapeUrlAndRunPattern(
-  urlToScrape: string
+export async function clipboardContentsAndRunPattern(): Promise<string> {
+  try {
+    await invoke("set_is_running", { value: true });
+    const selectedPattern = await invoke("get_selected_pattern");
+    if (!selectedPattern) {
+      return "Please select a pattern first.";
+    }
+
+    const currentPlatform = await platform();
+    let clipboardCommand: string;
+
+    switch (currentPlatform) {
+      case "windows":
+        clipboardCommand = 'powershell.exe -command "Get-Clipboard"';
+        break;
+      case "macos":
+        clipboardCommand = "pbpaste";
+        break;
+      case "linux":
+        clipboardCommand = "xclip -selection clipboard -o";
+        break;
+      default:
+        throw new Error(`Unsupported platform: ${currentPlatform}`);
+    }
+
+    console.log("Running pattern with clipboard contents:", selectedPattern);
+
+    const result = await Command.create("sh", [
+      "-c",
+      `${clipboardCommand} | fabric --pattern "${selectedPattern}"`,
+    ]).execute();
+
+    console.log("Execution result:", result);
+    return result.stdout;
+  } catch (error) {
+    console.error("Error:", error);
+    return `Error: ${error instanceof Error ? error.message : String(error)}`;
+  } finally {
+    await invoke("set_is_running", { value: false });
+  }
+}
+
+async function runFabricCommand(
+  input: string,
+  flag: "-u" | "-q"
 ): Promise<string> {
   try {
     await invoke("set_is_running", { value: true });
@@ -79,14 +97,14 @@ export async function scrapeUrlAndRunPattern(
     }
 
     console.log(
-      "Scraping URL and running pattern:",
-      urlToScrape,
+      `Scraping ${flag === "-u" ? "URL" : "question"} and running pattern:`,
+      input,
       selectedPattern
     );
 
     const result = await Command.create("fabric", [
-      "-u",
-      urlToScrape,
+      flag,
+      input,
       "|",
       "fabric",
       "--pattern",
@@ -103,37 +121,14 @@ export async function scrapeUrlAndRunPattern(
   }
 }
 
+export async function scrapeUrlAndRunPattern(
+  urlToScrape: string
+): Promise<string> {
+  return runFabricCommand(urlToScrape, "-u");
+}
+
 export async function scrapeQuestionAndRunPattern(
   questionToScrape: string
 ): Promise<string> {
-  try {
-    await invoke("set_is_running", { value: true });
-    const selectedPattern = await invoke("get_selected_pattern");
-    if (!selectedPattern) {
-      return "Please select a pattern first.";
-    }
-
-    console.log(
-      "Scraping question and running pattern:",
-      questionToScrape,
-      selectedPattern
-    );
-
-    const result = await Command.create("fabric", [
-      "-q",
-      questionToScrape,
-      "|",
-      "fabric",
-      "--pattern",
-      selectedPattern as string,
-    ]).execute();
-
-    console.log("Execution result:", result);
-    return result.stdout;
-  } catch (error) {
-    console.error("Error:", error);
-    return `Error: ${error instanceof Error ? error.message : String(error)}`;
-  } finally {
-    await invoke("set_is_running", { value: false });
-  }
+  return runFabricCommand(questionToScrape, "-q");
 }
