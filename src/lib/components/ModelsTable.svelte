@@ -103,6 +103,12 @@
   onMount(fetchModels);
 </script>
 
+<!-- 
+TODO move search bar at the top
+TODO make it so that there are checkboxes that determine the default model
+TODO maybe make it so that users can no see some of the models depending on the keys they have
+-->
+
 <div class="rounded-md border">
   <Table.Root {...$tableAttrs}>
     <Table.Header>
