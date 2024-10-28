@@ -1,5 +1,6 @@
 pub mod base;
 pub mod patterns;
+pub mod secrets;
 pub mod settings;
 
 pub use patterns::{
@@ -14,3 +15,4 @@ pub use settings::{
 };
 
 pub use base::{get_fabric_dir, get_home_dir, get_pattern_folders};
+pub use secrets::{get_env_file_path, get_secret, get_secrets, update_secret};
