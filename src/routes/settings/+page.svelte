@@ -7,6 +7,8 @@
   import * as Tabs from "$lib/components/ui/tabs/index.js";
   import ModelsTable from "$lib/components/ModelsTable.svelte";
   import PatternsTable from "$lib/components/PatternsTable.svelte";
+  import SecretsTable from "$lib/components/SecretsTable.svelte";
+
   // svelte stores
   import { writable } from "svelte/store";
   import { onMount } from "svelte";
@@ -147,6 +149,7 @@
       <Tabs.Trigger value="general">General</Tabs.Trigger>
       <Tabs.Trigger value="models">Models</Tabs.Trigger>
       <Tabs.Trigger value="patterns">Patterns</Tabs.Trigger>
+      <Tabs.Trigger value="secrets">Secrets</Tabs.Trigger>
     </Tabs.List>
     <Tabs.Content value="general">
       <div class="space-y-4 mt-4">
@@ -216,6 +219,11 @@
     <Tabs.Content value="patterns">
       <div class="mt-4">
         <PatternsTable />
+      </div>
+    </Tabs.Content>
+    <Tabs.Content value="secrets">
+      <div class="mt-4">
+        <SecretsTable />
       </div>
     </Tabs.Content>
   </Tabs.Root>
