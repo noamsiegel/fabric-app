@@ -7,8 +7,8 @@ use crate::fabric::patterns::{
     set_selected_pattern,
 };
 use crate::fabric::settings::{
-    get_model, get_models, get_presence_penalty, get_temperature, set_model, set_presence_penalty,
-    set_temperature,
+    get_model, get_models, get_presence_penalty, get_temperature, set_default_model, set_model,
+    set_presence_penalty, set_temperature,
 };
 
 pub mod plugins;
@@ -33,6 +33,7 @@ pub fn run() {
                 // fabric pattern flags
                 temperature: Mutex::new(0.7),
                 presence_penalty: Mutex::new(0.0),
+                default_model: Mutex::new(String::new()),
                 frequency_penalty: Mutex::new(0.0),
                 model: Mutex::new(String::new()),
                 top_p: Mutex::new(0.9),
@@ -63,6 +64,7 @@ pub fn run() {
             get_models,
             get_model,
             set_model,
+            set_default_model,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

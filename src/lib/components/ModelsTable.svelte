@@ -1,16 +1,21 @@
 <!-- ModelsTable.svelte -->
 <script lang="ts">
+  // svelte headless table
   import { createTable, Render, Subscribe } from "svelte-headless-table";
   import {
     addSortBy,
     addTableFilter,
     addPagination,
+    addSelectedRows,
   } from "svelte-headless-table/plugins";
+  // components
   import * as Table from "$lib/components/ui/table";
   import { Input } from "$lib/components/ui/input";
   import { Button } from "$lib/components/ui/button";
   import { ArrowUpDown } from "lucide-svelte";
   import { onMount } from "svelte";
+  import { Checkbox } from "$lib/components/ui/checkbox";
+  // tauri
   import { invoke } from "@tauri-apps/api/core";
   import { writable, type Writable } from "svelte/store";
 
@@ -26,6 +31,9 @@
     sort: addSortBy({ disableMultiSort: true }),
     filter: addTableFilter(),
     page: addPagination(),
+    select: addSelectedRows({
+      initialSelectedDataIds: {},
+    }),
   });
 
   const columns = table.createColumns([
@@ -33,8 +41,9 @@
       header: "ID",
       accessor: "id",
       plugins: {
-        sort: { disable: true },
+        sort: { disable: false },
         filter: { exclude: true },
+        select: {},
       },
     }),
     table.column({
@@ -49,6 +58,7 @@
 
   const { headerRows, pageRows, tableAttrs, tableBodyAttrs, pluginStates } =
     table.createViewModel(columns);
+  const { selectedDataIds } = pluginStates.select;
   const { filterValue } = pluginStates.filter;
   const { sortKeys } = pluginStates.sort;
 
@@ -100,14 +110,47 @@
     }
   }
 
+  async function handleSetDefaultModel() {
+    try {
+      console.log("Raw selected data:", $selectedDataIds);
+
+      const selectedIds = Object.entries($selectedDataIds)
+        .filter(([_, selected]) => selected)
+        .map(([id]) => parseInt(id) + 1);
+
+      console.log("Selected IDs:", selectedIds[0]);
+      console.log("Raw selected data:", $selectedDataIds);
+      console.log("Selected IDs (full array):", selectedIds);
+      console.log("Selected ID type:", typeof selectedIds[0]);
+      console.log("Selected ID value:", selectedIds[0]);
+
+      if (selectedIds.length !== 1) {
+        alert("Please select exactly one model");
+        return;
+      }
+
+      // Updated parameter name to match Rust function
+      await invoke("set_default_model", { modelId: selectedIds[0] });
+    } catch (err) {
+      console.error("Failed to set default model:", err);
+    }
+  }
+
   onMount(fetchModels);
 </script>
 
 <!-- 
-TODO move search bar at the top
-TODO make it so that there are checkboxes that determine the default model
 TODO maybe make it so that users can no see some of the models depending on the keys they have
 -->
+
+<div class="flex items-center py-4">
+  <Input
+    placeholder="Filter models..."
+    bind:value={$filterValue}
+    class="max-w-sm"
+  />
+  <Button on:click={handleSetDefaultModel}>Set Default Model</Button>
+</div>
 
 <div class="rounded-md border">
   <Table.Root {...$tableAttrs}>
@@ -142,8 +185,22 @@ TODO maybe make it so that users can no see some of the models depending on the 
     </Table.Header>
     <Table.Body {...$tableBodyAttrs}>
       {#each $pageRows as row}
-        <Subscribe rowAttrs={row.attrs()} let:rowAttrs>
+        <Subscribe
+          rowAttrs={row.attrs()}
+          let:rowAttrs
+          rowProps={row.props()}
+          let:rowProps
+        >
           <Table.Row {...rowAttrs}>
+            <Table.Cell>
+              <Checkbox
+                checked={rowProps.select.selected}
+                onCheckedChange={() => {
+                  const state = pluginStates.select.getRowState(row);
+                  state.isSelected.set(!rowProps.select.selected);
+                }}
+              />
+            </Table.Cell>
             {#each row.cells as cell (cell.id)}
               <Subscribe attrs={cell.attrs()} let:attrs>
                 <Table.Cell {...attrs}>
@@ -156,12 +213,4 @@ TODO maybe make it so that users can no see some of the models depending on the 
       {/each}
     </Table.Body>
   </Table.Root>
-</div>
-
-<div class="flex items-center py-4">
-  <Input
-    placeholder="Filter models..."
-    bind:value={$filterValue}
-    class="max-w-sm"
-  />
 </div>

@@ -15,6 +15,7 @@ pub struct AppState {
     pub presence_penalty: Mutex<f32>,  // -P, --presencepenalty
     pub frequency_penalty: Mutex<f32>, // -F, --frequencypenalty
     pub model: Mutex<String>,          // -m, --model
+    pub default_model: Mutex<String>,  // -d, --defaultmodel
 }
 
 #[tauri::command]
