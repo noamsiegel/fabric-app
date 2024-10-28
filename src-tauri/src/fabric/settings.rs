@@ -81,3 +81,28 @@ pub fn get_models(_app_handle: tauri::AppHandle) -> Result<Vec<String>, String> 
 
     Ok(models)
 }
+
+#[tauri::command]
+pub fn set_default_model(state: tauri::State<AppState>, modelId: i32) -> Result<(), String> {
+    println!("Attempting to set default model with ID: {}", modelId);
+
+    match state.default_pattern.lock() {
+        Ok(mut default_model) => {
+            println!("Successfully acquired lock on default_pattern");
+            *default_model = modelId.to_string();
+            println!("Successfully set default model to: {}", modelId);
+            Ok(())
+        }
+        Err(e) => {
+            let error_msg = format!("Failed to acquire lock on default_pattern: {}", e);
+            println!("Error: {}", error_msg);
+            Err(error_msg)
+        }
+    }
+}
+
+#[tauri::command]
+pub fn get_default_model(state: State<AppState>) -> String {
+    let default_model = state.default_pattern.lock().unwrap();
+    default_model.clone()
+}
