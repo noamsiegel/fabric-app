@@ -34,6 +34,7 @@
     "lucide-svelte": "^0.453.0",
     "svelte": "^5.0.0",
     "svelte-check": "^4.0.0",
+    "svelte-headless-table": "^0.18.2",
     "tailwind-merge": "^2.5.4",
     "tailwind-variants": "^0.2.1",
     "tailwindcss": "^3.4.9",
