@@ -55,36 +55,36 @@
       },
     }),
     // TODO add edit and view options
-    table.column({
-      id: "actions",
-      header: "Actions",
-      accessor: ({ id }) => id, // Add accessor that returns a value we can use to identify the row
-      cell: ({ row }) => {
-        return createRender(Button, {
-          variant: "ghost",
-          class: "flex gap-2",
-          children: [
-            {
-              component: Edit,
-              props: {
-                class: "h-4 w-4",
-                onClick: () => handleEdit(row.data),
-              },
-            },
-            {
-              component: Eye,
-              props: {
-                class: "h-4 w-4",
-                onClick: () => handleView(row.data),
-              },
-            },
-          ],
-        });
-      },
-      plugins: {
-        sort: { disable: true },
-      },
-    }),
+    // table.column({
+    //   id: "actions",
+    //   header: "Actions",
+    //   accessor: ({ id }) => id, // Add accessor that returns a value we can use to identify the row
+    //   cell: ({ row }) => {
+    //     return createRender(Button, {
+    //       variant: "ghost",
+    //       class: "flex gap-2",
+    //       children: [
+    //         {
+    //           component: Edit,
+    //           props: {
+    //             class: "h-4 w-4",
+    //             onClick: () => handleEdit(row.data),
+    //           },
+    //         },
+    //         {
+    //           component: Eye,
+    //           props: {
+    //             class: "h-4 w-4",
+    //             onClick: () => handleView(row.data),
+    //           },
+    //         },
+    //       ],
+    //     });
+    //   },
+    //   plugins: {
+    //     sort: { disable: true },
+    //   },
+    // }),
   ]);
 
   const { headerRows, pageRows, tableAttrs, tableBodyAttrs, pluginStates } =
