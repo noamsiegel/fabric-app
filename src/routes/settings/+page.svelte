@@ -4,7 +4,8 @@
   import { Switch } from "$lib/components/ui/switch";
   import { Label } from "$lib/components/ui/label";
   import { Slider } from "$lib/components/ui/slider";
-
+  import * as Tabs from "$lib/components/ui/tabs/index.js";
+  import ModelsTable from "$lib/components/ModelsTable.svelte";
   // svelte stores
   import { writable } from "svelte/store";
   import { onMount } from "svelte";
@@ -18,6 +19,9 @@
   let fabricFolderPath = "";
   const fabricFolderStore = writable("");
   let patterns: string[] = [];
+  let temperature = 0.5;
+  let presencePenalty = 0.0;
+  let models: { id: number; name: string; provider: string }[] = [];
 
   async function selectFabricFolder() {
     try {
@@ -64,9 +68,6 @@
     }
   }
 
-  let temperature = 0.5;
-  let presencePenalty = 0.0;
-
   async function setTemperature(value: number) {
     await invoke("set_temperature", { value });
   }
@@ -77,73 +78,93 @@
 
   async function showModels() {
     try {
-      const models: string[] = await invoke("get_models");
-      await alert(`Available Models:\n\n${models.join("\n")}`);
+      const modelList: string[] = await invoke("get_models");
+      models = modelList.map((model, index) => {
+        const [provider, ...nameParts] = model.split(":");
+        return {
+          id: index + 1,
+          name: nameParts.join(":").trim(),
+          provider: provider.trim(),
+        };
+      });
     } catch (err) {
       console.error("Failed to fetch models:", err);
-      await alert(`Failed to fetch models: ${err}`);
     }
   }
 
   // Load the fabric folder path when the component mounts
   onMount(() => {
     loadFabricFolderPath();
+    showModels();
   });
 </script>
 
 <div class="p-4">
   <h1 class="text-2xl font-bold mb-4">Settings</h1>
 
-  <div class="space-y-4">
-    <div class="flex items-center space-x-2">
-      <Switch id="dark-mode" bind:checked={darkMode} />
-      <Label for="dark-mode">Dark Mode</Label>
-    </div>
+  <Tabs.Root value="general">
+    <Tabs.List>
+      <Tabs.Trigger value="general">General</Tabs.Trigger>
+      <Tabs.Trigger value="models">Models</Tabs.Trigger>
+    </Tabs.List>
+    <Tabs.Content value="general">
+      <div class="space-y-4 mt-4">
+        <div class="flex items-center space-x-2">
+          <Switch id="dark-mode" bind:checked={darkMode} />
+          <Label for="dark-mode">Dark Mode</Label>
+        </div>
 
-    <div class="flex items-center space-x-2">
-      <Switch id="notifications" bind:checked={notifications} />
-      <Label for="notifications">Enable Notifications</Label>
-    </div>
+        <div class="flex items-center space-x-2">
+          <Switch id="notifications" bind:checked={notifications} />
+          <Label for="notifications">Enable Notifications</Label>
+        </div>
 
-    <div class="flex flex-col space-y-2">
-      <Button on:click={selectFabricFolder}>Select Fabric Folder</Button>
-      {#if fabricFolderPath}
-        <p class="text-sm">Selected Fabric folder: {fabricFolderPath}</p>
-      {:else}
-        <p class="text-sm">No Fabric folder selected</p>
-      {/if}
-    </div>
-  </div>
-  <div class="flex flex-col space-y-2">
-    <Label for="temperature">Temperature: {temperature.toFixed(2)}</Label>
-    <Slider
-      id="temperature"
-      min={0}
-      max={1}
-      step={0.1}
-      value={[temperature]}
-      onValueChange={(values) => {
-        temperature = values[0];
-        setTemperature(temperature);
-      }}
-    />
-  </div>
+        <div class="flex flex-col space-y-2">
+          <Button on:click={selectFabricFolder}>Select Fabric Folder</Button>
+          {#if fabricFolderPath}
+            <p class="text-sm">Selected Fabric folder: {fabricFolderPath}</p>
+          {:else}
+            <p class="text-sm">No Fabric folder selected</p>
+          {/if}
+        </div>
 
-  <div class="flex flex-col space-y-2">
-    <Label for="presence-penalty"
-      >Presence Penalty: {presencePenalty.toFixed(2)}</Label
-    >
-    <Slider
-      id="presence-penalty"
-      min={0}
-      max={1}
-      step={0.1}
-      value={[presencePenalty]}
-      onValueChange={(values) => {
-        presencePenalty = values[0];
-        setPresencePenalty(presencePenalty);
-      }}
-    />
-  </div>
-  <Button on:click={showModels}>Show Available Models</Button>
+        <div class="flex flex-col space-y-2">
+          <Label for="temperature">Temperature: {temperature.toFixed(2)}</Label>
+          <Slider
+            id="temperature"
+            min={0}
+            max={1}
+            step={0.1}
+            value={[temperature]}
+            onValueChange={(values) => {
+              temperature = values[0];
+              setTemperature(temperature);
+            }}
+          />
+        </div>
+
+        <div class="flex flex-col space-y-2">
+          <Label for="presence-penalty"
+            >Presence Penalty: {presencePenalty.toFixed(2)}</Label
+          >
+          <Slider
+            id="presence-penalty"
+            min={0}
+            max={1}
+            step={0.1}
+            value={[presencePenalty]}
+            onValueChange={(values) => {
+              presencePenalty = values[0];
+              setPresencePenalty(presencePenalty);
+            }}
+          />
+        </div>
+      </div>
+    </Tabs.Content>
+    <Tabs.Content value="models">
+      <div class="mt-4">
+        <ModelsTable />
+      </div>
+    </Tabs.Content>
+  </Tabs.Root>
 </div>
