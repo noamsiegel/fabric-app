@@ -1,8 +1,10 @@
-use std::sync::Mutex;
+use std::{path::PathBuf, sync::Mutex};
 
 pub struct AppState {
     // fabric folder
     pub fabric_folder: Mutex<String>,
+    pub fabric_dir: Mutex<PathBuf>,
+
     // fabric pattern
     pub default_pattern: Mutex<String>,
     pub selected_pattern: Mutex<String>,

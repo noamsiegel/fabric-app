@@ -1,3 +1,4 @@
+pub mod base;
 pub mod patterns;
 pub mod settings;
 
@@ -11,3 +12,5 @@ pub use settings::{
     set_default_model, set_frequency_penalty, set_model, set_presence_penalty, set_temperature,
     set_top_p,
 };
+
+pub use base::{get_fabric_dir, get_home_dir, get_pattern_folders};

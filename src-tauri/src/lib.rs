@@ -1,7 +1,9 @@
+use std::path::PathBuf;
 use std::sync::Mutex;
 use tauri::Manager;
 
 pub mod fabric;
+use crate::fabric::base::{get_fabric_dir, get_home_dir, get_pattern_folders};
 use crate::fabric::patterns::{
     get_fabric_folder, get_patterns, get_selected_pattern, set_fabric_folder, set_patterns,
     set_selected_pattern,
@@ -26,6 +28,7 @@ pub fn run() {
             // Initialize the AppState with an empty fabric folder
             app.manage(AppState {
                 fabric_folder: Mutex::new(String::new()),
+                fabric_dir: Mutex::new(PathBuf::new()),
                 default_pattern: Mutex::new(String::new()),
                 selected_pattern: Mutex::new(String::new()),
                 patterns: Mutex::new(Vec::new()),
@@ -47,6 +50,10 @@ pub fn run() {
             // fabric folder
             set_fabric_folder,
             get_fabric_folder,
+            // new stuff
+            get_home_dir,
+            get_fabric_dir,
+            get_pattern_folders,
             // fabric pattern
             get_patterns,
             set_selected_pattern,
