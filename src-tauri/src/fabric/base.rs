@@ -52,8 +52,6 @@ pub async fn get_pattern_folders(app: tauri::AppHandle) -> Result<Vec<String>, S
     fs::create_dir_all(&patterns_dir)
         .map_err(|_| "Could not create patterns directory".to_string())?;
 
-    println!("patterns_dir: {:?}", patterns_dir);
-
     // Read the directory entries
     let entries =
         fs::read_dir(&patterns_dir).map_err(|_| "Could not read patterns directory".to_string())?;

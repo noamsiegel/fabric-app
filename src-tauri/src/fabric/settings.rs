@@ -101,8 +101,8 @@ pub fn set_default_model(state: tauri::State<AppState>, modelId: i32) -> Result<
     }
 }
 
-#[tauri::command]
-pub fn get_default_model(state: State<AppState>) -> String {
-    let default_model = state.default_pattern.lock().unwrap();
-    default_model.clone()
-}
+// #[tauri::command]
+// pub fn get_default_model(state: State<AppState>) -> String {
+//     let default_model = state.default_pattern.lock().unwrap();
+//     default_model.clone()
+// }
