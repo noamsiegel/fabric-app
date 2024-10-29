@@ -20,6 +20,8 @@
 
   // custom svelte components
   import PatternCombobox from "$lib/components/PatternCombobox.svelte";
+  import { settingsOpen } from "$lib/stores/settings";
+  import SettingsDrawer from "./settings/+page.svelte";
 
   // fabric commands
   import {
@@ -86,11 +88,19 @@
       <a href="/models" class="text-gray-600 hover:text-gray-900"
         ><Database size={24} /></a
       >
-      <a href="/settings" class="text-gray-600 hover:text-gray-900"
+      <!-- <a href="/settings" class="text-gray-600 hover:text-gray-900"
         ><Settings size={24} /></a
+      > -->
+      <button
+        class="text-gray-600 hover:text-gray-900"
+        on:click={() => ($settingsOpen = true)}
       >
+        <Settings size={24} />
+      </button>
     </nav>
   </header>
+
+  <SettingsDrawer />
 
   <main class="flex-grow p-6">
     <div class="max-w-3xl mx-auto">
