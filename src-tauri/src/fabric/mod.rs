@@ -6,7 +6,10 @@ pub use settings::{
 };
 
 pub mod patterns;
-pub use patterns::{get_fabric_dir, get_patterns, get_selected_pattern, set_selected_pattern};
+pub use patterns::{
+    get_fabric_dir, get_patterns, get_patterns_git_folder, get_patterns_git_repo,
+    get_selected_pattern, set_patterns_git_folder, set_selected_pattern,
+};
 
 pub mod secrets;
 pub use secrets::{get_api_keys, get_base_urls, get_env_file_path, get_secret, update_secret};

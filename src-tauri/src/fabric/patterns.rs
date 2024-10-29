@@ -1,3 +1,4 @@
+use crate::fabric::secrets::{get_secret, update_secret};
 use crate::state::AppState;
 use std::fs;
 use tauri::Manager;
@@ -102,4 +103,32 @@ pub async fn get_selected_pattern(state: State<'_, AppState>) -> Result<String, 
 
     // Clone the pattern to return it
     Ok(selected_pattern.clone())
+}
+
+#[tauri::command]
+pub async fn set_patterns_git_repo(app: tauri::AppHandle, repo_url: String) -> Result<(), String> {
+    update_secret(app, "PATTERNS_LOADER_GIT_REPO_URL".to_string(), repo_url).await
+}
+
+#[tauri::command]
+pub async fn set_patterns_git_folder(
+    app: tauri::AppHandle,
+    folder_path: String,
+) -> Result<(), String> {
+    update_secret(
+        app,
+        "PATTERNS_LOADER_GIT_REPO_PATTERNS_FOLDER".to_string(),
+        folder_path,
+    )
+    .await
+}
+
+#[tauri::command]
+pub async fn get_patterns_git_repo(app: tauri::AppHandle) -> Result<String, String> {
+    get_secret(app, "PATTERNS_LOADER_GIT_REPO_URL".to_string()).await
+}
+
+#[tauri::command]
+pub async fn get_patterns_git_folder(app: tauri::AppHandle) -> Result<String, String> {
+    get_secret(app, "PATTERNS_LOADER_GIT_REPO_PATTERNS_FOLDER".to_string()).await
 }
