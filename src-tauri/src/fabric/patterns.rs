@@ -3,6 +3,7 @@ use crate::state::AppState;
 use std::fs;
 use tauri::Manager;
 use tauri::{Error, State};
+use tauri_plugin_shell::ShellExt;
 
 #[tauri::command]
 pub async fn get_home_dir(app: tauri::AppHandle) -> Result<String, String> {
@@ -131,4 +132,50 @@ pub async fn get_patterns_git_repo(app: tauri::AppHandle) -> Result<String, Stri
 #[tauri::command]
 pub async fn get_patterns_git_folder(app: tauri::AppHandle) -> Result<String, String> {
     get_secret(app, "PATTERNS_LOADER_GIT_REPO_PATTERNS_FOLDER".to_string()).await
+}
+
+// TODO make sure that this works, it doesn't seem to be updating
+#[tauri::command]
+pub async fn update_patterns(app: tauri::AppHandle) -> Result<String, Error> {
+    println!("Starting pattern update...");
+
+    let shell = app.shell();
+    let output = shell
+        .command("fabric")
+        .args(["-U"])
+        .output()
+        .await
+        .map_err(|e| {
+            println!("Error executing fabric command: {:?}", e);
+            Error::FailedToReceiveMessage
+        })?;
+
+    println!("Command completed with status: {:?}", output.status);
+
+    if output.status.success() {
+        let result = String::from_utf8_lossy(&output.stdout).into_owned();
+        println!("Update successful: {}", result);
+        Ok(result)
+    } else {
+        let error = String::from_utf8_lossy(&output.stderr);
+        println!("Update failed: {}", error);
+        Err(Error::FailedToReceiveMessage)
+    }
+}
+
+#[tauri::command]
+pub async fn run_fabric(app: tauri::AppHandle, flag: String) -> Result<String, Error> {
+    let shell = app.shell();
+    let output = shell
+        .command("fabric")
+        .args(&[&flag])
+        .output()
+        .await
+        .map_err(|_| Error::FailedToReceiveMessage)?;
+
+    if output.status.success() {
+        Ok(String::from_utf8_lossy(&output.stdout).into_owned())
+    } else {
+        Err(Error::FailedToReceiveMessage)
+    }
 }

@@ -33,17 +33,43 @@
     }
   }
 
+  let isUpdating = false;
+
+  async function handleUpdatePatterns() {
+    if (isUpdating) return;
+
+    isUpdating = true;
+    try {
+      console.log("Updating patterns...");
+      const result = await invoke("update_patterns");
+      console.log("Patterns updated:", result);
+    } catch (error) {
+      console.error("Failed to update patterns:", error);
+    } finally {
+      isUpdating = false;
+    }
+  }
+
   onMount(async () => {
     await loadGitSettings();
   });
 </script>
 
 <Card class="mb-6">
-  <CardHeader>
-    <CardTitle>Git Pattern Settings</CardTitle>
-    <CardDescription
-      >Configure pattern loading from git repository</CardDescription
+  <CardHeader class="flex flex-row items-center justify-between">
+    <div>
+      <CardTitle>Git Pattern Settings</CardTitle>
+      <CardDescription
+        >Configure pattern loading from git repository</CardDescription
+      >
+    </div>
+    <Button
+      variant="outline"
+      on:click={handleUpdatePatterns}
+      disabled={isUpdating}
     >
+      {isUpdating ? "Updating..." : "Update Patterns"}
+    </Button>
   </CardHeader>
   <CardContent class="space-y-4">
     <div class="space-y-2">
