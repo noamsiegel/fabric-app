@@ -1,4 +1,8 @@
 <script lang="ts">
+  // Svelte
+  import { onMount } from "svelte";
+
+  // Svelte components
   import {
     Card,
     CardContent,
@@ -9,16 +13,39 @@
   } from "$lib/components/ui/card";
   import { Button } from "$lib/components/ui/button";
   import { Input } from "$lib/components/ui/input";
+  import { defaultPatternStore } from "$lib/stores/pattern";
+  import { toast } from "svelte-sonner";
+
+  // Tauri
   import { invoke } from "@tauri-apps/api/core";
-  import { onMount } from "svelte";
 
   let gitRepo = "";
   let gitFolder = "";
+  let defaultPattern = "n";
+  let isUpdating = false;
 
-  async function loadGitSettings() {
+  defaultPatternStore.subscribe(async (newPattern) => {
+    if (newPattern) {
+      defaultPattern = newPattern;
+    }
+  });
+
+  function handleInputClick() {
+    toast.info("Set Default Pattern", {
+      description:
+        "To change the default pattern, click the star icon (⭐︎) next to a pattern in the table below.",
+      duration: 4000,
+    });
+  }
+
+  async function loadSettings() {
     try {
       gitRepo = await invoke("get_patterns_git_repo");
       gitFolder = await invoke("get_patterns_git_folder");
+      const pattern = (await invoke("get_default_pattern")) as string;
+      defaultPattern = pattern;
+      defaultPattern = await invoke("get_default_pattern");
+      defaultPatternStore.set(pattern); // Initialize the store
     } catch (err) {
       console.error("Failed to load git settings:", err);
     }
@@ -32,8 +59,6 @@
       console.error("Failed to save git settings:", err);
     }
   }
-
-  let isUpdating = false;
 
   async function handleUpdatePatterns() {
     if (isUpdating) return;
@@ -51,7 +76,7 @@
   }
 
   onMount(async () => {
-    await loadGitSettings();
+    await loadSettings();
   });
 </script>
 
@@ -72,6 +97,17 @@
     </Button>
   </CardHeader>
   <CardContent class="space-y-4">
+    <div class="space-y-2">
+      <label for="defaultPattern">Default Pattern</label>
+      <Input
+        id="defaultPattern"
+        value={defaultPattern}
+        readonly
+        disabled={false}
+        class="bg-white font-medium text-black cursor-help"
+        on:click={handleInputClick}
+      />
+    </div>
     <div class="space-y-2">
       <label for="gitRepo">Git Repository URL</label>
       <Input

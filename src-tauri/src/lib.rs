@@ -5,9 +5,9 @@ use tauri::Manager;
 pub mod fabric;
 use crate::fabric::install::install_fabric;
 use crate::fabric::patterns::{
-    get_fabric_dir, get_patterns, get_patterns_git_folder, get_patterns_git_repo,
-    get_selected_pattern, set_patterns_git_folder, set_patterns_git_repo, set_selected_pattern,
-    update_patterns,
+    get_default_pattern, get_fabric_dir, get_patterns, get_patterns_git_folder,
+    get_patterns_git_repo, get_selected_pattern, set_default_pattern, set_patterns_git_folder,
+    set_patterns_git_repo, set_selected_pattern, update_patterns,
 };
 use crate::fabric::run::{
     clipboard_contents_and_run_pattern, get_is_running, scrape_question_and_run_pattern,
@@ -76,6 +76,8 @@ pub fn run() {
             get_patterns_git_folder,
             set_patterns_git_repo,
             set_patterns_git_folder,
+            get_default_pattern,
+            set_default_pattern,
             // vendors
             get_vendors,
             get_default_vendor,
