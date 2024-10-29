@@ -1,5 +1,7 @@
+use crate::state::AppState;
 use std::fs;
 use tauri::Manager;
+use tauri::{Error, State};
 
 #[tauri::command]
 pub async fn get_home_dir(app: tauri::AppHandle) -> Result<String, String> {
@@ -71,4 +73,33 @@ pub async fn get_patterns(app: tauri::AppHandle) -> Result<Vec<String>, String> 
         .collect();
 
     Ok(folders)
+}
+
+#[tauri::command]
+pub async fn set_selected_pattern(
+    pattern: String,
+    state: State<'_, AppState>,
+) -> Result<(), Error> {
+    // Lock the mutex to get mutable access
+    let mut selected_pattern = state
+        .selected_pattern
+        .lock()
+        .map_err(|_| Error::FailedToReceiveMessage)?;
+
+    // Set the new pattern
+    *selected_pattern = pattern;
+
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn get_selected_pattern(state: State<'_, AppState>) -> Result<String, Error> {
+    // Lock the mutex to get access to the pattern
+    let selected_pattern = state
+        .selected_pattern
+        .lock()
+        .map_err(|_| Error::FailedToReceiveMessage)?;
+
+    // Clone the pattern to return it
+    Ok(selected_pattern.clone())
 }

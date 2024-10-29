@@ -19,8 +19,8 @@
   import {
     scrapeUrlAndRunPattern,
     scrapeQuestionAndRunPattern,
-    clipboardContentsAndRunPattern,
   } from "$lib/fabricCommands";
+  import { clipboard_contents_and_run_pattern } from "$lib/tauriCommands";
 
   // state
   let isRunning = false;
@@ -104,7 +104,18 @@
             placeholder="https://example.com"
           />
           <Button
-            on:click={() => (result = scrapeUrlAndRunPattern(urlToScrape))}
+            on:click={async () => {
+              if (!$selected.value) {
+                alert("Please select a pattern first");
+                return;
+              }
+              try {
+                result = scrapeUrlAndRunPattern(urlToScrape);
+                console.log("Started scraping URL:", urlToScrape);
+              } catch (error) {
+                console.error("Error in scrape_url_and_run_pattern:", error);
+              }
+            }}
             disabled={isRunning}
           >
             Scrape and Run Pattern
@@ -135,7 +146,7 @@
         <Label for="clipboard-button">Run Pattern on Clipboard Contents</Label>
         <div class="flex space-x-2">
           <Button
-            on:click={() => (result = clipboardContentsAndRunPattern())}
+            on:click={() => (result = clipboard_contents_and_run_pattern())}
             disabled={isRunning}
           >
             Run Pattern on Clipboard
@@ -146,13 +157,14 @@
       {#if result}
         {#await result}
           <p>Loading...</p>
-        {:then result}
+        {:then value}
           <div class="mt-4">
             <h3>Result:</h3>
-            <Textarea value={result} readonly rows={30} class="w-full" />
+            <Textarea {value} readonly rows={30} class="w-full" />
           </div>
         {:catch error}
           <p>Error: {error.message}</p>
+          <pre>{JSON.stringify(error, null, 2)}</pre>
         {/await}
       {/if}
     </div>
