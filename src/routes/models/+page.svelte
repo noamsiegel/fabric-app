@@ -1,7 +1,7 @@
 <script lang="ts">
   import ModelsTable from "./ModelsTable.svelte";
   import DefaultModelSettings from "./DefaultModelSettings.svelte";
-  import DefaultModelParameters from "./DefaultModelParameters.svelte";
+  import DefaultModelParameters from "./ModelParameters.svelte";
 </script>
 
 <div class="container py-8">

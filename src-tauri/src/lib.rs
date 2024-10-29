@@ -15,11 +15,14 @@ use crate::fabric::run::{
 use crate::fabric::secrets::{
     get_api_keys, get_base_urls, get_env_file_path, get_secret, update_secret,
 };
-use crate::fabric::settings::models::{
-    get_default_model, get_default_vendor, get_model, get_models, get_presence_penalty,
-    get_temperature, get_vendors, set_default_model, set_default_vendor, set_model,
-    set_presence_penalty, set_temperature,
+use crate::fabric::settings::model_parameters::{
+    get_frequency_penalty, get_presence_penalty, get_temperature, get_top_p, set_frequency_penalty,
+    set_presence_penalty, set_temperature, set_top_p,
 };
+use crate::fabric::settings::models::{
+    get_default_model, get_model, get_models, set_default_model, set_model,
+};
+use crate::fabric::settings::vendors::{get_default_vendor, get_vendors, set_default_vendor};
 
 pub mod plugins;
 use crate::plugins::get_clipboard_contents;
@@ -56,6 +59,7 @@ pub fn run() {
         .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![
             install_fabric,
+            get_fabric_dir,
             // runs
             scrape_url_and_run_pattern,
             scrape_question_and_run_pattern,
@@ -63,7 +67,6 @@ pub fn run() {
             get_is_running,
             set_is_running,
             // patterns
-            get_fabric_dir,
             get_patterns,
             set_selected_pattern,
             get_selected_pattern,
@@ -90,6 +93,11 @@ pub fn run() {
             get_temperature,
             set_presence_penalty,
             get_presence_penalty,
+            set_top_p,
+            get_top_p,
+            set_frequency_penalty,
+            get_frequency_penalty,
+            // models
             get_models,
             get_model,
             set_model,
