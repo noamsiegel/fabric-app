@@ -9,7 +9,13 @@
   import { Input } from "$lib/components/ui/input";
   import { Button } from "$lib/components/ui/button";
   import { Label } from "$lib/components/ui/label";
-  import { Settings, Home, FileText, PlayCircle } from "lucide-svelte";
+  import {
+    Settings,
+    Home,
+    FileText,
+    PlayCircle,
+    Database,
+  } from "lucide-svelte";
   import { Textarea } from "$lib/components/ui/textarea";
 
   // custom svelte components
@@ -76,6 +82,9 @@
     <nav class="flex space-x-4">
       <a href="/patterns" class="text-gray-600 hover:text-gray-900"
         ><FileText size={24} /></a
+      >
+      <a href="/models" class="text-gray-600 hover:text-gray-900"
+        ><Database size={24} /></a
       >
       <a href="/settings" class="text-gray-600 hover:text-gray-900"
         ><Settings size={24} /></a
