@@ -11,6 +11,7 @@
   import { Button } from "$lib/components/ui/button";
   import * as Dialog from "$lib/components/ui/dialog";
   import { Label } from "$lib/components/ui/label";
+  import { Eye, EyeOff } from "lucide-svelte"; // Add these imports
 
   import { ArrowUpDown, Pencil } from "lucide-svelte";
   import { onMount } from "svelte";
@@ -27,6 +28,7 @@
   let editedValue = "";
   let secretsData: Writable<Secret[]> = writable([]);
   let dialogOpen = false;
+  let visibleSecrets = new Set<string>();
 
   const table = createTable(secretsData, {
     sort: addSortBy({ disableMultiSort: true }),
@@ -82,6 +84,15 @@
     }
   }
 
+  function toggleSecretVisibility(name: string) {
+    if (visibleSecrets.has(name)) {
+      visibleSecrets.delete(name);
+    } else {
+      visibleSecrets.add(name);
+    }
+    visibleSecrets = visibleSecrets; // Trigger reactivity
+  }
+
   onMount(fetchApiKeys);
 </script>
 
@@ -107,7 +118,11 @@
                 let:props
               >
                 <Table.Head {...attrs}>
-                  <Button variant="ghost" on:click={props.sort.toggle}>
+                  <Button
+                    variant="ghost"
+                    class="justify-start w-full"
+                    on:click={props.sort.toggle}
+                  >
                     <Render of={cell.render()} />
                     <ArrowUpDown
                       class={`ml-2 h-4 w-4 ${$sortKeys[0]?.id === cell.id ? "text-foreground" : ""}`}
@@ -128,8 +143,36 @@
           <Table.Row {...rowAttrs}>
             {#each row.cells as cell (cell.id)}
               <Subscribe attrs={cell.attrs()} let:attrs>
-                <Table.Cell {...attrs}>
-                  <Render of={cell.render()} />
+                <Table.Cell {...attrs} class="text-left">
+                  {#if cell.id === "secret"}
+                    <div class="flex items-left gap-2">
+                      <span class="font-mono">
+                        {visibleSecrets.has(row.cells[0].value)
+                          ? cell.value
+                          : "••••••••••••••••"}
+                      </span>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        class="h-8 w-8"
+                        on:click={() =>
+                          toggleSecretVisibility(row.cells[0].value)}
+                      >
+                        {#if visibleSecrets.has(row.cells[0].value)}
+                          <EyeOff class="h-4 w-4" />
+                        {:else}
+                          <Eye class="h-4 w-4" />
+                        {/if}
+                        <span class="sr-only">
+                          {visibleSecrets.has(row.cells[0].value)
+                            ? "Hide"
+                            : "Show"} API key
+                        </span>
+                      </Button>
+                    </div>
+                  {:else}
+                    <Render of={cell.render()} />
+                  {/if}
                 </Table.Cell>
               </Subscribe>
             {/each}
