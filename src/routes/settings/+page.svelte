@@ -5,9 +5,12 @@
   import { Label } from "$lib/components/ui/label";
   import { Slider } from "$lib/components/ui/slider";
   import * as Tabs from "$lib/components/ui/tabs/index.js";
+
+  // tables
   import ModelsTable from "$lib/components/ModelsTable.svelte";
   import PatternsTable from "$lib/components/PatternsTable.svelte";
-  import SecretsTable from "$lib/components/SecretsTable.svelte";
+  import SecretsTable from "$lib/components/ApiKeysTable.svelte";
+  import BaseUrlTable from "$lib/components/BaseUrlTable.svelte";
 
   // svelte stores
   import { writable } from "svelte/store";
@@ -24,27 +27,8 @@
   let patterns: string[] = [];
   let temperature = 0.5;
   let presencePenalty = 0.0;
-  let models: { id: number; name: string; provider: string }[] = [];
   let fabricDirExists = false;
   let patternFolders: string[] = [];
-
-  async function checkFabricDir() {
-    try {
-      fabricDirExists = await invoke("get_fabric_dir");
-      console.log("home directory exists:", fabricDirExists);
-    } catch (err) {
-      console.error("Failed to check home directory:", err);
-    }
-  }
-
-  async function getPatternFolders() {
-    try {
-      patternFolders = await invoke("get_pattern_folders");
-      console.log("Pattern folders:", patternFolders);
-    } catch (err) {
-      console.error("Failed to get pattern folders:", err);
-    }
-  }
 
   async function selectFabricFolder() {
     try {
@@ -99,35 +83,15 @@
     await invoke("set_presence_penalty", { value });
   }
 
-  async function showModels() {
-    try {
-      const modelList: string[] = await invoke("get_models");
-      models = modelList.map((model, index) => {
-        const [provider, ...nameParts] = model.split(":");
-        return {
-          id: index + 1,
-          name: nameParts.join(":").trim(),
-          provider: provider.trim(),
-        };
-      });
-    } catch (err) {
-      console.error("Failed to fetch models:", err);
-    }
-  }
-
   // Load the fabric folder path when the component mounts
   onMount(() => {
     loadFabricFolderPath();
-    showModels();
-    checkFabricDir(); // Add initial check
+    // checkFabricDir(); // Add initial check
   });
 </script>
 
 <div class="p-4">
   <div class="flex flex-col space-y-2">
-    <Button variant="secondary" on:click={getPatternFolders}>
-      Get Pattern Folders
-    </Button>
     {#if patternFolders.length > 0}
       <div class="mt-2">
         <h3 class="text-sm font-medium mb-2">Pattern Folders:</h3>
@@ -149,7 +113,8 @@
       <Tabs.Trigger value="general">General</Tabs.Trigger>
       <Tabs.Trigger value="models">Models</Tabs.Trigger>
       <Tabs.Trigger value="patterns">Patterns</Tabs.Trigger>
-      <Tabs.Trigger value="secrets">Secrets</Tabs.Trigger>
+      <Tabs.Trigger value="secrets">API Keys</Tabs.Trigger>
+      <Tabs.Trigger value="base-urls">Base URLs</Tabs.Trigger>
     </Tabs.List>
     <Tabs.Content value="general">
       <div class="space-y-4 mt-4">
@@ -170,9 +135,6 @@
           {:else}
             <p class="text-sm">No Fabric folder selected</p>
           {/if}
-          <Button variant="secondary" on:click={checkFabricDir}>
-            Check Fabric Directory
-          </Button>
           <p class="text-sm">
             Fabric directory {fabricDirExists ? "exists" : "does not exist"}
           </p>
@@ -224,6 +186,11 @@
     <Tabs.Content value="secrets">
       <div class="mt-4">
         <SecretsTable />
+      </div>
+    </Tabs.Content>
+    <Tabs.Content value="base-urls">
+      <div class="mt-4">
+        <BaseUrlTable />
       </div>
     </Tabs.Content>
   </Tabs.Root>

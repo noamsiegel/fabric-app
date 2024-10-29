@@ -1,5 +1,10 @@
 <script lang="ts">
-  import { createTable, Render, Subscribe } from "svelte-headless-table";
+  import {
+    createTable,
+    Render,
+    Subscribe,
+    createRender,
+  } from "svelte-headless-table";
   import {
     addSortBy,
     addTableFilter,
@@ -37,7 +42,7 @@
       accessor: "name",
     }),
     table.column({
-      header: "Secret",
+      header: "Base URL",
       accessor: "secret",
     }),
   ]);
@@ -47,16 +52,16 @@
   const { filterValue } = pluginStates.filter;
   const { sortKeys } = pluginStates.sort;
 
-  async function fetchSecrets() {
+  async function fetchBaseUrls() {
     try {
-      const data = await invoke<Secret[]>("get_secrets");
+      const data = await invoke<Secret[]>("get_base_urls");
       secretsData.set(data);
     } catch (err) {
       console.error("Failed to fetch secrets:", err);
     }
   }
 
-  onMount(fetchSecrets);
+  onMount(fetchBaseUrls);
 </script>
 
 <div class="flex items-center py-4">

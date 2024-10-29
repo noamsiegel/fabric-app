@@ -8,7 +8,9 @@ use crate::fabric::patterns::{
     get_fabric_folder, get_patterns, get_selected_pattern, set_fabric_folder, set_patterns,
     set_selected_pattern,
 };
-use crate::fabric::secrets::{get_env_file_path, get_secret, get_secrets, update_secret};
+use crate::fabric::secrets::{
+    get_api_keys, get_base_urls, get_env_file_path, get_secret, update_secret,
+};
 use crate::fabric::settings::{
     get_model, get_models, get_presence_penalty, get_temperature, set_default_model, set_model,
     set_presence_penalty, set_temperature,
@@ -57,7 +59,8 @@ pub fn run() {
             get_pattern_folders,
             // secrets
             get_env_file_path,
-            get_secrets,
+            get_api_keys,
+            get_base_urls,
             get_secret,
             update_secret,
             // fabric pattern
