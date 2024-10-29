@@ -19,15 +19,3 @@ pub struct AppState {
     pub model: Mutex<String>,          // -m, --model
     pub default_model: Mutex<String>,  // -d, --defaultmodel
 }
-
-#[tauri::command]
-pub fn get_is_running(state: tauri::State<AppState>) -> bool {
-    let is_running = state.is_running.lock().unwrap();
-    *is_running
-}
-
-#[tauri::command]
-pub fn set_is_running(state: tauri::State<AppState>, value: bool) {
-    let mut is_running = state.is_running.lock().unwrap();
-    *is_running = value;
-}

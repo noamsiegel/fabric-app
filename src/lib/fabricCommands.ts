@@ -47,50 +47,6 @@ export async function searchQuestion(questionToSearch: string) {
   }
 }
 
-// Run pattern with contexts
-
-export async function clipboardContentsAndRunPattern(): Promise<string> {
-  try {
-    await invoke("set_is_running", { value: true });
-    const selectedPattern = await invoke("get_selected_pattern");
-    if (!selectedPattern) {
-      return "Please select a pattern first.";
-    }
-
-    const currentPlatform = await platform();
-    let clipboardCommand: string;
-
-    switch (currentPlatform) {
-      case "windows":
-        clipboardCommand = 'powershell.exe -command "Get-Clipboard"';
-        break;
-      case "macos":
-        clipboardCommand = "pbpaste";
-        break;
-      case "linux":
-        clipboardCommand = "xclip -selection clipboard -o";
-        break;
-      default:
-        throw new Error(`Unsupported platform: ${currentPlatform}`);
-    }
-
-    console.log("Running pattern with clipboard contents:", selectedPattern);
-
-    const result = await Command.create("sh", [
-      "-c",
-      `${clipboardCommand} | fabric --pattern "${selectedPattern}"`,
-    ]).execute();
-
-    console.log("Execution result:", result);
-    return result.stdout;
-  } catch (error) {
-    console.error("Error:", error);
-    return `Error: ${error instanceof Error ? error.message : String(error)}`;
-  } finally {
-    await invoke("set_is_running", { value: false });
-  }
-}
-
 async function runFabricCommand(
   input: string,
   flag: "-u" | "-q"

@@ -3,7 +3,13 @@ use std::sync::Mutex;
 use tauri::Manager;
 
 pub mod fabric;
-use crate::fabric::patterns::{get_fabric_dir, get_home_dir, get_patterns};
+use crate::fabric::patterns::{
+    get_fabric_dir, get_patterns, get_selected_pattern, set_selected_pattern,
+};
+use crate::fabric::run::{
+    clipboard_contents_and_run_pattern, get_is_running, scrape_question_and_run_pattern,
+    scrape_url_and_run_pattern, set_is_running,
+};
 use crate::fabric::secrets::{
     get_api_keys, get_base_urls, get_env_file_path, get_secret, update_secret,
 };
@@ -16,7 +22,7 @@ pub mod plugins;
 use crate::plugins::get_clipboard_contents;
 
 mod state;
-use crate::state::{get_is_running, set_is_running, AppState};
+use crate::state::AppState;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -46,19 +52,23 @@ pub fn run() {
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![
-            // new stuff
-            get_home_dir,
+            // runs
+            scrape_url_and_run_pattern,
+            scrape_question_and_run_pattern,
+            clipboard_contents_and_run_pattern,
+            get_is_running,
+            set_is_running,
+            // patterns
             get_fabric_dir,
             get_patterns,
+            set_selected_pattern,
+            get_selected_pattern,
             // secrets
             get_env_file_path,
             get_api_keys,
             get_base_urls,
             get_secret,
             update_secret,
-            // fabric state
-            get_is_running,
-            set_is_running,
             // fabric LLM flags
             get_clipboard_contents,
             set_temperature,
