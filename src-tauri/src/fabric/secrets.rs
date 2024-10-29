@@ -142,50 +142,50 @@ pub async fn get_pattern_secrets(app: tauri::AppHandle) -> Result<Vec<Secret>, S
     Ok(secrets)
 }
 
-#[tauri::command]
-pub async fn get_default_model(app: tauri::AppHandle) -> Result<Vec<Secret>, String> {
-    let env_path = get_env_file_path(app).await?;
+// #[tauri::command]
+// pub async fn get_default_model(app: tauri::AppHandle) -> Result<Vec<Secret>, String> {
+//     let env_path = get_env_file_path(app).await?;
 
-    // Read file content
-    let content = fs::read_to_string(&env_path).unwrap_or_default();
+//     // Read file content
+//     let content = fs::read_to_string(&env_path).unwrap_or_default();
 
-    // Parse each line into a key-value pair and filter for API_KEY
-    let secrets: Vec<Secret> = content
-        .lines()
-        .filter(|line| !line.is_empty() && line.contains('='))
-        .map(|line| {
-            let mut parts = line.splitn(2, '=');
-            let name = parts.next().unwrap_or_default().to_string();
-            let secret = parts.next().unwrap_or_default().to_string();
+//     // Parse each line into a key-value pair and filter for API_KEY
+//     let secrets: Vec<Secret> = content
+//         .lines()
+//         .filter(|line| !line.is_empty() && line.contains('='))
+//         .map(|line| {
+//             let mut parts = line.splitn(2, '=');
+//             let name = parts.next().unwrap_or_default().to_string();
+//             let secret = parts.next().unwrap_or_default().to_string();
 
-            Secret { name, secret }
-        })
-        .filter(|secret| secret.name.contains("DEFAULT_MODEL"))
-        .collect();
+//             Secret { name, secret }
+//         })
+//         .filter(|secret| secret.name.contains("DEFAULT_MODEL"))
+//         .collect();
 
-    Ok(secrets)
-}
+//     Ok(secrets)
+// }
 
-#[tauri::command]
-pub async fn get_default_vendor(app: tauri::AppHandle) -> Result<Vec<Secret>, String> {
-    let env_path = get_env_file_path(app).await?;
+// #[tauri::command]
+// pub async fn get_default_vendor(app: tauri::AppHandle) -> Result<Vec<Secret>, String> {
+//     let env_path = get_env_file_path(app).await?;
 
-    // Read file content
-    let content = fs::read_to_string(&env_path).unwrap_or_default();
+//     // Read file content
+//     let content = fs::read_to_string(&env_path).unwrap_or_default();
 
-    // Parse each line into a key-value pair and filter for API_KEY
-    let secrets: Vec<Secret> = content
-        .lines()
-        .filter(|line| !line.is_empty() && line.contains('='))
-        .map(|line| {
-            let mut parts = line.splitn(2, '=');
-            let name = parts.next().unwrap_or_default().to_string();
-            let secret = parts.next().unwrap_or_default().to_string();
+//     // Parse each line into a key-value pair and filter for API_KEY
+//     let secrets: Vec<Secret> = content
+//         .lines()
+//         .filter(|line| !line.is_empty() && line.contains('='))
+//         .map(|line| {
+//             let mut parts = line.splitn(2, '=');
+//             let name = parts.next().unwrap_or_default().to_string();
+//             let secret = parts.next().unwrap_or_default().to_string();
 
-            Secret { name, secret }
-        })
-        .filter(|secret| secret.name.contains("DEFAULT_VENDOR"))
-        .collect();
+//             Secret { name, secret }
+//         })
+//         .filter(|secret| secret.name.contains("DEFAULT_VENDOR"))
+//         .collect();
 
-    Ok(secrets)
-}
+//     Ok(secrets)
+// }

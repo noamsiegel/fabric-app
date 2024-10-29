@@ -15,8 +15,6 @@
   import { ArrowUpDown } from "lucide-svelte";
   import { onMount } from "svelte";
   import { Checkbox } from "$lib/components/ui/checkbox";
-  import { Label } from "$lib/components/ui/label";
-  import { Slider } from "$lib/components/ui/slider";
   // tauri
   import { invoke } from "@tauri-apps/api/core";
   import { writable, type Writable } from "svelte/store";
@@ -28,17 +26,6 @@
   }
 
   let modelsData: Writable<Model[]> = writable([]);
-
-  let temperature = 0.5;
-  let presencePenalty = 0.0;
-
-  async function setTemperature(value: number) {
-    await invoke("set_temperature", { value });
-  }
-
-  async function setPresencePenalty(value: number) {
-    await invoke("set_presence_penalty", { value });
-  }
 
   const table = createTable(modelsData, {
     sort: addSortBy({ disableMultiSort: true }),
@@ -126,28 +113,48 @@
 
   async function handleSetDefaultModel() {
     try {
-      console.log("Raw selected data:", $selectedDataIds);
-
       const selectedIds = Object.entries($selectedDataIds)
         .filter(([_, selected]) => selected)
-        .map(([id]) => parseInt(id) + 1);
-
-      console.log("Selected IDs:", selectedIds[0]);
-      console.log("Raw selected data:", $selectedDataIds);
-      console.log("Selected IDs (full array):", selectedIds);
-      console.log("Selected ID type:", typeof selectedIds[0]);
-      console.log("Selected ID value:", selectedIds[0]);
+        .map(([id]) => parseInt(id));
 
       if (selectedIds.length !== 1) {
         alert("Please select exactly one model");
         return;
       }
 
-      // Updated parameter name to match Rust function
-      await invoke("set_default_model", { modelId: selectedIds[0] });
+      // Get the selected model's data from the table
+      const selectedModel = $modelsData[selectedIds[0]];
+
+      if (!selectedModel) {
+        throw new Error("Selected model not found");
+      }
+
+      // Pass the model name to the Rust function
+      await invoke("set_default_model", { model: selectedModel.name });
     } catch (err) {
       console.error("Failed to set default model:", err);
     }
+  }
+
+  // Modify the checkbox logic to allow only one selection at a time
+  function toggleSelection(row: any) {
+    const state = pluginStates.select.getRowState(row);
+    const isSelected = !row.props().select.selected;
+
+    // If the row is already selected, just deselect it
+    if (isSelected) {
+      state.isSelected.set(false);
+      return;
+    }
+
+    // Deselect all rows
+    $pageRows.forEach((r) => {
+      const rowState = pluginStates.select.getRowState(r);
+      rowState.isSelected.set(false);
+    });
+
+    // Select the current row
+    state.isSelected.set(isSelected);
   }
 
   onMount(fetchModels);
@@ -157,39 +164,7 @@
 TODO maybe make it so that users can no see some of the models depending on the keys they have
 -->
 
-<div class="flex flex-col space-y-2">
-  <Label for="temperature">Temperature: {temperature.toFixed(2)}</Label>
-  <Slider
-    id="temperature"
-    min={0}
-    max={1}
-    step={0.1}
-    value={[temperature]}
-    onValueChange={(values) => {
-      temperature = values[0];
-      setTemperature(temperature);
-    }}
-  />
-</div>
-
-<div class="flex flex-col space-y-2">
-  <Label for="presence-penalty"
-    >Presence Penalty: {presencePenalty.toFixed(2)}</Label
-  >
-  <Slider
-    id="presence-penalty"
-    min={0}
-    max={1}
-    step={0.1}
-    value={[presencePenalty]}
-    onValueChange={(values) => {
-      presencePenalty = values[0];
-      setPresencePenalty(presencePenalty);
-    }}
-  />
-</div>
-
-<div class="flex items-center py-4">
+<div class="flex items-center justify-between py-4">
   <Input
     placeholder="Filter models..."
     bind:value={$filterValue}
@@ -242,10 +217,7 @@ TODO maybe make it so that users can no see some of the models depending on the 
             <Table.Cell>
               <Checkbox
                 checked={rowProps.select.selected}
-                onCheckedChange={() => {
-                  const state = pluginStates.select.getRowState(row);
-                  state.isSelected.set(!rowProps.select.selected);
-                }}
+                on:click={() => toggleSelection(row)}
               />
             </Table.Cell>
             {#each row.cells as cell (cell.id)}

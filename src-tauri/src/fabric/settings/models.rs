@@ -1,7 +1,9 @@
+// pub mod fabric::secrets;
+use crate::fabric::secrets::get_secret;
+use crate::fabric::secrets::update_secret;
 use crate::state::AppState;
 use std::process::Command;
 use tauri::State;
-
 #[tauri::command]
 pub fn set_temperature(state: State<AppState>, value: f32) {
     let mut temperature = state.temperature.lock().unwrap();
@@ -83,26 +85,48 @@ pub fn get_models(_app_handle: tauri::AppHandle) -> Result<Vec<String>, String> 
 }
 
 #[tauri::command]
-pub fn set_default_model(state: tauri::State<AppState>, modelId: i32) -> Result<(), String> {
-    println!("Attempting to set default model with ID: {}", modelId);
+pub fn get_vendors(_app_handle: tauri::AppHandle) -> Result<Vec<String>, String> {
+    let output = Command::new("fabric")
+        .arg("--listmodels")
+        .output()
+        .map_err(|e| format!("Failed to execute fabric command: {}", e))?;
 
-    match state.default_pattern.lock() {
-        Ok(mut default_model) => {
-            println!("Successfully acquired lock on default_pattern");
-            *default_model = modelId.to_string();
-            println!("Successfully set default model to: {}", modelId);
-            Ok(())
-        }
-        Err(e) => {
-            let error_msg = format!("Failed to acquire lock on default_pattern: {}", e);
-            println!("Error: {}", error_msg);
-            Err(error_msg)
-        }
+    if !output.status.success() {
+        return Err(String::from_utf8_lossy(&output.stderr).into_owned());
     }
+
+    let output_str = String::from_utf8_lossy(&output.stdout);
+    let vendors: Vec<String> = output_str
+        .lines()
+        .filter(|line| {
+            !line.trim().starts_with('[')
+                && !line.trim().starts_with("Available models:")
+                && !line.trim().is_empty()
+        })
+        .map(|line| line.trim().to_string())
+        .collect();
+
+    println!("vendors: {:?}", vendors);
+
+    Ok(vendors)
 }
 
-// #[tauri::command]
-// pub fn get_default_model(state: State<AppState>) -> String {
-//     let default_model = state.default_pattern.lock().unwrap();
-//     default_model.clone()
-// }
+#[tauri::command]
+pub async fn set_default_model(app: tauri::AppHandle, model: String) -> Result<(), String> {
+    update_secret(app, "DEFAULT_MODEL".to_string(), model).await
+}
+
+#[tauri::command]
+pub async fn set_default_vendor(app: tauri::AppHandle, vendor: String) -> Result<(), String> {
+    update_secret(app, "DEFAULT_VENDOR".to_string(), vendor).await
+}
+
+#[tauri::command]
+pub async fn get_default_model(app: tauri::AppHandle) -> Result<String, String> {
+    get_secret(app, "DEFAULT_MODEL".to_string()).await
+}
+
+#[tauri::command]
+pub async fn get_default_vendor(app: tauri::AppHandle) -> Result<String, String> {
+    get_secret(app, "DEFAULT_VENDOR".to_string()).await
+}
