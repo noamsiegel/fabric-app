@@ -52,7 +52,7 @@
       id="temperature"
       label="Temperature"
       bind:value={temperature}
-      on:valueChange={async (e: CustomEvent<number>) => {
+      on:valueChange={async (e) => {
         temperature = e.detail;
         await saveModelParameters();
       }}
@@ -61,7 +61,7 @@
       id="presence-penalty"
       label="Presence Penalty"
       bind:value={presencePenalty}
-      on:valueChange={async (e: CustomEvent<number>) => {
+      on:valueChange={async (e) => {
         presencePenalty = e.detail;
         await saveModelParameters();
       }}
@@ -70,7 +70,7 @@
       id="top-p"
       label="Top P"
       bind:value={topP}
-      on:valueChange={async (e: CustomEvent<number>) => {
+      on:valueChange={async (e) => {
         topP = e.detail;
         await saveModelParameters();
       }}
@@ -79,7 +79,7 @@
       id="frequency-penalty"
       label="Frequency Penalty"
       bind:value={frequencyPenalty}
-      on:valueChange={async (e: CustomEvent<number>) => {
+      on:valueChange={async (e) => {
         frequencyPenalty = e.detail;
         await saveModelParameters();
       }}
