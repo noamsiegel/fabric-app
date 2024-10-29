@@ -3,11 +3,7 @@ use std::sync::Mutex;
 use tauri::Manager;
 
 pub mod fabric;
-use crate::fabric::base::{get_fabric_dir, get_home_dir, get_pattern_folders};
-use crate::fabric::patterns::{
-    get_fabric_folder, get_patterns, get_selected_pattern, set_fabric_folder, set_patterns,
-    set_selected_pattern,
-};
+use crate::fabric::patterns::{get_fabric_dir, get_home_dir, get_patterns};
 use crate::fabric::secrets::{
     get_api_keys, get_base_urls, get_env_file_path, get_secret, update_secret,
 };
@@ -50,24 +46,16 @@ pub fn run() {
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![
-            // fabric folder
-            set_fabric_folder,
-            get_fabric_folder,
             // new stuff
             get_home_dir,
             get_fabric_dir,
-            get_pattern_folders,
+            get_patterns,
             // secrets
             get_env_file_path,
             get_api_keys,
             get_base_urls,
             get_secret,
             update_secret,
-            // fabric pattern
-            get_patterns,
-            set_selected_pattern,
-            get_selected_pattern,
-            set_patterns,
             // fabric state
             get_is_running,
             set_is_running,
