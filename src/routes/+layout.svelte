@@ -1,8 +1,10 @@
 <script>
   import "../app.css";
   import BackButton from "../lib/components/BackButton.svelte";
+  import { Toaster } from "$lib/components/ui/sonner";
 </script>
 
+<Toaster />
 <!-- <slot></slot>-->
 
 <header>

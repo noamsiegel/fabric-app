@@ -179,3 +179,29 @@ pub async fn run_fabric(app: tauri::AppHandle, flag: String) -> Result<String, E
         Err(Error::FailedToReceiveMessage)
     }
 }
+
+#[tauri::command]
+pub async fn set_default_pattern(pattern: String, state: State<'_, AppState>) -> Result<(), Error> {
+    // Lock the mutex to get mutable access
+    let mut default_pattern = state
+        .default_pattern
+        .lock()
+        .map_err(|_| Error::FailedToReceiveMessage)?;
+
+    // Set the new default pattern
+    *default_pattern = pattern;
+
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn get_default_pattern(state: State<'_, AppState>) -> Result<String, Error> {
+    // Lock the mutex to get access to the pattern
+    let default_pattern = state
+        .default_pattern
+        .lock()
+        .map_err(|_| Error::FailedToReceiveMessage)?;
+
+    // Clone the pattern to return it
+    Ok(default_pattern.clone())
+}
