@@ -1,12 +1,6 @@
-pub mod base;
 pub mod patterns;
 pub mod secrets;
 pub mod settings;
-
-pub use patterns::{
-    get_fabric_folder, get_patterns, get_selected_pattern, set_fabric_folder, set_patterns,
-    set_selected_pattern,
-};
 
 pub use settings::{
     get_frequency_penalty, get_model, get_models, get_presence_penalty, get_temperature, get_top_p,
@@ -14,5 +8,5 @@ pub use settings::{
     set_top_p,
 };
 
-pub use base::{get_fabric_dir, get_home_dir, get_pattern_folders};
+pub use patterns::{get_fabric_dir, get_home_dir, get_patterns};
 pub use secrets::{get_api_keys, get_base_urls, get_env_file_path, get_secret, update_secret};

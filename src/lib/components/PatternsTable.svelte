@@ -95,7 +95,7 @@
 
   async function fetchPatterns() {
     try {
-      const data: string[] = await invoke("get_pattern_folders");
+      const data: string[] = await invoke("get_patterns");
       const formattedPatterns: Pattern[] = data.map((pattern, index) => ({
         id: index + 1,
         name: formatPatternName(pattern),
