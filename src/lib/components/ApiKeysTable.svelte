@@ -26,6 +26,7 @@
 
   let editedValue = "";
   let secretsData: Writable<Secret[]> = writable([]);
+  let dialogOpen = false;
 
   const table = createTable(secretsData, {
     sort: addSortBy({ disableMultiSort: true }),
@@ -50,10 +51,6 @@
       secret: editedValue,
     };
 
-    console.log(secret);
-    const result = await invoke("get_secret", { key: "OPENAI_API_KEY" });
-    console.log(result);
-
     try {
       await invoke("update_secret", {
         key: secret.name,
@@ -65,10 +62,12 @@
           s.name === secret.name ? { ...s, secret: secret.secret } : s
         )
       );
+      dialogOpen = false;
     } catch (err) {
-      console.error("Failed to update API key:", err);
+      console.error("Failed to update secret:", err);
     }
   }
+
   const { headerRows, pageRows, tableAttrs, tableBodyAttrs, pluginStates } =
     table.createViewModel(columns);
   const { filterValue } = pluginStates.filter;
@@ -117,9 +116,7 @@
                 </Table.Head>
               </Subscribe>
             {/each}
-            <!-- Actions Header -->
             <Table.Head>Actions</Table.Head>
-            <!-- New Actions column -->
           </Table.Row>
         </Subscribe>
       {/each}
@@ -138,7 +135,7 @@
             {/each}
             <!-- Button in each row -->
             <Table.Cell>
-              <Dialog.Root>
+              <Dialog.Root bind:open={dialogOpen}>
                 <Dialog.Trigger asChild let:builder>
                   <Button variant="outline" builders={[builder]}>
                     <Pencil class="h-4 w-4 mr-2" />
