@@ -8,7 +8,6 @@
 
   // tables
   import ModelsTable from "$lib/components/ModelsTable.svelte";
-  import PatternsTable from "$lib/components/PatternsTable.svelte";
   import SecretsTable from "$lib/components/ApiKeysTable.svelte";
   import BaseUrlTable from "$lib/components/BaseUrlTable.svelte";
 
@@ -38,7 +37,6 @@
     <Tabs.List>
       <Tabs.Trigger value="general">General</Tabs.Trigger>
       <Tabs.Trigger value="models">Models</Tabs.Trigger>
-      <Tabs.Trigger value="patterns">Patterns</Tabs.Trigger>
       <Tabs.Trigger value="secrets">API Keys</Tabs.Trigger>
       <Tabs.Trigger value="base-urls">Base URLs</Tabs.Trigger>
     </Tabs.List>
@@ -82,11 +80,6 @@
     <Tabs.Content value="models">
       <div class="mt-4">
         <ModelsTable />
-      </div>
-    </Tabs.Content>
-    <Tabs.Content value="patterns">
-      <div class="mt-4">
-        <PatternsTable />
       </div>
     </Tabs.Content>
     <Tabs.Content value="secrets">
