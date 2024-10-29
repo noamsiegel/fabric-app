@@ -18,7 +18,6 @@
   let notifications = true;
   let temperature = 0.5;
   let presencePenalty = 0.0;
-  let patternFolders: string[] = [];
 
   async function setTemperature(value: number) {
     await invoke("set_temperature", { value });
@@ -30,21 +29,6 @@
 </script>
 
 <div class="p-4">
-  <div class="flex flex-col space-y-2">
-    {#if patternFolders.length > 0}
-      <div class="mt-2">
-        <h3 class="text-sm font-medium mb-2">Pattern Folders:</h3>
-        <ul class="list-disc list-inside">
-          {#each patternFolders as folder}
-            <li class="text-sm">{folder}</li>
-          {/each}
-        </ul>
-      </div>
-    {:else}
-      <p class="text-sm text-gray-500">No pattern folders found</p>
-    {/if}
-  </div>
-
   <h1 class="text-2xl font-bold mb-4">Settings</h1>
 
   <Tabs.Root value="general">
