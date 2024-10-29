@@ -40,6 +40,7 @@
     table.column({
       header: "Name",
       accessor: "name",
+      cell: ({ value }) => formatApiKeyName(value),
     }),
     table.column({
       header: "API Key",
@@ -82,6 +83,14 @@
     } catch (err) {
       console.error("Failed to fetch secrets:", err);
     }
+  }
+
+  function formatApiKeyName(name: string): string {
+    return name
+      .replace("_API_KEY", "") // Remove '_api_key' from the string
+      .split("_")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()) // Make rest of letters lowercase
+      .join(" ");
   }
 
   function toggleSecretVisibility(name: string) {
