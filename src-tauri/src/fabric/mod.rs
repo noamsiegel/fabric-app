@@ -1,7 +1,7 @@
 pub mod patterns;
 pub use patterns::{
     get_fabric_dir, get_patterns, get_patterns_git_folder, get_patterns_git_repo,
-    get_selected_pattern, set_patterns_git_folder, set_selected_pattern,
+    get_selected_pattern, set_patterns_git_folder, set_selected_pattern, update_patterns,
 };
 
 pub mod secrets;
