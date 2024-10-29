@@ -35,16 +35,15 @@
 
   function handlePatternSelect(event: CustomEvent<string>) {
     selected.set({ value: event.detail, label: event.detail });
+    console.log("Selected pattern:", event.detail);
   }
 
   onMount(async () => {
     try {
       patterns = await invoke("get_patterns");
-      console.log("Patterns:", patterns);
       const savedPattern = await invoke("get_selected_pattern");
       if (typeof savedPattern === "string" && savedPattern) {
         selected.set({ value: savedPattern, label: savedPattern });
-        // alert(`Selected pattern: ${savedPattern}`);
       }
     } catch (error) {
       console.error("Error fetching patterns or selected pattern:", error);
