@@ -2,8 +2,7 @@
   // svelte stores
   import { onMount } from "svelte";
   import { invoke } from "@tauri-apps/api/core";
-  import { writable } from "svelte/store";
-  import type { Writable } from "svelte/store";
+  import { writable, type Writable } from "svelte/store";
 
   // svelte components
   import { Input } from "$lib/components/ui/input";
