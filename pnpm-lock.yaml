@@ -60,6 +60,9 @@ importers:
       lucide-svelte:
         specifier: ^0.453.0
         version: 0.453.0(svelte@5.1.2)
+      mode-watcher:
+        specifier: ^0.4.1
+        version: 0.4.1(svelte@5.1.2)
       svelte:
         specifier: ^5.0.0
         version: 5.1.2
@@ -69,6 +72,9 @@ importers:
       svelte-headless-table:
         specifier: ^0.18.2
         version: 0.18.2(svelte@5.1.2)
+      svelte-sonner:
+        specifier: ^0.3.28
+        version: 0.3.28(svelte@5.1.2)
       tailwind-merge:
         specifier: ^2.5.4
         version: 2.5.4
@@ -840,6 +846,11 @@ packages:
     resolution: {integrity: sha512-qOOzS1cBTWYF4BH8fVePDBOO9iptMnGUEZwNc/cMWnTV2nVLZ7VoNWEPHkYczZA0pdoA7dl6e7FL659nX9S2aw==}
     engines: {node: '>=16 || 14 >=14.17'}
 
+  mode-watcher@0.4.1:
+    resolution: {integrity: sha512-bNC+1NXmwEFZtziCdZSgP7HFQTpqJPcQn9GwwJQGSf6SBF3neEPYV1uRwkYuAQwbsvsXIYtzaqgedDzJ7D1mhg==}
+    peerDependencies:
+      svelte: ^4.0.0 || ^5.0.0-next.1
+
   mri@1.2.0:
     resolution: {integrity: sha512-tzzskb3bG8LvYGFF/mDTpq3jpI6Q9wc3LEmBaghu+DdCssd1FakN7Bc0hVNmEyGq1bq3RgfkCb3cmQLpNPOroA==}
     engines: {node: '>=4'}
@@ -1066,6 +1077,11 @@ packages:
     resolution: {integrity: sha512-RpB0SurwXm4xhjvHHtjeqMmvd645FURb79GFOotScOSqnKK5vpqBgoBPGC0pp+E/eZgDSQ9rRAdn/+N4ys1mXQ==}
     peerDependencies:
       svelte: ^4.0.0
+
+  svelte-sonner@0.3.28:
+    resolution: {integrity: sha512-K3AmlySeFifF/cKgsYNv5uXqMVNln0NBAacOYgmkQStLa/UoU0LhfAACU6Gr+YYC8bOCHdVmFNoKuDbMEsppJg==}
+    peerDependencies:
+      svelte: ^3.0.0 || ^4.0.0 || ^5.0.0-next.1
 
   svelte-subscribe@2.0.1:
     resolution: {integrity: sha512-eKXIjLxB4C7eQWPqKEdxcGfNXm2g/qJ67zmEZK/GigCZMfrTR3m7DPY93R6MX+5uoqM1FRYxl8LZ1oy4URWi2A==}
@@ -1819,6 +1835,10 @@ snapshots:
 
   minipass@7.1.2: {}
 
+  mode-watcher@0.4.1(svelte@5.1.2):
+    dependencies:
+      svelte: 5.1.2
+
   mri@1.2.0: {}
 
   mrmime@2.0.0: {}
@@ -2039,6 +2059,10 @@ snapshots:
     dependencies:
       svelte: 5.1.2
       svelte-subscribe: 2.0.1(svelte@5.1.2)
+
+  svelte-sonner@0.3.28(svelte@5.1.2):
+    dependencies:
+      svelte: 5.1.2
 
   svelte-subscribe@2.0.1(svelte@5.1.2):
     dependencies:
