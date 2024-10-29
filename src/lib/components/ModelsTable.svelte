@@ -61,6 +61,7 @@
   const { selectedDataIds } = pluginStates.select;
   const { filterValue } = pluginStates.filter;
   const { sortKeys } = pluginStates.sort;
+  const { pageIndex, hasNextPage, hasPreviousPage } = pluginStates.page; // Add pagination states
 
   async function fetchModels() {
     try {
@@ -158,6 +159,7 @@ TODO maybe make it so that users can no see some of the models depending on the 
       {#each $headerRows as headerRow}
         <Subscribe rowAttrs={headerRow.attrs()}>
           <Table.Row>
+            <Table.Head class="w-[10px]"></Table.Head>
             {#each headerRow.cells as cell (cell.id)}
               <Subscribe
                 attrs={cell.attrs()}
@@ -213,4 +215,23 @@ TODO maybe make it so that users can no see some of the models depending on the 
       {/each}
     </Table.Body>
   </Table.Root>
+</div>
+
+<div class="flex items-center justify-end space-x-2 py-4">
+  <Button
+    variant="outline"
+    size="sm"
+    on:click={() => ($pageIndex = $pageIndex - 1)}
+    disabled={!$hasPreviousPage}
+  >
+    Previous
+  </Button>
+  <Button
+    variant="outline"
+    size="sm"
+    disabled={!$hasNextPage}
+    on:click={() => ($pageIndex = $pageIndex + 1)}
+  >
+    Next
+  </Button>
 </div>
