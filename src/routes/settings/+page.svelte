@@ -7,7 +7,7 @@
   import { PlayCircle } from "lucide-svelte";
 
   // tables
-  import ModelsTable from "$lib/components/ModelsTable.svelte";
+  // import ModelsTable from "$lib/components/ModelsTable.svelte";
   import SecretsTable from "$lib/components/ApiKeysTable.svelte";
   import BaseUrlTable from "$lib/components/BaseUrlTable.svelte";
 
@@ -36,7 +36,6 @@
   <Tabs.Root value="general">
     <Tabs.List>
       <Tabs.Trigger value="general">General</Tabs.Trigger>
-      <Tabs.Trigger value="models">Models</Tabs.Trigger>
       <Tabs.Trigger value="secrets">API Keys</Tabs.Trigger>
       <Tabs.Trigger value="base-urls">Base URLs</Tabs.Trigger>
     </Tabs.List>
@@ -75,11 +74,6 @@
           <Switch id="notifications" bind:checked={notifications} />
           <Label for="notifications">Enable Notifications</Label>
         </div>
-      </div>
-    </Tabs.Content>
-    <Tabs.Content value="models">
-      <div class="mt-4">
-        <ModelsTable />
       </div>
     </Tabs.Content>
     <Tabs.Content value="secrets">
