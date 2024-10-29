@@ -2,8 +2,9 @@
   // svelte components
   import { Switch } from "$lib/components/ui/switch";
   import { Label } from "$lib/components/ui/label";
-  import { Slider } from "$lib/components/ui/slider";
   import * as Tabs from "$lib/components/ui/tabs/index.js";
+  import { Button } from "$lib/components/ui/button";
+  import { PlayCircle } from "lucide-svelte";
 
   // tables
   import ModelsTable from "$lib/components/ModelsTable.svelte";
@@ -13,19 +14,21 @@
 
   // tauri plugins
   import { invoke } from "@tauri-apps/api/core";
+  import { onMount } from "svelte";
 
   let darkMode = false;
   let notifications = true;
-  let temperature = 0.5;
-  let presencePenalty = 0.0;
+  let isInstalling = false;
+  let isInstalled = false;
 
-  async function setTemperature(value: number) {
-    await invoke("set_temperature", { value });
-  }
-
-  async function setPresencePenalty(value: number) {
-    await invoke("set_presence_penalty", { value });
-  }
+  onMount(async () => {
+    try {
+      await invoke("get_fabric_dir");
+      isInstalled = true;
+    } catch (error) {
+      isInstalled = false;
+    }
+  });
 </script>
 
 <div class="p-4">
@@ -40,6 +43,30 @@
       <Tabs.Trigger value="base-urls">Base URLs</Tabs.Trigger>
     </Tabs.List>
     <Tabs.Content value="general">
+      <Button
+        variant="outline"
+        class="flex items-center gap-2"
+        disabled={isInstalling}
+        on:click={async () => {
+          try {
+            isInstalling = true;
+            const result = await invoke("install_fabric");
+            console.log("Installation successful:", result);
+            isInstalled = true;
+          } catch (error) {
+            console.error("Installation failed:", error);
+          } finally {
+            isInstalling = false;
+          }
+        }}
+      >
+        <PlayCircle size={20} />
+        {#if isInstalling}
+          Installing...
+        {:else}
+          {isInstalled ? "Update Fabric" : "Install Fabric"}
+        {/if}
+      </Button>
       <div class="space-y-4 mt-4">
         <div class="flex items-center space-x-2">
           <Switch id="dark-mode" bind:checked={darkMode} />
@@ -49,38 +76,6 @@
         <div class="flex items-center space-x-2">
           <Switch id="notifications" bind:checked={notifications} />
           <Label for="notifications">Enable Notifications</Label>
-        </div>
-
-        <div class="flex flex-col space-y-2">
-          <Label for="temperature">Temperature: {temperature.toFixed(2)}</Label>
-          <Slider
-            id="temperature"
-            min={0}
-            max={1}
-            step={0.1}
-            value={[temperature]}
-            onValueChange={(values) => {
-              temperature = values[0];
-              setTemperature(temperature);
-            }}
-          />
-        </div>
-
-        <div class="flex flex-col space-y-2">
-          <Label for="presence-penalty"
-            >Presence Penalty: {presencePenalty.toFixed(2)}</Label
-          >
-          <Slider
-            id="presence-penalty"
-            min={0}
-            max={1}
-            step={0.1}
-            value={[presencePenalty]}
-            onValueChange={(values) => {
-              presencePenalty = values[0];
-              setPresencePenalty(presencePenalty);
-            }}
-          />
         </div>
       </div>
     </Tabs.Content>
