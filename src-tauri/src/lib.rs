@@ -15,8 +15,9 @@ use crate::fabric::run::{
 use crate::fabric::secrets::{
     get_api_keys, get_base_urls, get_env_file_path, get_secret, update_secret,
 };
-use crate::fabric::settings::{
-    get_model, get_models, get_presence_penalty, get_temperature, set_default_model, set_model,
+use crate::fabric::settings::models::{
+    get_default_model, get_default_vendor, get_model, get_models, get_presence_penalty,
+    get_temperature, get_vendors, set_default_model, set_default_vendor, set_model,
     set_presence_penalty, set_temperature,
 };
 
@@ -70,6 +71,13 @@ pub fn run() {
             get_patterns_git_folder,
             set_patterns_git_repo,
             set_patterns_git_folder,
+            // vendors
+            get_vendors,
+            get_default_vendor,
+            set_default_vendor,
+            // models
+            set_default_model,
+            get_default_model,
             // secrets
             get_env_file_path,
             get_api_keys,
@@ -85,7 +93,6 @@ pub fn run() {
             get_models,
             get_model,
             set_model,
-            set_default_model,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
