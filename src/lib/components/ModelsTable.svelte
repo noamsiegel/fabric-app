@@ -15,6 +15,8 @@
   import { ArrowUpDown } from "lucide-svelte";
   import { onMount } from "svelte";
   import { Checkbox } from "$lib/components/ui/checkbox";
+  import { Label } from "$lib/components/ui/label";
+  import { Slider } from "$lib/components/ui/slider";
   // tauri
   import { invoke } from "@tauri-apps/api/core";
   import { writable, type Writable } from "svelte/store";
@@ -26,6 +28,17 @@
   }
 
   let modelsData: Writable<Model[]> = writable([]);
+
+  let temperature = 0.5;
+  let presencePenalty = 0.0;
+
+  async function setTemperature(value: number) {
+    await invoke("set_temperature", { value });
+  }
+
+  async function setPresencePenalty(value: number) {
+    await invoke("set_presence_penalty", { value });
+  }
 
   const table = createTable(modelsData, {
     sort: addSortBy({ disableMultiSort: true }),
@@ -143,6 +156,38 @@
 <!-- 
 TODO maybe make it so that users can no see some of the models depending on the keys they have
 -->
+
+<div class="flex flex-col space-y-2">
+  <Label for="temperature">Temperature: {temperature.toFixed(2)}</Label>
+  <Slider
+    id="temperature"
+    min={0}
+    max={1}
+    step={0.1}
+    value={[temperature]}
+    onValueChange={(values) => {
+      temperature = values[0];
+      setTemperature(temperature);
+    }}
+  />
+</div>
+
+<div class="flex flex-col space-y-2">
+  <Label for="presence-penalty"
+    >Presence Penalty: {presencePenalty.toFixed(2)}</Label
+  >
+  <Slider
+    id="presence-penalty"
+    min={0}
+    max={1}
+    step={0.1}
+    value={[presencePenalty]}
+    onValueChange={(values) => {
+      presencePenalty = values[0];
+      setPresencePenalty(presencePenalty);
+    }}
+  />
+</div>
 
 <div class="flex items-center py-4">
   <Input

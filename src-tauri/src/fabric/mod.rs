@@ -16,3 +16,6 @@ pub use run::{
     clipboard_contents_and_run_pattern, get_is_running, run_fabric_command,
     scrape_url_and_run_pattern, set_is_running,
 };
+
+pub mod install;
+pub use install::install_fabric;
