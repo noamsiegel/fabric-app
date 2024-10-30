@@ -135,6 +135,7 @@ pub async fn get_patterns_git_folder(app: tauri::AppHandle) -> Result<String, St
 }
 
 // TODO make sure that this works, it doesn't seem to be updating
+// Issue URL: https://github.com/noamsiegel/fabric-app/issues/43
 #[tauri::command]
 pub async fn update_patterns(app: tauri::AppHandle) -> Result<String, Error> {
     println!("Starting pattern update...");
