@@ -1,0 +1,13 @@
+name: "Sync Issues to Todoist"
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  create-task:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Create Todoist Task"
+        uses: ptallen63/todoist-task-action@v1.0.3
+        with:
+          token: ${{ secrets.TODOIST_API_KEY }}
