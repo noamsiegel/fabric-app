@@ -9,12 +9,6 @@ const config = {
   preprocess: vitePreprocess(),
   kit: {
     adapter: adapter(),
-    // Add these configurations for Tauri
-    prerender: {
-      default: true
-    },
-    // Prevent SvelteKit from handling static assets that Tauri will handle
-    inlineStyleThreshold: Infinity
   },
 };
 
