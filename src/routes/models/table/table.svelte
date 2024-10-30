@@ -137,6 +137,7 @@
 
 <!-- 
   TODO maybe make it so that users can no see some of the models depending on the keys they have
+  Issue URL: https://github.com/noamsiegel/fabric-app/issues/45
   -->
 <div>
   <!-- filter -->
