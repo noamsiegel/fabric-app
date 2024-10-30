@@ -2,8 +2,7 @@
   // svelte stores
   import { onMount } from "svelte";
   import { invoke } from "@tauri-apps/api/core";
-  import { writable } from "svelte/store";
-  import type { Writable } from "svelte/store";
+  import { writable, type Writable } from "svelte/store";
 
   // svelte components
   import { Input } from "$lib/components/ui/input";
@@ -75,32 +74,7 @@
 </script>
 
 <div class="flex flex-col h-screen">
-  <header class="flex justify-between items-center p-4 border-b">
-    <div class="flex items-center">
-      <!-- TODO add fabric logo -->
-      <!-- <img src="/logo.png" alt="Fabric Logo" class="h-8 w-8 mr-2" /> -->
-      <h1 class="text-2xl font-bold">Fabric</h1>
-    </div>
-    <nav class="flex space-x-4">
-      <a href="/patterns" class="text-gray-600 hover:text-gray-900"
-        ><FileText size={24} /></a
-      >
-      <a href="/models" class="text-gray-600 hover:text-gray-900"
-        ><Database size={24} /></a
-      >
-      <!-- <a href="/settings" class="text-gray-600 hover:text-gray-900"
-        ><Settings size={24} /></a
-      > -->
-      <button
-        class="text-gray-600 hover:text-gray-900"
-        on:click={() => ($settingsOpen = true)}
-      >
-        <Settings size={24} />
-      </button>
-    </nav>
-  </header>
-
-  <SettingsDrawer />
+  <!-- <SettingsDrawer /> -->
 
   <main class="flex-grow p-6">
     <div class="max-w-3xl mx-auto">
