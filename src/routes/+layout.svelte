@@ -6,6 +6,7 @@
 </script>
 
 <!-- TODO make it so that all front end pages have the same width margins -->
+<!-- Issue URL: https://github.com/noamsiegel/fabric-app/issues/53 -->
 <!-- Issue URL: https://github.com/noamsiegel/fabric-app/issues/52 -->
 <Toaster />
 <Header />
