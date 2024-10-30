@@ -34,7 +34,5 @@ pub fn get_vendors(_app_handle: tauri::AppHandle) -> Result<Vec<String>, String>
         .map(|line| line.trim().to_string())
         .collect();
 
-    println!("vendors: {:?}", vendors);
-
     Ok(vendors)
 }
