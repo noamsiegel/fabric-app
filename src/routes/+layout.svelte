@@ -9,6 +9,7 @@
 <!-- Issue URL: https://github.com/noamsiegel/fabric-app/issues/53 -->
 <!-- Issue URL: https://github.com/noamsiegel/fabric-app/issues/52 -->
 <!-- TODO todoist test 2 -->
+<!-- Issue URL: https://github.com/noamsiegel/fabric-app/issues/55 -->
 <Toaster />
 <Header />
 <Settings />
