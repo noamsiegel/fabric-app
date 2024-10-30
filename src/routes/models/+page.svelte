@@ -1,7 +1,7 @@
 <script lang="ts">
-  import ModelsTable from "./ModelsTable.svelte";
-  import DefaultModelSettings from "./DefaultModelSettings.svelte";
-  import DefaultModelParameters from "./ModelParameters.svelte";
+  import DefaultModelSettings from "./cards/ModelSettings.svelte";
+  import DefaultModelParameters from "./cards/ModelParameters.svelte";
+  import Table from "./table/table.svelte";
 </script>
 
 <div class="container py-8">
@@ -11,5 +11,5 @@
     <DefaultModelSettings />
     <DefaultModelParameters />
   </div>
-  <ModelsTable />
+  <Table />
 </div>
