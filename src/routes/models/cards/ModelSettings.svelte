@@ -13,7 +13,11 @@
   import { invoke } from "@tauri-apps/api/core";
   import { onMount } from "svelte";
 
-  let defaultModel = "";
+  // stores
+  import { defaultModelStore } from "$lib/stores/models";
+
+  $: defaultModel = $defaultModelStore;
+
   let vendors: string[] = [];
   let defaultVendor: VendorOption = { value: "", label: "" };
 
@@ -32,7 +36,8 @@
 
   async function loadDefaultSettings() {
     try {
-      defaultModel = await invoke("get_secret", { key: "DEFAULT_MODEL" });
+      const model = await invoke("get_secret", { key: "DEFAULT_MODEL" });
+      defaultModelStore.set(model as string);
       const vendor = (await invoke("get_secret", {
         key: "DEFAULT_VENDOR",
       })) as string;
@@ -45,6 +50,7 @@
   async function saveDefaultSettings() {
     try {
       await invoke("set_default_model", { model: defaultModel });
+      defaultModelStore.set(defaultModel);
       await invoke("set_default_vendor", { vendor: defaultVendor.value });
     } catch (err) {
       console.error("Failed to save default settings:", err);

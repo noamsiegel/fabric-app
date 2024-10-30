@@ -1,5 +1,6 @@
+<!-- ModelsTable.svelte -->
 <script lang="ts">
-  // svelte headless components
+  // svelte headless table
   import {
     createTable,
     Render,
@@ -12,7 +13,7 @@
     addPagination,
   } from "svelte-headless-table/plugins";
 
-  //svelte components
+  // svelte components
   import * as Table from "$lib/components/ui/table";
   import { Button } from "$lib/components/ui/button";
   import { Input } from "$lib/components/ui/input";
@@ -27,14 +28,15 @@
   // tauri
   import { invoke } from "@tauri-apps/api/core";
 
-  interface Pattern {
+  interface Model {
     id: number;
     name: string;
+    provider: string;
   }
 
-  let patternsData: Writable<Pattern[]> = writable([]);
+  let modelsData: Writable<Model[]> = writable([]);
 
-  const table = createTable(patternsData, {
+  const table = createTable(modelsData, {
     sort: addSortBy({ disableMultiSort: true }),
     filter: addTableFilter({
       fn: ({ filterValue, value }) =>
@@ -44,16 +46,15 @@
   });
 
   const columns = table.createColumns([
-    // table.column({
-    //   header: "ID",
-    //   accessor: "id",
-    //   plugins: {
-    //     sort: { disable: false },
-    //     filter: {
-    //       exclude: true,
-    //     },
-    //   },
-    // }),
+    table.column({
+      accessor: ({ name }) => name,
+      header: "",
+      cell: ({ value }) => {
+        return createRender(Actions, {
+          name: value,
+        });
+      },
+    }),
     table.column({
       header: "Name",
       accessor: "name",
@@ -65,53 +66,90 @@
       },
     }),
     table.column({
-      accessor: ({ name }) => name,
-      header: "",
-      cell: ({ value }) => {
-        return createRender(Actions, { name: value });
+      header: "Provider",
+      accessor: "provider",
+      plugins: {
+        sort: { disable: false },
+        filter: {
+          exclude: true,
+        },
       },
     }),
   ]);
 
   const { headerRows, pageRows, tableAttrs, tableBodyAttrs, pluginStates } =
     table.createViewModel(columns);
-  const { hasNextPage, hasPreviousPage, pageIndex } = pluginStates.page;
+  const { pageIndex, hasNextPage, hasPreviousPage } = pluginStates.page;
   const { filterValue } = pluginStates.filter;
 
-  async function fetchPatterns() {
+  async function fetchModels() {
     try {
-      const data: string[] = await invoke("get_patterns");
-      const formattedPatterns: Pattern[] = data.map((pattern, index) => ({
-        id: index + 1,
-        name: formatPatternName(pattern),
-      }));
-      patternsData.set(formattedPatterns);
+      const data: string[] = await invoke("get_models");
+      const formattedModels: Model[] = [];
+      let currentProvider = "";
+      let lineIndex = 0;
+
+      for (const line of data) {
+        const trimmedLine = line.trim();
+        lineIndex++;
+
+        // Skip empty lines and the "Available models:" header
+        if (!trimmedLine || trimmedLine === "Available models:") {
+          continue;
+        }
+
+        // Check if the line is a provider name
+        if (["Anthropic", "Groq", "Gemini", "OpenAI"].includes(trimmedLine)) {
+          currentProvider = trimmedLine;
+          continue;
+        }
+
+        // Regex to match lines like "[ID]\tmodel-name"
+        const modelRegex = /^\[(\d+)\]\s+(.*)$/;
+        const match = modelRegex.exec(trimmedLine);
+
+        if (match) {
+          const id = parseInt(match[1], 10);
+          const name = match[2].trim();
+
+          formattedModels.push({
+            id: id,
+            name: name,
+            provider: currentProvider,
+          });
+        } else {
+          console.warn(
+            `Line ${lineIndex} does not match model pattern: ${trimmedLine}`
+          );
+        }
+      }
+
+      modelsData.set(formattedModels);
     } catch (err) {
-      console.error("Failed to fetch patterns:", err);
+      console.error("Failed to fetch models:", err);
     }
   }
 
-  function formatPatternName(name: string): string {
-    return name
-      .split("_")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" ");
-  }
-
   onMount(async () => {
-    await fetchPatterns();
+    await fetchModels();
   });
 </script>
 
+<!-- 
+  TODO maybe make it so that users can no see some of the models depending on the keys they have
+  -->
 <div>
-  <div class="flex items-center py-4">
+  <!-- filter -->
+  <div class="flex items-center justify-between py-4">
     <Input
       class="max-w-sm"
-      placeholder="Filter patterns..."
+      placeholder="Filter models..."
       type="text"
       bind:value={$filterValue}
     />
   </div>
+
+  <!-- table -->
   <div class="rounded-md border">
     <Table.Root {...$tableAttrs}>
       <Table.Header>
@@ -146,6 +184,8 @@
       </Table.Body>
     </Table.Root>
   </div>
+
+  <!-- pagination -->
   <div class="flex items-center justify-end space-x-4 py-4">
     <Button
       variant="outline"
