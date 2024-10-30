@@ -18,23 +18,25 @@
   import { Input } from "$lib/components/ui/input";
 
   // svelte
-  import { onMount } from "svelte";
+  import { onMount, onDestroy } from "svelte";
   import { writable, type Writable } from "svelte/store";
+  import { browser } from "$app/environment";
 
   // table components
-  import Actions from "./actions.svelte";
+  //   import Actions from "./model-actions.svelte";
 
   // tauri
   import { invoke } from "@tauri-apps/api/core";
 
-  interface Pattern {
+  interface Model {
     id: number;
     name: string;
+    provider: string;
   }
 
-  let patternsData: Writable<Pattern[]> = writable([]);
+  let modelsData: Writable<Model[]> = writable([]);
 
-  const table = createTable(patternsData, {
+  const table = createTable(modelsData, {
     sort: addSortBy({ disableMultiSort: true }),
     filter: addTableFilter({
       fn: ({ filterValue, value }) =>
@@ -55,6 +57,13 @@
     //   },
     // }),
     table.column({
+      accessor: ({ name }) => name,
+      header: "",
+      cell: ({ value }) => {
+        return createRender(Actions, { name: value });
+      },
+    }),
+    table.column({
       header: "Name",
       accessor: "name",
       plugins: {
@@ -65,10 +74,13 @@
       },
     }),
     table.column({
-      accessor: ({ name }) => name,
-      header: "",
-      cell: ({ value }) => {
-        return createRender(Actions, { name: value });
+      header: "Provider",
+      accessor: "provider",
+      plugins: {
+        sort: { disable: false },
+        filter: {
+          exclude: false,
+        },
       },
     }),
   ]);
@@ -78,28 +90,65 @@
   const { hasNextPage, hasPreviousPage, pageIndex } = pluginStates.page;
   const { filterValue } = pluginStates.filter;
 
-  async function fetchPatterns() {
+  async function fetchModels() {
     try {
-      const data: string[] = await invoke("get_patterns");
-      const formattedPatterns: Pattern[] = data.map((pattern, index) => ({
-        id: index + 1,
-        name: formatPatternName(pattern),
-      }));
-      patternsData.set(formattedPatterns);
+      const data: string[] = await invoke("get_models");
+      const formattedModels: Model[] = [];
+      let currentProvider = "";
+      let lineIndex = 0;
+
+      for (const line of data) {
+        const trimmedLine = line.trim();
+        lineIndex++;
+
+        // Skip empty lines and the "Available models:" header
+        if (!trimmedLine || trimmedLine === "Available models:") {
+          continue;
+        }
+
+        // Check if the line is a provider name
+        if (["Anthropic", "Groq", "Gemini", "OpenAI"].includes(trimmedLine)) {
+          currentProvider = trimmedLine;
+          continue;
+        }
+
+        // Regex to match lines like "[ID]\tmodel-name"
+        const modelRegex = /^\[(\d+)\]\s+(.*)$/;
+        const match = modelRegex.exec(trimmedLine);
+
+        if (match) {
+          const id = parseInt(match[1], 10);
+          const name = match[2].trim();
+
+          formattedModels.push({
+            id: id,
+            name: name,
+            provider: currentProvider,
+          });
+        } else {
+          console.warn(
+            `Line ${lineIndex} does not match model pattern: ${trimmedLine}`
+          );
+        }
+      }
+
+      modelsData.set(formattedModels);
     } catch (err) {
-      console.error("Failed to fetch patterns:", err);
+      console.error("Failed to fetch models:", err);
     }
   }
 
-  function formatPatternName(name: string): string {
-    return name
-      .split("_")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" ");
-  }
+  let mounted = false;
 
   onMount(async () => {
-    await fetchPatterns();
+    if (browser && !mounted) {
+      mounted = true;
+      await fetchModels();
+    }
+  });
+
+  onDestroy(() => {
+    mounted = false;
   });
 </script>
 

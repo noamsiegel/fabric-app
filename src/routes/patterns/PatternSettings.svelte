@@ -21,7 +21,7 @@
 
   let gitRepo = "";
   let gitFolder = "";
-  let defaultPattern = "n";
+  let defaultPattern = "";
   let isUpdating = false;
 
   defaultPatternStore.subscribe(async (newPattern) => {

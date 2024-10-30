@@ -1,4 +1,5 @@
 <script lang="ts">
+  // svelte components
   import {
     Card,
     CardContent,
@@ -10,12 +11,18 @@
   import { Button } from "$lib/components/ui/button";
   import { Input } from "$lib/components/ui/input";
   import * as Select from "$lib/components/ui/select";
-  import { invoke } from "@tauri-apps/api/core";
-  import { onMount } from "svelte";
 
-  let defaultModel = "";
+  // svelte
+  import { onMount } from "svelte";
+  import { toast } from "svelte-sonner";
+
+  // Tauri
+  import { invoke } from "@tauri-apps/api/core";
+
+  let defaultModel: string = "";
   let vendors: string[] = [];
   let defaultVendor: VendorOption = { value: "", label: "" };
+  let isUpdating = false;
 
   interface VendorOption {
     value: string;
@@ -32,7 +39,10 @@
 
   async function loadDefaultSettings() {
     try {
-      defaultModel = await invoke("get_secret", { key: "DEFAULT_MODEL" });
+      const model = (await invoke("get_secret", {
+        key: "DEFAULT_MODEL",
+      })) as string;
+      defaultModel = model;
       const vendor = (await invoke("get_secret", {
         key: "DEFAULT_VENDOR",
       })) as string;
@@ -44,11 +54,30 @@
 
   async function saveDefaultSettings() {
     try {
-      await invoke("set_default_model", { model: defaultModel });
-      await invoke("set_default_vendor", { vendor: defaultVendor.value });
+      isUpdating = true;
+      await invoke("update_secret", {
+        key: "DEFAULT_MODEL",
+        value: defaultModel,
+      });
+      await invoke("update_secret", {
+        key: "DEFAULT_VENDOR",
+        value: defaultVendor.value,
+      });
+      toast.success("Settings saved successfully");
     } catch (err) {
       console.error("Failed to save default settings:", err);
+      toast.error("Failed to save settings");
+    } finally {
+      isUpdating = false;
     }
+  }
+
+  function handleInputClick() {
+    toast.info("Set Default Model", {
+      description:
+        "To change the default model, click the star icon (⭐︎) next to a model name in the table below.",
+      duration: 4000,
+    });
   }
 
   onMount(async () => {
@@ -66,8 +95,12 @@
       <label for="defaultModel">Default Model</label>
       <Input
         id="defaultModel"
-        bind:value={defaultModel}
+        value={defaultModel}
+        readonly
+        disabled={false}
+        class="bg-white font-medium text-black cursor-help"
         placeholder="gpt-4-turbo-preview"
+        on:click={handleInputClick}
       />
     </div>
     <div class="space-y-2">

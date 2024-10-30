@@ -15,7 +15,7 @@
     <a href="/patterns" class="text-gray-600 hover:text-gray-900"
       ><FileText size={24} /></a
     >
-    <a href="/models" class="text-gray-600 hover:text-gray-900"
+    <a href="/models2" class="text-gray-600 hover:text-gray-900"
       ><Database size={24} /></a
     >
   </nav>

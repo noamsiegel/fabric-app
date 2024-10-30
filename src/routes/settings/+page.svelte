@@ -9,7 +9,6 @@
   import { settingsOpen } from "$lib/stores/settings";
 
   // tables
-  // import ModelsTable from "$lib/components/ModelsTable.svelte";
   import SecretsTable from "./ApiKeysTable.svelte";
   import BaseUrlTable from "./BaseUrlTable.svelte";
 

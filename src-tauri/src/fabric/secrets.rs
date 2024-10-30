@@ -38,17 +38,22 @@ pub async fn update_secret(
     // Find if key exists
     let key_prefix = format!("{}=", key);
     if let Some(line) = lines.iter_mut().find(|line| line.starts_with(&key_prefix)) {
-        // Update only the value part after the '='
+        // Update existing key
         *line = format!("{}={}", key, value);
-
-        // Write back to file
-        let new_content = lines.join("\n") + "\n";
-        fs::write(&env_path, new_content)
-            .map_err(|_| "Could not write to .env file".to_string())?;
-        Ok(())
     } else {
-        Err(format!("Key '{}' not found in .env file", key))
+        // Key doesn't exist, append it
+        lines.push(format!("{}={}", key, value));
     }
+
+    // Write back to file
+    let new_content = if lines.is_empty() {
+        format!("{}={}\n", key, value)
+    } else {
+        lines.join("\n") + "\n"
+    };
+
+    fs::write(&env_path, new_content).map_err(|_| "Could not write to .env file".to_string())?;
+    Ok(())
 }
 
 #[tauri::command]

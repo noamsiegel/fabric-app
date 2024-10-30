@@ -8,13 +8,23 @@ import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
 const config = {
   preprocess: vitePreprocess(),
   kit: {
-    adapter: adapter(),
+    adapter: adapter({
+      fallback: 'index.html'
+    }),
+    // prerender: {
+    //   default: true,
+    //   handleMissingId: 'ignore'  // Add this line
+    // },
+    // Add this to ensure proper static handling
+    env: {
+      dir: '.'
+    }
     // Add these configurations for Tauri
-    prerender: {
-      default: true
-    },
+    // prerender: {
+    //   default: true
+    // },
     // Prevent SvelteKit from handling static assets that Tauri will handle
-    inlineStyleThreshold: Infinity
+    // inlineStyleThreshold: Infinity
   },
 };
 
