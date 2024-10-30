@@ -6,6 +6,8 @@
 </script>
 
 <!-- TODO todoist test 3 -->
+<!-- Issue URL: https://github.com/noamsiegel/fabric-app/issues/56 -->
+
 
 <!-- TODO make it so that all front end pages have the same width margins -->
 <!-- Issue URL: https://github.com/noamsiegel/fabric-app/issues/53 -->
