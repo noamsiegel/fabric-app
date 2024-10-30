@@ -17,6 +17,7 @@
   import * as Table from "$lib/components/ui/table";
   import { Button } from "$lib/components/ui/button";
   import { Input } from "$lib/components/ui/input";
+  import * as Select from "$lib/components/ui/select";
 
   // svelte
   import { onMount } from "svelte";
@@ -33,8 +34,9 @@
     name: string;
     provider: string;
   }
-
+  let originalModelsData: Model[] = [];
   let modelsData: Writable<Model[]> = writable([]);
+  let selectedVendor = { value: "all", label: "All Vendors" };
 
   const table = createTable(modelsData, {
     sort: addSortBy({ disableMultiSort: true }),
@@ -44,6 +46,17 @@
     }),
     page: addPagination({ initialPageSize: 10 }),
   });
+
+  // Add this to track unique vendors and filter data
+  $: vendors = [...new Set($modelsData.map((model) => model.provider))];
+  $: {
+    const filteredData = originalModelsData.filter(
+      (model) =>
+        selectedVendor.value === "all" ||
+        model.provider === selectedVendor.value
+    );
+    modelsData.set(filteredData);
+  }
 
   const columns = table.createColumns([
     table.column({
@@ -123,7 +136,7 @@
           );
         }
       }
-
+      originalModelsData = formattedModels;
       modelsData.set(formattedModels);
     } catch (err) {
       console.error("Failed to fetch models:", err);
@@ -148,6 +161,17 @@
       type="text"
       bind:value={$filterValue}
     />
+    <Select.Root bind:selected={selectedVendor}>
+      <Select.Trigger class="w-[180px]">
+        <Select.Value placeholder="Select Vendor" />
+      </Select.Trigger>
+      <Select.Content>
+        <Select.Item value="all">All Vendors</Select.Item>
+        {#each vendors as vendor}
+          <Select.Item value={vendor}>{vendor}</Select.Item>
+        {/each}
+      </Select.Content>
+    </Select.Root>
   </div>
 
   <!-- table -->
