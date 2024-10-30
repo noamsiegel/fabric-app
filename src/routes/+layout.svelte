@@ -5,6 +5,7 @@
   import Header from "./Header.svelte";
 </script>
 
+<!-- TODO make it so that all front end pages have the same width margins -->
 <Toaster />
 <Header />
 <Settings />
