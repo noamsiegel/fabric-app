@@ -21,6 +21,7 @@
   import PatternCombobox from "$lib/components/PatternCombobox.svelte";
   import { settingsOpen } from "$lib/stores/settings";
   import SettingsDrawer from "./settings/+page.svelte";
+  import Header from "./Header.svelte";
 
   // fabric commands
   import {
