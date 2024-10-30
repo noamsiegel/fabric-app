@@ -14,11 +14,6 @@
 </main>
 
 <style>
-  header {
-    padding: 16px;
-    /* background-color: #f8f8f8; */
-  }
-
   main {
     padding: 16px;
   }
