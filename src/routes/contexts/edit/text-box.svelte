@@ -1,39 +1,23 @@
 <script lang="ts">
   import { Textarea } from "$lib/components/ui/textarea";
   import { Label } from "$lib/components/ui/label";
-  import { Button } from "$lib/components/ui/button";
-  import { invoke } from "@tauri-apps/api/core";
+
+  // buttons
+  import DeleteContextButton from "../buttons/delete-context.svelte";
+  import SaveContextButton from "../buttons/save-context.svelte";
 
   export let content: string = "";
   export let selectedTitle: string = "";
-
-  async function handleSave() {
-    try {
-      await invoke("save_context_file", {
-        title: selectedTitle,
-        content: content,
-      });
-      console.log("Context saved successfully");
-    } catch (error) {
-      console.error("Error saving context:", error);
-    }
-  }
+  export let onContextDeleted: () => void;
 </script>
-
-<!-- TODO add ability to save context -->
-<!-- TODO make this show the context name -->
 
 <div class="grid w-full gap-1.5">
   <div class="flex justify-between items-center">
     <Label for="message">{selectedTitle || "Message"}</Label>
-    <Button
-      variant="outline"
-      size="sm"
-      on:click={handleSave}
-      disabled={!selectedTitle}
-    >
-      Save
-    </Button>
+    <div class="flex gap-2">
+      <SaveContextButton {selectedTitle} {content} />
+      <DeleteContextButton {selectedTitle} bind:content {onContextDeleted} />
+    </div>
   </div>
   <Textarea
     id="message"

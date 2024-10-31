@@ -25,6 +25,7 @@
   import CreateContext from "../buttons/create-context.svelte";
   export let selectedContent: Writable<string>;
   export let selectedTitle: Writable<string>;
+  export let onContextsChange: (fn: () => Promise<void>) => void;
 
   // tauri
   import { invoke } from "@tauri-apps/api/core";
@@ -115,7 +116,8 @@
 
   onMount(async () => {
     await fetchContexts();
-    console.log("Initial table rows:", $pageRows);
+    onContextsChange(fetchContexts);
+    console.log("Table rows:", $pageRows);
   });
 </script>
 
