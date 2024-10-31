@@ -13,6 +13,7 @@
 </script>
 
 <!-- TODO make sure that the position of the icons does not shift on page change -->
+<!-- Issue URL: https://github.com/noamsiegel/fabric-app/issues/99 -->
 <!-- Issue URL: https://github.com/noamsiegel/fabric-app/issues/97 -->
 
 <header class="flex justify-between items-center p-4 border-b h-16">
