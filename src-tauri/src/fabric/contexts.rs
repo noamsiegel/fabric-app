@@ -164,8 +164,6 @@ pub async fn save_context_file(
     Ok("Context saved successfully".to_string())
 }
 
-// ... existing code ...
-
 /// Deletes a specific context.md file
 ///
 /// ### Arguments
