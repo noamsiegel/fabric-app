@@ -6,8 +6,6 @@
 </script>
 
 <!-- TODO load faster by storing models in file and having a refresh button -->
-<!-- Issue URL: https://github.com/noamsiegel/fabric-app/issues/92 -->
-<!-- Issue URL: https://github.com/noamsiegel/fabric-app/issues/90 -->
 
 <div class="container py-8">
   <h1 class="text-3xl font-bold mb-6">Models</h1>
