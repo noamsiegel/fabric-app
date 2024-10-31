@@ -26,7 +26,7 @@ jobs:
       - name: Sync Issues to Todoist
         uses: simenandre/todoist-action@v1.2.0
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.PAT }}
           todoist-token: ${{ secrets.TODOIST_API_KEY }}
           query: 
             updated:>2024-01-01 archived:false sort:updated-desc
