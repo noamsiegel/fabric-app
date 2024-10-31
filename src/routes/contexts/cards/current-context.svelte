@@ -19,7 +19,9 @@
 </script>
 
 <div class="space-y-2 mb-4">
-  <label for="currentContext">Current Context</label>
+  <div class="pb-2 pt-4">
+    <h3 class="font-semibold text-lg">Current Context</h3>
+  </div>
   <Input
     id="currentContext"
     value={$currentContextStore}
