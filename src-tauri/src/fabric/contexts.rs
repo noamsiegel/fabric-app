@@ -5,7 +5,6 @@ use tauri::{AppHandle, Error, Manager};
 
 #[tauri::command]
 // TODO move this to a specific fabric commands file
-// Issue URL: https://github.com/noamsiegel/fabric-app/issues/93
 pub async fn set_context(app: AppHandle, context: String) -> Result<String, Error> {
     run_fabric(app, format!("--context={}", context))
 }

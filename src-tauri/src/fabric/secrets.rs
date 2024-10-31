@@ -23,7 +23,6 @@ pub async fn get_env_file_path(app: tauri::AppHandle) -> Result<PathBuf, String>
 
 #[tauri::command]
 // TODO move this to fabric env file and change fn name
-// Issue URL: https://github.com/noamsiegel/fabric-app/issues/94
 pub async fn update_secret(
     app: tauri::AppHandle,
     key: String,
