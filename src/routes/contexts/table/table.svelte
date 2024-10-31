@@ -27,8 +27,14 @@
   export let selectedTitle: Writable<string>;
   export let onContextsChange: (fn: () => Promise<void>) => void;
 
+  // cards
+  import CurrentContext from "../cards/current-context.svelte";
+
   // tauri
   import { invoke } from "@tauri-apps/api/core";
+
+  // actions
+  import Actions from "./actions.svelte";
 
   interface Context {
     name: string;
@@ -61,6 +67,19 @@
 
   const columns = table.createColumns([
     table.column({
+      accessor: ({ name }) => name,
+      header: "",
+      cell: ({ value }) => {
+        return createRender(Actions, { name: value });
+      },
+      plugins: {
+        resize: {
+          initialWidth: 24, // Set fixed width for actions column
+          disable: true, // Prevent resizing
+        },
+      },
+    }),
+    table.column({
       header: "Name",
       accessor: "name",
       plugins: {
@@ -70,13 +89,6 @@
         },
       },
     }),
-    // table.column({
-    //   accessor: ({ name }) => name,
-    //   header: "",
-    //   cell: ({ value }) => {
-    //     return createRender(Actions, { name: value });
-    //   },
-    // }),
   ]);
 
   $: console.log("contextsData value:", $contextsData);
@@ -122,6 +134,7 @@
 </script>
 
 <div>
+  <CurrentContext />
   <div class="flex items-center justify-between py-4">
     <Input
       class="max-w-sm"

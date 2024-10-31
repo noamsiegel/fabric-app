@@ -1,8 +1,10 @@
 use crate::fabric::patterns::run_fabric;
+use crate::fabric::secrets::update_secret;
 use std::path::PathBuf;
 use tauri::{AppHandle, Error, Manager};
 
 #[tauri::command]
+// TODO move this to a specific fabric commands file
 pub async fn set_context(app: AppHandle, context: String) -> Result<String, Error> {
     run_fabric(app, format!("--context={}", context))
 }
@@ -73,8 +75,6 @@ pub async fn get_contexts_dir(app: AppHandle) -> Result<PathBuf, Error> {
     env_path.push(".config");
     env_path.push("fabric");
     env_path.push("contexts");
-
-    println!("contexts path: {}", env_path.display());
 
     Ok(env_path)
 }
@@ -188,4 +188,14 @@ pub async fn delete_context_file(app: AppHandle, title: String) -> Result<String
 
     std::fs::remove_file(&context_path).map_err(|e| Error::Io(e))?;
     Ok(format!("Context file '{}' deleted successfully", title))
+}
+
+#[tauri::command]
+pub async fn set_current_context(app: AppHandle, context: String) -> Result<String, Error> {
+    // Update the CURRENT_CONTEXT in .env file
+    update_secret(app.clone(), "CURRENT_CONTEXT".to_string(), context.clone())
+        .await
+        .map_err(|e| Error::Io(std::io::Error::new(std::io::ErrorKind::Other, e)))?;
+
+    Ok("Current context set successfully".to_string())
 }

@@ -37,7 +37,7 @@ use crate::fabric::sessions::{
 
 use crate::fabric::contexts::{
     create_context_file, delete_context_file, get_contexts_dir, list_contexts, print_context,
-    read_context_file, save_context_file, set_context, wipe_context,
+    read_context_file, save_context_file, set_context, set_current_context, wipe_context,
 };
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -131,6 +131,7 @@ pub fn run() {
             read_context_file,
             save_context_file,
             delete_context_file,
+            set_current_context,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
