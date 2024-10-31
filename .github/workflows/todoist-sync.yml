@@ -28,5 +28,6 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           todoist-token: ${{ secrets.TODOIST_API_KEY }}
-          query: 'repo:${{ github.repository }} is:open assignee:noamsiegel'
+          query: 
+            updated:>2024-01-01 archived:false sort:updated-desc
           sync-file-name: ./sync.json
