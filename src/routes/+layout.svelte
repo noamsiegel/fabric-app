@@ -5,7 +5,6 @@
   import Header from "./Header.svelte";
 </script>
 
-<!-- TODO make it so that all front end pages have the same width margins -->
 <!-- Issue URL: https://github.com/noamsiegel/fabric-app/issues/80 -->
 <!-- Issue URL: https://github.com/noamsiegel/fabric-app/issues/79 -->
 <!-- Issue URL: https://github.com/noamsiegel/fabric-app/issues/43 -->
