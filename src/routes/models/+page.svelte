@@ -5,6 +5,8 @@
   import Table from "./table/table.svelte";
 </script>
 
+<!-- TODO load faster by storing models in file and having a refresh button -->
+
 <div class="container py-8">
   <h1 class="text-3xl font-bold mb-6">Models</h1>
 
