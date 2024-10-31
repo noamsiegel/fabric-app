@@ -1,5 +1,7 @@
 name: "Run TODO to Issue"
-on: [ "push" ]
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
 permissions:
   issues: write
   contents: write
