@@ -1,9 +1,9 @@
 name: Todoist Sync
 
 on:
-  # Runs every day at 00:00 UTC
+  # Runs every minute
   schedule:
-    - cron: '0 0 * * *'
+    - cron: '* * * * *'
   # Allows manual trigger
   workflow_dispatch:
   # Runs when issues are modified
