@@ -28,5 +28,5 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           todoist-token: ${{ secrets.TODOIST_API_KEY }}
-          query: 'is:open assignee:${{ github.repository_owner }}'
+          query: 'repo:${{ github.repository }} is:open assignee:noamsiegel'
           sync-file-name: ./sync.json
