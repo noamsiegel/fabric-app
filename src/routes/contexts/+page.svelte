@@ -9,7 +9,7 @@
   let refreshContexts: () => Promise<void>;
 </script>
 
-<div class="p-4">
+<div>
   <h1 class="text-2xl font-bold mb-4">Context Browser</h1>
   <Resizable.PaneGroup
     direction="horizontal"
