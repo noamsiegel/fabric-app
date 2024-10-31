@@ -13,12 +13,6 @@
 <Header />
 <Settings />
 
-<main>
+<main class="container mx-auto px-[3%] pt-6">
   <slot />
 </main>
-
-<style>
-  main {
-    padding: 16px;
-  }
-</style>
