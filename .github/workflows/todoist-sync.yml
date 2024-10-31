@@ -14,17 +14,17 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4.2.2
 
       # Setup cache for sync data
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4.1.2
         with:
           path: ./sync.json
           key: ${{ runner.os }}-todoist-sync
 
       # Sync with Todoist
       - name: Sync Issues to Todoist
-        uses: simenandre/todoist-action@v1
+        uses: simenandre/todoist-action@v1.2.0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           todoist-token: ${{ secrets.TODOIST_API_KEY }}
