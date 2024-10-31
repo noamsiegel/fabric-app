@@ -34,18 +34,19 @@
 
 <Drawer.Root bind:open={$settingsOpen}>
   <Drawer.Content class="min-h-[50vh]">
-    <div class="mx-auto w-full max-w-lg p-4">
-      <Drawer.Header>
-        <Drawer.Title>Settings</Drawer.Title>
-        <Drawer.Description>Manage your application settings</Drawer.Description
-        >
-      </Drawer.Header>
-
+    <div class="mx-auto w-full max-w-4xl p-4">
       <Tabs.Root value="general">
-        <Tabs.List>
-          <Tabs.Trigger value="general">General</Tabs.Trigger>
-          <Tabs.Trigger value="secrets">API Keys</Tabs.Trigger>
-          <Tabs.Trigger value="base-urls">Base URLs</Tabs.Trigger>
+        <Tabs.List class="flex justify-center bg-transparent">
+          <Tabs.Trigger class="data-[state=active]:bg-gray-100" value="general"
+            >General</Tabs.Trigger
+          >
+          <Tabs.Trigger class="data-[state=active]:bg-gray-100" value="secrets"
+            >API Keys</Tabs.Trigger
+          >
+          <Tabs.Trigger
+            class="data-[state=active]:bg-gray-100"
+            value="base-urls">Base URLs</Tabs.Trigger
+          >
         </Tabs.List>
         <Tabs.Content value="general">
           <Button
