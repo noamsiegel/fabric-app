@@ -2,6 +2,7 @@ use std::process::Command;
 use tauri::command;
 
 #[command]
+// TODO Make sure that users have go installed before install fabric
 pub async fn install_fabric() -> Result<String, String> {
     let output = Command::new("go")
         .args(["install", "github.com/danielmiessler/fabric@latest"])
