@@ -1,87 +1,27 @@
-use tauri::{Error, Manager};
-use tauri_plugin_shell::ShellExt;
+use crate::fabric::patterns::run_fabric;
+use tauri::{AppHandle, Error};
 
 #[tauri::command]
-pub async fn set_session(app: tauri::AppHandle, session: String) -> Result<String, Error> {
-    let shell = app.shell();
-    let output = shell
-        .command("fabric")
-        .args(["--session", &session])
-        .output()
-        .await
-        .map_err(|_| Error::FailedToReceiveMessage)?;
-
-    if output.status.success() {
-        Ok(String::from_utf8_lossy(&output.stdout).into_owned())
-    } else {
-        Err(Error::FailedToReceiveMessage)
-    }
+pub async fn set_session(app: AppHandle, session: String) -> Result<String, Error> {
+    run_fabric(app, format!("--session={}", session)).await
 }
 
 #[tauri::command]
-pub async fn list_sessions(app: tauri::AppHandle) -> Result<String, Error> {
-    let shell = app.shell();
-    let output = shell
-        .command("fabric")
-        .args(["-X"])
-        .output()
-        .await
-        .map_err(|_| Error::FailedToReceiveMessage)?;
-
-    if output.status.success() {
-        Ok(String::from_utf8_lossy(&output.stdout).into_owned())
-    } else {
-        Err(Error::FailedToReceiveMessage)
-    }
+pub async fn list_sessions(app: AppHandle) -> Result<String, Error> {
+    run_fabric(app, "--listsessions".to_string()).await
 }
 
 #[tauri::command]
-pub async fn output_session(app: tauri::AppHandle) -> Result<String, Error> {
-    let shell = app.shell();
-    let output = shell
-        .command("fabric")
-        .args(["--output-session"])
-        .output()
-        .await
-        .map_err(|_| Error::FailedToReceiveMessage)?;
-
-    if output.status.success() {
-        Ok(String::from_utf8_lossy(&output.stdout).into_owned())
-    } else {
-        Err(Error::FailedToReceiveMessage)
-    }
+pub async fn output_session(app: AppHandle) -> Result<String, Error> {
+    run_fabric(app, "--output-session".to_string()).await
 }
 
 #[tauri::command]
-pub async fn wipe_session(app: tauri::AppHandle, session: String) -> Result<String, Error> {
-    let shell = app.shell();
-    let output = shell
-        .command("fabric")
-        .args(["-W", &session])
-        .output()
-        .await
-        .map_err(|_| Error::FailedToReceiveMessage)?;
-
-    if output.status.success() {
-        Ok(String::from_utf8_lossy(&output.stdout).into_owned())
-    } else {
-        Err(Error::FailedToReceiveMessage)
-    }
+pub async fn wipe_session(app: AppHandle, session: String) -> Result<String, Error> {
+    run_fabric(app, format!("--wipesession={}", session)).await
 }
 
 #[tauri::command]
-pub async fn print_session(app: tauri::AppHandle, session: String) -> Result<String, Error> {
-    let shell = app.shell();
-    let output = shell
-        .command("fabric")
-        .args(["--printsession", &session])
-        .output()
-        .await
-        .map_err(|_| Error::FailedToReceiveMessage)?;
-
-    if output.status.success() {
-        Ok(String::from_utf8_lossy(&output.stdout).into_owned())
-    } else {
-        Err(Error::FailedToReceiveMessage)
-    }
+pub async fn print_session(app: AppHandle, session: String) -> Result<String, Error> {
+    run_fabric(app, format!("--printsession={}", session)).await
 }
