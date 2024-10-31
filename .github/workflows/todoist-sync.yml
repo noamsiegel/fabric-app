@@ -28,6 +28,5 @@ jobs:
         with:
           github-token: ${{ secrets.PAT }}
           todoist-token: ${{ secrets.TODOIST_API_KEY }}
-          query: 
-            updated:>2024-01-01 archived:false sort:updated-desc
+          query: 'is:open updated:>2024-01-01 sort:updated-desc'
           sync-file-name: ./sync.json
