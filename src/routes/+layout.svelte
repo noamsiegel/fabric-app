@@ -6,12 +6,14 @@
 </script>
 
 <!-- TODO todoist-sync test 1 -->
+<!-- Issue URL: https://github.com/noamsiegel/fabric-app/issues/68 -->
 
 <!-- TODO todoist test 3 -->
 <!-- Issue URL: https://github.com/noamsiegel/fabric-app/issues/62 -->
 <!-- Issue URL: https://github.com/noamsiegel/fabric-app/issues/60 -->
 <!-- Issue URL: https://github.com/noamsiegel/fabric-app/issues/58 -->
 <!-- Issue URL: https://github.com/noamsiegel/fabric-app/issues/56 -->
+
 
 <!-- TODO make it so that all front end pages have the same width margins -->
 <!-- Issue URL: https://github.com/noamsiegel/fabric-app/issues/53 -->
