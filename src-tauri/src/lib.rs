@@ -31,6 +31,10 @@ use crate::plugins::get_clipboard_contents;
 mod state;
 use crate::state::AppState;
 
+use crate::fabric::sessions::{
+    list_sessions, output_session, print_session, set_session, wipe_session,
+};
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -105,6 +109,12 @@ pub fn run() {
             get_models,
             get_model,
             set_model,
+            // sessions
+            list_sessions,
+            output_session,
+            set_session,
+            wipe_session,
+            print_session,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

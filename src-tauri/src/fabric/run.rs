@@ -3,6 +3,7 @@ use tauri::{AppHandle, Error, State};
 use tauri_plugin_shell::ShellExt;
 
 // TODO get the jina ai functions to work from the rust side
+// TODO change function to "run_fabric_pattern"
 #[tauri::command]
 pub async fn run_fabric_command(
     app: AppHandle,
