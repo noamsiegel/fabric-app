@@ -24,6 +24,7 @@
   // buttons
   import CreateContext from "../buttons/create-context.svelte";
   export let selectedContent: Writable<string>;
+  export let selectedTitle: Writable<string>;
 
   // tauri
   import { invoke } from "@tauri-apps/api/core";
@@ -48,8 +49,8 @@
     try {
       const content = await invoke("read_context_file", { title });
       if (typeof content === "string") {
-        // Add type check
         selectedContent.set(content);
+        selectedTitle.set(title);
         console.log("Context file contents:", content);
       }
     } catch (error) {

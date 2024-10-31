@@ -74,3 +74,23 @@ pub async fn read_context_file(app: AppHandle, title: String) -> Result<String, 
 
     std::fs::read_to_string(&context_path).map_err(|e| Error::Io(e))
 }
+
+#[tauri::command]
+pub async fn save_context_file(
+    app: AppHandle,
+    title: String,
+    content: String,
+) -> Result<String, Error> {
+    let mut context_path = get_contexts_dir(app.clone()).await?;
+    context_path.push(format!("{}.md", title));
+
+    if !context_path.exists() {
+        return Err(Error::Io(std::io::Error::new(
+            std::io::ErrorKind::NotFound,
+            "Context file does not exist",
+        )));
+    }
+
+    std::fs::write(&context_path, content).map_err(|e| Error::Io(e))?;
+    Ok("Context saved successfully".to_string())
+}

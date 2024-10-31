@@ -5,6 +5,7 @@
   import { writable } from "svelte/store";
 
   const selectedContent = writable("");
+  const selectedTitle = writable("");
 </script>
 
 <div class="p-4">
@@ -15,13 +16,13 @@
   >
     <Resizable.Pane defaultSize={40} class="pl-4">
       <div class="h-full p-2">
-        <Table {selectedContent} />
+        <Table {selectedContent} {selectedTitle} />
       </div>
     </Resizable.Pane>
     <Resizable.Handle withHandle class="mx-2" />
     <Resizable.Pane defaultSize={60} class="pr-4">
       <div class="h-full p-2">
-        <TextBox content={$selectedContent} />
+        <TextBox content={$selectedContent} selectedTitle={$selectedTitle} />
       </div>
     </Resizable.Pane>
   </Resizable.PaneGroup>
