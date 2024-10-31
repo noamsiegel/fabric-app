@@ -38,6 +38,7 @@
         title: newContextTitle,
       });
       //  TODO make this show to the user
+      //  Issue URL: https://github.com/noamsiegel/fabric-app/issues/86
       console.log("Context created:", result);
       // Refresh the contexts list
       await listContexts();
