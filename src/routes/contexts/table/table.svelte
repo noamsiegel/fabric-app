@@ -23,6 +23,7 @@
 
   // buttons
   import CreateContext from "../buttons/create-context.svelte";
+  export let selectedContent: Writable<string>;
 
   // tauri
   import { invoke } from "@tauri-apps/api/core";
@@ -41,6 +42,20 @@
     }),
     page: addPagination({ initialPageSize: 10 }),
   });
+
+  // clicking row -> puts context markdown in textbox
+  const handleRowClick = async (title: string) => {
+    try {
+      const content = await invoke("read_context_file", { title });
+      if (typeof content === "string") {
+        // Add type check
+        selectedContent.set(content);
+        console.log("Context file contents:", content);
+      }
+    } catch (error) {
+      console.error("Error reading context file:", error);
+    }
+  };
 
   const columns = table.createColumns([
     table.column({
@@ -133,7 +148,11 @@
       <Table.Body {...$tableBodyAttrs}>
         {#each $pageRows as row (row.id)}
           <Subscribe rowAttrs={row.attrs()} let:rowAttrs>
-            <Table.Row {...rowAttrs}>
+            <Table.Row
+              {...rowAttrs}
+              on:click={() => handleRowClick(row.original.name)}
+              class="cursor-pointer"
+            >
               {#each row.cells as cell (cell.id)}
                 <Subscribe attrs={cell.attrs()} let:attrs>
                   <Table.Cell {...attrs}>
