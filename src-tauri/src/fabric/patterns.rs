@@ -1,6 +1,7 @@
 use crate::fabric::secrets::{get_secret, update_secret};
 use crate::state::AppState;
 use std::fs;
+use std::process::Command;
 use tauri::Manager;
 use tauri::{Error, State};
 use tauri_plugin_shell::ShellExt;
@@ -164,20 +165,17 @@ pub async fn update_patterns(app: tauri::AppHandle) -> Result<String, Error> {
 }
 
 #[tauri::command]
-pub async fn run_fabric(app: tauri::AppHandle, flag: String) -> Result<String, Error> {
-    let shell = app.shell();
-    let output = shell
-        .command("fabric")
-        .args(&[&flag])
+pub fn run_fabric(_app_handle: tauri::AppHandle, flag: String) -> Result<String, Error> {
+    let output = Command::new("fabric")
+        .arg(&flag)
         .output()
-        .await
         .map_err(|_| Error::FailedToReceiveMessage)?;
 
-    if output.status.success() {
-        Ok(String::from_utf8_lossy(&output.stdout).into_owned())
-    } else {
-        Err(Error::FailedToReceiveMessage)
+    if !output.status.success() {
+        return Err(Error::FailedToReceiveMessage);
     }
+
+    Ok(String::from_utf8_lossy(&output.stdout).into_owned())
 }
 
 #[tauri::command]

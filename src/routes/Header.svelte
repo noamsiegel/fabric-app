@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Settings, FileText, Database, Home } from "lucide-svelte";
+  import { Settings, FileText, Database, Home, Layers } from "lucide-svelte";
   import { settingsOpen } from "$lib/stores/settings";
 </script>
 
@@ -17,6 +17,9 @@
     >
     <a href="/models" class="text-gray-600 hover:text-gray-900"
       ><Database size={24} /></a
+    >
+    <a href="/contexts" class="text-gray-600 hover:text-gray-900"
+      ><Layers size={24} /></a
     >
   </nav>
 
