@@ -14,7 +14,8 @@ use crate::fabric::run::{
     scrape_url_and_run_pattern, set_is_running,
 };
 use crate::fabric::secrets::{
-    get_api_keys, get_base_urls, get_env_file_path, get_secret, update_secret,
+    get_api_keys, get_base_urls, get_env_file_path, get_secret, get_secrets, reset_secret,
+    update_secret,
 };
 use crate::fabric::settings::model_parameters::{
     get_frequency_penalty, get_presence_penalty, get_temperature, get_top_p, set_frequency_penalty,
@@ -36,7 +37,8 @@ use crate::fabric::sessions::{
 };
 
 use crate::fabric::contexts::{
-    create_context_file, get_contexts_dir, list_contexts, print_context, set_context, wipe_context,
+    create_context_file, delete_context_file, get_contexts_dir, list_contexts, print_context,
+    read_context_file, save_context_file, set_context, set_current_context, wipe_context,
 };
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -99,6 +101,8 @@ pub fn run() {
             get_base_urls,
             get_secret,
             update_secret,
+            get_secrets,
+            reset_secret,
             // fabric LLM flags
             get_clipboard_contents,
             set_temperature,
@@ -126,6 +130,10 @@ pub fn run() {
             wipe_context,
             get_contexts_dir,
             create_context_file,
+            read_context_file,
+            save_context_file,
+            delete_context_file,
+            set_current_context,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
