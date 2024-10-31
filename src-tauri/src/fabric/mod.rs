@@ -6,7 +6,10 @@ pub use patterns::{
 };
 
 pub mod secrets;
-pub use secrets::{get_api_keys, get_base_urls, get_env_file_path, get_secret, update_secret};
+pub use secrets::{
+    get_api_keys, get_base_urls, get_env_file_path, get_secret, get_secrets, reset_secret,
+    update_secret,
+};
 
 pub mod run;
 pub use run::{

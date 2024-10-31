@@ -23,9 +23,18 @@
 
   // buttons
   import CreateContext from "../buttons/create-context.svelte";
+  export let selectedContent: Writable<string>;
+  export let selectedTitle: Writable<string>;
+  export let onContextsChange: (fn: () => Promise<void>) => void;
+
+  // cards
+  import CurrentContext from "../cards/current-context.svelte";
 
   // tauri
   import { invoke } from "@tauri-apps/api/core";
+
+  // actions
+  import Actions from "./actions.svelte";
 
   interface Context {
     name: string;
@@ -42,7 +51,34 @@
     page: addPagination({ initialPageSize: 10 }),
   });
 
+  // clicking row -> puts context markdown in textbox
+  const handleRowClick = async (title: string) => {
+    try {
+      const content = await invoke("read_context_file", { title });
+      if (typeof content === "string") {
+        selectedContent.set(content);
+        selectedTitle.set(title);
+        console.log("Context file contents:", content);
+      }
+    } catch (error) {
+      console.error("Error reading context file:", error);
+    }
+  };
+
   const columns = table.createColumns([
+    table.column({
+      accessor: ({ name }) => name,
+      header: "",
+      cell: ({ value }) => {
+        return createRender(Actions, { name: value });
+      },
+      plugins: {
+        resize: {
+          initialWidth: 24, // Set fixed width for actions column
+          disable: true, // Prevent resizing
+        },
+      },
+    }),
     table.column({
       header: "Name",
       accessor: "name",
@@ -53,13 +89,6 @@
         },
       },
     }),
-    // table.column({
-    //   accessor: ({ name }) => name,
-    //   header: "",
-    //   cell: ({ value }) => {
-    //     return createRender(Actions, { name: value });
-    //   },
-    // }),
   ]);
 
   $: console.log("contextsData value:", $contextsData);
@@ -99,11 +128,13 @@
 
   onMount(async () => {
     await fetchContexts();
-    console.log("Initial table rows:", $pageRows);
+    onContextsChange(fetchContexts);
+    console.log("Table rows:", $pageRows);
   });
 </script>
 
 <div>
+  <CurrentContext />
   <div class="flex items-center justify-between py-4">
     <Input
       class="max-w-sm"
@@ -133,7 +164,11 @@
       <Table.Body {...$tableBodyAttrs}>
         {#each $pageRows as row (row.id)}
           <Subscribe rowAttrs={row.attrs()} let:rowAttrs>
-            <Table.Row {...rowAttrs}>
+            <Table.Row
+              {...rowAttrs}
+              on:click={() => handleRowClick(row.original.name)}
+              class="cursor-pointer"
+            >
               {#each row.cells as cell (cell.id)}
                 <Subscribe attrs={cell.attrs()} let:attrs>
                   <Table.Cell {...attrs}>
