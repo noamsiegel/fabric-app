@@ -9,10 +9,6 @@
   let refreshContexts: () => Promise<void>;
 </script>
 
-<!-- TODO add ability to change current context (both --context and .env)-->
-<!-- TODO add ability to see current context (rust fn + .env)-->
-<!-- TODO add ability to wipe context (maybe) -->
-
 <div class="p-4">
   <h1 class="text-2xl font-bold mb-4">Context Browser</h1>
   <Resizable.PaneGroup
