@@ -14,7 +14,8 @@ use crate::fabric::run::{
     scrape_url_and_run_pattern, set_is_running,
 };
 use crate::fabric::secrets::{
-    get_api_keys, get_base_urls, get_env_file_path, get_secret, get_secrets, update_secret,
+    get_api_keys, get_base_urls, get_env_file_path, get_secret, get_secrets, reset_secret,
+    update_secret,
 };
 use crate::fabric::settings::model_parameters::{
     get_frequency_penalty, get_presence_penalty, get_temperature, get_top_p, set_frequency_penalty,
@@ -101,6 +102,7 @@ pub fn run() {
             get_secret,
             update_secret,
             get_secrets,
+            reset_secret,
             // fabric LLM flags
             get_clipboard_contents,
             set_temperature,

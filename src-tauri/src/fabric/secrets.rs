@@ -22,6 +22,7 @@ pub async fn get_env_file_path(app: tauri::AppHandle) -> Result<PathBuf, String>
 }
 
 #[tauri::command]
+// TODO move this to fabric env file and change fn name
 pub async fn update_secret(
     app: tauri::AppHandle,
     key: String,
@@ -102,6 +103,32 @@ pub async fn get_secrets(app: tauri::AppHandle, keys: Vec<String>) -> Result<Vec
         .collect();
 
     Ok(secrets)
+}
+
+#[tauri::command]
+pub async fn reset_secret(app: tauri::AppHandle, key: String) -> Result<(), String> {
+    let env_path = get_env_file_path(app).await?;
+
+    // Read existing content or create empty string if file doesn't exist
+    let content = fs::read_to_string(&env_path).unwrap_or_default();
+
+    // Split content into lines
+    let mut lines: Vec<String> = content.lines().map(String::from).collect();
+
+    // Find if key exists
+    let key_prefix = format!("{}=", key);
+    if let Some(line) = lines.iter_mut().find(|line| line.starts_with(&key_prefix)) {
+        // Reset the key by setting empty value
+        *line = format!("{}=", key);
+    } else {
+        // If key doesn't exist, create it with empty value
+        lines.push(format!("{}=", key));
+    }
+
+    // Write back to file
+    let new_content = lines.join("\n") + "\n";
+    fs::write(&env_path, new_content).map_err(|_| "Could not write to .env file".to_string())?;
+    Ok(())
 }
 
 #[tauri::command]
