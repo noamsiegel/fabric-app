@@ -1,0 +1,3 @@
+ancestorEntries = ["src/routes/+layout.svelte"]
+ourEntries = ["src/routes/+layout.svelte"]
+theirEntries = ["src/routes/+layout.svelte"]
