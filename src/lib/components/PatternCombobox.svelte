@@ -19,8 +19,8 @@
     filteredPatterns = patterns.filter((pattern) =>
       pattern.toLowerCase().includes(searchTerm.toLowerCase())
     );
-    console.log("Search term updated:", searchTerm);
-    console.log("Filtered patterns:", filteredPatterns);
+    // console.log("Search term updated:", searchTerm);
+    // console.log("Filtered patterns:", filteredPatterns);
   }
 
   const dispatch = createEventDispatcher();
