@@ -12,6 +12,7 @@
   import * as Select from "$lib/components/ui/select";
   import { invoke } from "@tauri-apps/api/core";
   import { onMount } from "svelte";
+  import { Loader2 } from "lucide-svelte";
 
   // stores
   import { defaultModelStore } from "$lib/stores/models";
@@ -20,6 +21,11 @@
 
   let vendors: string[] = [];
   let defaultVendor: VendorOption = { value: "", label: "" };
+  let isLoading = false;
+  let loadTimes = {
+    initial: 0,
+    save: 0,
+  };
 
   interface VendorOption {
     value: string;
@@ -27,13 +33,15 @@
   }
 
   async function loadVendors() {
+    const startTime = performance.now();
     try {
       vendors = await invoke("get_vendors");
     } catch (err) {
       console.error("Failed to load vendors:", err);
+    } finally {
+      loadTimes.initial = performance.now() - startTime;
     }
   }
-
   async function loadDefaultSettings() {
     try {
       const model = await invoke("get_secret", { key: "DEFAULT_MODEL" });
@@ -48,12 +56,18 @@
   }
 
   async function saveDefaultSettings() {
+    isLoading = true;
+    const startTime = performance.now();
+
     try {
       await invoke("set_default_model", { model: defaultModel });
       defaultModelStore.set(defaultModel);
       await invoke("set_default_vendor", { vendor: defaultVendor.value });
     } catch (err) {
       console.error("Failed to save default settings:", err);
+    } finally {
+      loadTimes.save = performance.now() - startTime;
+      isLoading = false;
     }
   }
 
@@ -64,7 +78,14 @@
 
 <Card>
   <CardHeader>
-    <CardTitle>Default Model Settings</CardTitle>
+    <CardTitle>
+      Default Model Settings
+      {#if loadTimes.initial > 0}
+        <span class="text-xs text-muted-foreground ml-2">
+          Loaded in {loadTimes.initial.toFixed(2)}ms
+        </span>
+      {/if}
+    </CardTitle>
     <CardDescription>Configure the default model to use</CardDescription>
   </CardHeader>
   <CardContent class="space-y-4">
@@ -90,7 +111,19 @@
       </Select.Root>
     </div>
   </CardContent>
-  <CardFooter class="flex gap-2">
-    <Button on:click={saveDefaultSettings}>Save Settings</Button>
+  <CardFooter class="flex gap-2 items-center">
+    {#if loadTimes.save > 0}
+      <span class="text-xs text-muted-foreground">
+        Last save took {loadTimes.save.toFixed(2)}ms
+      </span>
+    {/if}
+    <Button on:click={saveDefaultSettings} disabled={isLoading}>
+      {#if isLoading}
+        <Loader2 class="mr-2 h-4 w-4 animate-spin" />
+        Saving...
+      {:else}
+        Save Settings
+      {/if}
+    </Button>
   </CardFooter>
 </Card>

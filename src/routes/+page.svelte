@@ -8,20 +8,10 @@
   import { Input } from "$lib/components/ui/input";
   import { Button } from "$lib/components/ui/button";
   import { Label } from "$lib/components/ui/label";
-  import {
-    Settings,
-    Home,
-    FileText,
-    PlayCircle,
-    Database,
-  } from "lucide-svelte";
   import { Textarea } from "$lib/components/ui/textarea";
 
   // custom svelte components
   import PatternCombobox from "$lib/components/PatternCombobox.svelte";
-  import { settingsOpen } from "$lib/stores/settings";
-  import SettingsDrawer from "./settings/+page.svelte";
-  import Header from "./Header.svelte";
 
   // fabric commands
   import {
