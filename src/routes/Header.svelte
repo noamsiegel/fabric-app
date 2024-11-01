@@ -3,6 +3,8 @@
   import { settingsOpen } from "$lib/stores/settings";
   import { page } from "$app/stores";
   import NavbarItem from "./navbar/nav-item.svelte";
+  import FabricLogoGif from "$lib/static/icons/fabric-logo-gif.gif";
+  import FabricLogoPng from "$lib/static/icons/fabric-logo-png.png";
 
   const navItems = [
     { href: "/", icon: Home },
@@ -19,7 +21,13 @@
 <header class="flex justify-between items-center p-4 border-b h-16">
   <!-- Left section with fixed width -->
   <div class="flex items-center w-[100px]">
-    <h1 class="text-2xl font-bold">Fabric</h1>
+    <a
+      href="https://github.com/danielmiessler/fabric"
+      class="flex items-center"
+    >
+      <img src={FabricLogoPng} alt="Fabric Logo" class="h-8 w-8 mr-2" />
+      <!-- <h1 class="text-2xl font-bold">Fabric</h1> -->
+    </a>
   </div>
 
   <!-- Center section -->
