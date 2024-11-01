@@ -26,4 +26,5 @@ tauri-plugin-fs = "2"
 tauri-plugin-dialog = "2"
 tauri-plugin-clipboard-manager = "2.0.1"
 tauri-plugin-os = "2"
+regex = "1.11.1"
 

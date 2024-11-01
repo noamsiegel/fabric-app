@@ -22,7 +22,7 @@ use crate::fabric::settings::model_parameters::{
     set_presence_penalty, set_temperature, set_top_p,
 };
 use crate::fabric::settings::models::{
-    get_default_model, get_model, get_models, set_default_model, set_model,
+    get_default_model, get_models, refresh_models, set_default_model,
 };
 use crate::fabric::settings::vendors::{get_default_vendor, get_vendors, set_default_vendor};
 
@@ -40,6 +40,8 @@ use crate::fabric::contexts::{
     create_context_file, delete_context_file, get_contexts_dir, list_contexts, print_context,
     read_context_file, save_context_file, set_context, set_current_context, wipe_context,
 };
+
+use crate::fabric::paths::*;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -115,8 +117,7 @@ pub fn run() {
             get_frequency_penalty,
             // models
             get_models,
-            get_model,
-            set_model,
+            refresh_models,
             // sessions
             list_sessions,
             output_session,
@@ -134,6 +135,10 @@ pub fn run() {
             save_context_file,
             delete_context_file,
             set_current_context,
+            // paths
+            get_home_dir,
+            get_fabric_config_dir,
+            get_fabric_bin_path,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

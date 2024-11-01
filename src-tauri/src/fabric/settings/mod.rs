@@ -1,5 +1,5 @@
 pub mod models;
-pub use models::{get_default_model, get_model, get_models, set_default_model, set_model};
+pub use models::{get_default_model, get_models, set_default_model};
 
 pub mod model_parameters;
 pub use model_parameters::{
