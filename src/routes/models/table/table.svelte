@@ -22,9 +22,11 @@
   // svelte
   import { onMount } from "svelte";
   import { writable, type Writable } from "svelte/store";
+  import { Loader2 } from "lucide-svelte";
 
   // table components
   import Actions from "./actions.svelte";
+  import RefreshButton from "../buttons/refresh-models.svelte";
 
   // tauri
   import { invoke } from "@tauri-apps/api/core";
@@ -37,6 +39,13 @@
   let originalModelsData: Model[] = [];
   let modelsData: Writable<Model[]> = writable([]);
   let selectedVendor = { value: "all", label: "All Vendors" };
+
+  // loading
+  let isLoading = false;
+  let loadTimes = {
+    initial: 0,
+    filter: 0,
+  };
 
   const table = createTable(modelsData, {
     sort: addSortBy({ disableMultiSort: true }),
@@ -96,51 +105,31 @@
   const { filterValue } = pluginStates.filter;
 
   async function fetchModels() {
+    isLoading = true;
+    const startTime = performance.now();
+
     try {
-      const data: string[] = await invoke("get_models");
-      const formattedModels: Model[] = [];
-      let currentProvider = "";
-      let lineIndex = 0;
-
-      for (const line of data) {
-        const trimmedLine = line.trim();
-        lineIndex++;
-
-        // Skip empty lines and the "Available models:" header
-        if (!trimmedLine || trimmedLine === "Available models:") {
-          continue;
-        }
-
-        // Check if the line is a provider name
-        if (["Anthropic", "Groq", "Gemini", "OpenAI"].includes(trimmedLine)) {
-          currentProvider = trimmedLine;
-          continue;
-        }
-
-        // Regex to match lines like "[ID]\tmodel-name"
-        const modelRegex = /^\[(\d+)\]\s+(.*)$/;
-        const match = modelRegex.exec(trimmedLine);
-
-        if (match) {
-          const id = parseInt(match[1], 10);
-          const name = match[2].trim();
-
-          formattedModels.push({
-            id: id,
-            name: name,
-            provider: currentProvider,
-          });
-        } else {
-          console.warn(
-            `Line ${lineIndex} does not match model pattern: ${trimmedLine}`
-          );
-        }
-      }
+      const formattedModels: Model[] = await invoke("get_models");
       originalModelsData = formattedModels;
       modelsData.set(formattedModels);
     } catch (err) {
       console.error("Failed to fetch models:", err);
+    } finally {
+      loadTimes.initial = performance.now() - startTime;
+      isLoading = false;
     }
+  }
+
+  // Track filter timing
+  $: {
+    const startTime = performance.now();
+    const filteredData = originalModelsData.filter(
+      (model) =>
+        selectedVendor.value === "all" ||
+        model.provider === selectedVendor.value
+    );
+    modelsData.set(filteredData);
+    loadTimes.filter = performance.now() - startTime;
   }
 
   onMount(async () => {
@@ -152,30 +141,52 @@
   TODO maybe make it so that users can no see some of the models depending on the keys they have
   Issue URL: https://github.com/noamsiegel/fabric-app/issues/45
   -->
+<!-- Add loading indicator and timing info -->
 <div>
-  <!-- filter -->
   <div class="flex items-center justify-between py-4">
-    <Input
-      class="max-w-sm"
-      placeholder="Filter models..."
-      type="text"
-      bind:value={$filterValue}
-    />
-    <Select.Root bind:selected={selectedVendor}>
-      <Select.Trigger class="w-[180px]">
-        <Select.Value placeholder="Select Vendor" />
-      </Select.Trigger>
-      <Select.Content>
-        <Select.Item value="all">All Vendors</Select.Item>
-        {#each vendors as vendor}
-          <Select.Item value={vendor}>{vendor}</Select.Item>
-        {/each}
-      </Select.Content>
-    </Select.Root>
+    <div class="flex items-center gap-4">
+      <Input
+        class="max-w-sm"
+        placeholder="Filter models..."
+        type="text"
+        bind:value={$filterValue}
+      />
+      <RefreshButton on:refreshComplete={fetchModels} disabled={isLoading} />
+      {#if loadTimes.initial > 0}
+        <span class="text-xs text-muted-foreground">
+          Loaded in {loadTimes.initial.toFixed(2)}ms
+        </span>
+      {/if}
+    </div>
+    <div class="flex items-center gap-4">
+      {#if loadTimes.filter > 0}
+        <span class="text-xs text-muted-foreground">
+          Filtered in {loadTimes.filter.toFixed(2)}ms
+        </span>
+      {/if}
+      <Select.Root bind:selected={selectedVendor}>
+        <Select.Trigger class="w-[180px]">
+          <Select.Value placeholder="Select Vendor" />
+        </Select.Trigger>
+        <Select.Content>
+          <Select.Item value="all">All Vendors</Select.Item>
+          {#each vendors as vendor}
+            <Select.Item value={vendor}>{vendor}</Select.Item>
+          {/each}
+        </Select.Content>
+      </Select.Root>
+    </div>
   </div>
 
   <!-- table -->
   <div class="rounded-md border">
+    {#if isLoading}
+      <div
+        class="absolute inset-0 flex items-center justify-center bg-background/50 z-50"
+      >
+        <Loader2 class="h-8 w-8 animate-spin" />
+      </div>
+    {/if}
     <Table.Root {...$tableAttrs}>
       <Table.Header>
         {#each $headerRows as headerRow}

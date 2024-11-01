@@ -7,23 +7,6 @@ use tauri::{Error, State};
 use tauri_plugin_shell::ShellExt;
 
 #[tauri::command]
-pub async fn get_home_dir(app: tauri::AppHandle) -> Result<String, String> {
-    // Get the home directory using the path resolver
-    let home = app
-        .path()
-        .home_dir()
-        .map_err(|_| "Could not find home directory".to_string())?;
-
-    // Convert the PathBuf to a String
-    let home_str = home
-        .to_str()
-        .ok_or_else(|| "Could not convert home path to string".to_string())?
-        .to_string();
-
-    Ok(home_str)
-}
-
-#[tauri::command]
 pub async fn get_fabric_dir(app: tauri::AppHandle) -> Result<String, String> {
     // Get the config directory using the path resolver
     let config_dir = app
