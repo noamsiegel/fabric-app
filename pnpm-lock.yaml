@@ -26,6 +26,9 @@ importers:
       '@tauri-apps/plugin-shell':
         specifier: ^2.0.1
         version: 2.0.1
+      execution-time-decorators:
+        specifier: ^2.0.3
+        version: 2.0.3
     devDependencies:
       '@sveltejs/adapter-static':
         specifier: ^3.0.6
@@ -696,6 +699,10 @@ packages:
 
   estree-walker@3.0.3:
     resolution: {integrity: sha512-7RUKfXgSMMkzt6ZuXmqapOurLGPPfgj6l9uRZ7lRGolvk0y2yocc35LdcxKC5PQZdn2DMqioAQ2NoWcrTKmm6g==}
+
+  execution-time-decorators@2.0.3:
+    resolution: {integrity: sha512-ZSp7q1mOmfzUXz2TgLWJ47Q97xj1cn1Ik3Fx8KlewGiX9hSxdw/mavlEZDMC/udA+jHz4ftnqYqK2O6rzVy6hA==}
+    engines: {node: '>=10'}
 
   fast-glob@3.3.2:
     resolution: {integrity: sha512-oX2ruAFQwf/Orj8m737Y5adxDQO0LAB7/S5MnxCdTNDd4p6BsyIVsv9JQsATbTSq8KHRpLwIHbVlUNatxd+1Ow==}
@@ -1726,6 +1733,8 @@ snapshots:
   estree-walker@3.0.3:
     dependencies:
       '@types/estree': 1.0.6
+
+  execution-time-decorators@2.0.3: {}
 
   fast-glob@3.3.2:
     dependencies:
