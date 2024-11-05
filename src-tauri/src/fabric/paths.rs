@@ -32,8 +32,6 @@ pub async fn get_fabric_config_dir(app: tauri::AppHandle) -> Result<PathBuf, Str
     config_dir.push(".config");
     config_dir.push("fabric");
 
-    println!("Fabric config directory: {:?}", config_dir);
-
     Ok(config_dir)
 }
 

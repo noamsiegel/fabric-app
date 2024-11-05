@@ -1,7 +1,5 @@
 // pub mod fabric::secrets;
 use crate::fabric::paths::get_fabric_config_dir;
-use crate::fabric::secrets::get_secret;
-use crate::fabric::secrets::update_secret;
 use regex::Regex;
 use serde::Serialize;
 use std::process::Command;
@@ -99,11 +97,26 @@ pub async fn get_models(app_handle: tauri::AppHandle) -> Result<Vec<FormattedMod
 }
 
 #[tauri::command]
-pub async fn set_default_model(app: tauri::AppHandle, model: String) -> Result<(), String> {
-    update_secret(app, "DEFAULT_MODEL".to_string(), model).await
-}
+pub async fn get_vendors(app_handle: tauri::AppHandle) -> Result<Vec<String>, String> {
+    // Get the config directory and create the markdown file path
+    let mut config_dir = get_fabric_config_dir(app_handle).await?;
+    config_dir.push("models.md");
 
-#[tauri::command]
-pub async fn get_default_model(app: tauri::AppHandle) -> Result<String, String> {
-    get_secret(app, "DEFAULT_MODEL".to_string()).await
+    // Read file contents
+    let content = std::fs::read_to_string(&config_dir)
+        .map_err(|e| format!("Failed to read models file: {}", e))?;
+
+    let vendors: Vec<String> = content
+        .lines()
+        .skip(2) // Skip the header lines
+        .filter(|line| {
+            let trimmed = line.trim();
+            !trimmed.is_empty()
+                && !trimmed.starts_with('[')
+                && ["Anthropic", "Groq", "Gemini", "OpenAI"].contains(&trimmed)
+        })
+        .map(|line| line.trim().to_string())
+        .collect();
+
+    Ok(vendors)
 }

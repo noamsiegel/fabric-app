@@ -3,6 +3,7 @@
   import { Button } from "$lib/components/ui/button";
   import { createEventDispatcher } from "svelte";
 
+  export let disabled = false;
   const dispatch = createEventDispatcher();
   let loading = false;
 
@@ -19,6 +20,11 @@
   }
 </script>
 
-<Button variant="outline" size="sm" on:click={handleRefresh} disabled={loading}>
+<Button
+  variant="outline"
+  size="sm"
+  on:click={handleRefresh}
+  disabled={loading || disabled}
+>
   {loading ? "Refreshing..." : "Refresh Models"}
 </Button>
