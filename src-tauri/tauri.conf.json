@@ -24,7 +24,6 @@
   "bundle": {
     "active": true,
     "targets": "all",
-    "icon": [
-    ]
+    "icon": ["128x128.png"]
   }
 }
