@@ -2,6 +2,8 @@
 use crate::state::AppState;
 use tauri::State;
 
+// TODO delete this and remove from tauri state
+
 #[tauri::command]
 pub fn set_temperature(state: State<AppState>, value: f32) {
     let mut temperature = state.temperature.lock().unwrap();

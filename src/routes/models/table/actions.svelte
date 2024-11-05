@@ -24,7 +24,10 @@
     const startTime = performance.now();
 
     try {
-      await invoke("set_default_model", { model: name });
+      await invoke("update_secret", {
+        key: "DEFAULT_MODEL",
+        value: name,
+      });
       defaultModelStore.set(name);
       toast.success("Default model updated", {
         description: `${name} has been set as the default model (${loadTime.toFixed(2)}ms)`,
