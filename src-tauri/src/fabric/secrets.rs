@@ -8,6 +8,7 @@ pub struct Secret {
 }
 
 #[tauri::command]
+// TODO move this to path file
 pub async fn get_env_file_path(app: tauri::AppHandle) -> Result<PathBuf, String> {
     let mut env_path: std::path::PathBuf = app
         .path()
