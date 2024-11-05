@@ -12,47 +12,65 @@
   import SliderComponent from "./ParameterSlider.svelte";
   import { Loader2 } from "lucide-svelte";
 
+  // Add default constants
+  const DEFAULT_TEMPERATURE = 0.7;
+  const DEFAULT_PRESENCE_PENALTY = 0.0;
+  const DEFAULT_TOP_P = 1.0;
+  const DEFAULT_FREQUENCY_PENALTY = 0.0;
+
   export let temperature = 0.5;
   export let presencePenalty = 0.0;
   export let topP = 0.9;
   export let frequencyPenalty = 0.0;
+
   let isLoading = false;
-  let loadTimes = {
-    initial: 0,
-    save: 0,
-  };
 
   async function loadModelParameters() {
-    isLoading = true;
-    const startTime = performance.now();
-
     try {
-      temperature = await invoke("get_temperature");
-      presencePenalty = await invoke("get_presence_penalty");
-      topP = await invoke("get_top_p");
-      frequencyPenalty = await invoke("get_frequency_penalty");
+      temperature =
+        parseFloat(await invoke("get_secret", { key: "TEMPERATURE" })) || 0.7;
+      presencePenalty =
+        parseFloat(await invoke("get_secret", { key: "PRESENCE_PENALTY" })) ||
+        0;
+      topP = parseFloat(await invoke("get_secret", { key: "TOP_P" })) || 1;
+      frequencyPenalty =
+        parseFloat(await invoke("get_secret", { key: "FREQUENCY_PENALTY" })) ||
+        0;
     } catch (err) {
       console.error("Failed to load model parameters:", err);
-    } finally {
-      loadTimes.initial = performance.now() - startTime;
-      isLoading = false;
     }
   }
 
   async function saveModelParameters() {
-    isLoading = true;
-    const startTime = performance.now();
-
     try {
-      await invoke("set_temperature", { value: temperature });
-      await invoke("set_presence_penalty", { value: presencePenalty });
-      await invoke("set_top_p", { value: topP });
-      await invoke("set_frequency_penalty", { value: frequencyPenalty });
+      await invoke("update_secret", {
+        key: "TEMPERATURE",
+        value: temperature.toString(),
+      });
+      await invoke("update_secret", {
+        key: "PRESENCE_PENALTY",
+        value: presencePenalty.toString(),
+      });
+      await invoke("update_secret", { key: "TOP_P", value: topP.toString() });
+      await invoke("update_secret", {
+        key: "FREQUENCY_PENALTY",
+        value: frequencyPenalty.toString(),
+      });
     } catch (err) {
       console.error("Failed to save model parameters:", err);
-    } finally {
-      loadTimes.save = performance.now() - startTime;
-      isLoading = false;
+    }
+  }
+
+  async function resetModelParameters() {
+    try {
+      temperature = DEFAULT_TEMPERATURE;
+      presencePenalty = DEFAULT_PRESENCE_PENALTY;
+      topP = DEFAULT_TOP_P;
+      frequencyPenalty = DEFAULT_FREQUENCY_PENALTY;
+
+      await saveModelParameters();
+    } catch (err) {
+      console.error("Failed to reset model parameters:", err);
     }
   }
 
@@ -62,15 +80,20 @@
 </script>
 
 <Card>
-  <CardHeader class="flex justify-between w-full">
-    <CardTitle class="flex-1 text-left">
-      Model Parameters
-      {#if loadTimes.initial > 0}
-        <span class="text-xs text-muted-foreground ml-2">
-          Loaded in {loadTimes.initial.toFixed(2)}ms
-        </span>
+  <CardHeader class="flex flex-row items-center justify-between">
+    <CardTitle>Model Parameters</CardTitle>
+    <Button
+      variant="outline"
+      on:click={resetModelParameters}
+      disabled={isLoading}
+    >
+      {#if isLoading}
+        <Loader2 class="mr-2 h-4 w-4 animate-spin" />
+        Resetting...
+      {:else}
+        Reset
       {/if}
-    </CardTitle>
+    </Button>
   </CardHeader>
   <CardContent class="space-y-8">
     <SliderComponent
@@ -110,19 +133,5 @@
       }}
     />
   </CardContent>
-  <CardFooter class="flex justify-end gap-2">
-    <span class="text-xs text-muted-foreground">
-      {#if loadTimes.save > 0}
-        Last save took {loadTimes.save.toFixed(2)}ms
-      {/if}
-    </span>
-    <Button on:click={saveModelParameters} disabled={isLoading}>
-      {#if isLoading}
-        <Loader2 class="mr-2 h-4 w-4 animate-spin" />
-        Saving...
-      {:else}
-        Save Settings
-      {/if}
-    </Button>
-  </CardFooter>
+  <CardFooter class="flex justify-end gap-2"></CardFooter>
 </Card>

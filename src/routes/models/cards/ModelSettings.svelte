@@ -7,7 +7,7 @@
   } from "$lib/components/ui/card";
   import { Button } from "$lib/components/ui/button";
   import { Input } from "$lib/components/ui/input";
-  import * as Select from "$lib/components/ui/select";
+  import * as Select from "$lib/components/ui/select"; 
   import { onMount } from "svelte";
   import {
     ModelSettingsManager,

@@ -10,5 +10,5 @@
 <Settings />
 
 <main class="container mx-auto px-[3%] pt-6">
-  <slot />
+  <slot></slot>
 </main>
