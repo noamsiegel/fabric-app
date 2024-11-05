@@ -21,10 +21,7 @@ use crate::fabric::settings::model_parameters::{
     get_frequency_penalty, get_presence_penalty, get_temperature, get_top_p, set_frequency_penalty,
     set_presence_penalty, set_temperature, set_top_p,
 };
-use crate::fabric::settings::models::{
-    get_default_model, get_models, refresh_models, set_default_model,
-};
-use crate::fabric::settings::vendors::{get_default_vendor, get_vendors, set_default_vendor};
+use crate::fabric::settings::models::{get_models, get_vendors, refresh_models};
 
 pub mod plugins;
 use crate::plugins::get_clipboard_contents;
@@ -92,11 +89,6 @@ pub fn run() {
             set_default_pattern,
             // vendors
             get_vendors,
-            get_default_vendor,
-            set_default_vendor,
-            // models
-            set_default_model,
-            get_default_model,
             // secrets
             get_env_file_path,
             get_api_keys,
