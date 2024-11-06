@@ -1,15 +1,8 @@
 <script lang="ts">
   import { Button } from "$lib/components/ui/button";
   import { invoke } from "@tauri-apps/api/core";
-  import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-    CardFooter,
-  } from "$lib/components/ui/card";
   import { onMount } from "svelte";
-  import SliderComponent from "./ParameterSlider.svelte";
+  import SliderComponent from "../input/ParameterSlider.svelte";
   import { Loader2 } from "lucide-svelte";
 
   // Add default constants
@@ -63,6 +56,7 @@
 
   async function resetModelParameters() {
     try {
+      isLoading = true;
       temperature = DEFAULT_TEMPERATURE;
       presencePenalty = DEFAULT_PRESENCE_PENALTY;
       topP = DEFAULT_TOP_P;
@@ -71,6 +65,8 @@
       await saveModelParameters();
     } catch (err) {
       console.error("Failed to reset model parameters:", err);
+    } finally {
+      isLoading = false;
     }
   }
 
@@ -79,9 +75,8 @@
   });
 </script>
 
-<Card>
-  <CardHeader class="flex flex-row items-center justify-between">
-    <CardTitle>Model Parameters</CardTitle>
+<div class="p-4 space-y-8">
+  <div class="flex justify-end">
     <Button
       variant="outline"
       on:click={resetModelParameters}
@@ -94,8 +89,9 @@
         Reset
       {/if}
     </Button>
-  </CardHeader>
-  <CardContent class="space-y-8">
+  </div>
+
+  <div class="space-y-8">
     <SliderComponent
       id="temperature"
       label="Temperature"
@@ -132,6 +128,5 @@
         await saveModelParameters();
       }}
     />
-  </CardContent>
-  <CardFooter class="flex justify-end gap-2"></CardFooter>
-</Card>
+  </div>
+</div>
