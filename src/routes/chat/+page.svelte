@@ -16,6 +16,9 @@
   } from "lucide-svelte/icons";
   // lib components
   import ModelParameters from "$lib/components/cards/ModelParameters.svelte";
+  import PatternSearchBox from "$lib/components/search-box/Patterns.svelte";
+  import ContextSearchBox from "$lib/components/search-box/Contexts.svelte";
+
   // tauri
   import { writeText } from "@tauri-apps/plugin-clipboard-manager";
   import { create, BaseDirectory } from "@tauri-apps/plugin-fs";
@@ -163,66 +166,70 @@
   </div>
 
   <!-- Input Area -->
-  <div class="flex gap-2">
-    <Select.Root bind:selected={messageType}>
-      <Select.Trigger class="w-[140px]">
-        <div class="flex items-center gap-2">
-          {#if messageType.icon}
-            {@const Icon = messageType.icon}
-            <Icon class="size-4" />
-          {/if}
-          <Select.Value>{messageType.label}</Select.Value>
-        </div>
-      </Select.Trigger>
-      <Select.Content>
-        {#each inputTypes as type}
-          <Select.Item value={type}>
-            <div class="flex items-center gap-2">
-              {#if type.icon}
-                {@const Icon = type.icon}
-                <Icon class="size-4" />
-              {/if}
-              {type.label}
-            </div>
-          </Select.Item>
-        {/each}
-      </Select.Content>
-    </Select.Root>
+  <div class="flex flex-col gap-2">
+    <!-- First row: Input type, pattern search, and settings -->
+    <div class="flex gap-2">
+      <Select.Root bind:selected={messageType}>
+        <Select.Trigger class="w-[140px]">
+          <div class="flex items-center gap-2">
+            {#if messageType.icon}
+              {@const Icon = messageType.icon}
+              <Icon class="size-4" />
+            {/if}
+            <Select.Value>{messageType.label}</Select.Value>
+          </div>
+        </Select.Trigger>
+        <Select.Content>
+          {#each inputTypes as type}
+            <Select.Item value={type}>
+              <div class="flex items-center gap-2">
+                {#if type.icon}
+                  {@const Icon = type.icon}
+                  <Icon class="size-4" />
+                {/if}
+                {type.label}
+              </div>
+            </Select.Item>
+          {/each}
+        </Select.Content>
+      </Select.Root>
+      <PatternSearchBox />
+      <ContextSearchBox />
 
-    <!-- input -->
-    <Input
-      class="flex-1"
-      placeholder="Type your message..."
-      bind:value={inputMessage}
-    />
-
-    <!-- send button -->
-    <Button on:click={handleSend}>Send</Button>
-
-    <!-- settings drawer  -->
-    <Drawer.Root bind:open={showSettings}>
-      <Drawer.Trigger
-        class={buttonVariants({ variant: "outline", size: "icon" })}
-      >
-        <Settings class="size-4" />
-        <span class="sr-only">Model settings</span>
-      </Drawer.Trigger>
-      <Drawer.Content>
-        <div class="mx-auto w-full max-w-sm">
-          <Drawer.Header>
-            <Drawer.Title>Model Parameters</Drawer.Title>
-            <Drawer.Description>
-              Adjust the AI model's behavior parameters.
-            </Drawer.Description>
-          </Drawer.Header>
-          <ModelParameters />
-          <Drawer.Footer>
-            <Drawer.Close class={buttonVariants({ variant: "outline" })}>
-              Close
-            </Drawer.Close>
-          </Drawer.Footer>
-        </div>
-      </Drawer.Content>
-    </Drawer.Root>
+      <!-- settings drawer  -->
+      <Drawer.Root bind:open={showSettings}>
+        <Drawer.Trigger
+          class={buttonVariants({ variant: "outline", size: "icon" })}
+        >
+          <Settings class="size-4" />
+          <span class="sr-only">Model settings</span>
+        </Drawer.Trigger>
+        <Drawer.Content>
+          <div class="mx-auto w-full max-w-sm">
+            <Drawer.Header>
+              <Drawer.Title>Model Parameters</Drawer.Title>
+              <Drawer.Description>
+                Adjust the AI model's behavior parameters.
+              </Drawer.Description>
+            </Drawer.Header>
+            <ModelParameters />
+            <Drawer.Footer>
+              <Drawer.Close class={buttonVariants({ variant: "outline" })}>
+                Close
+              </Drawer.Close>
+            </Drawer.Footer>
+          </div>
+        </Drawer.Content>
+      </Drawer.Root>
+    </div>
+    <!-- Second row: Input and send button -->
+    <div class="flex gap-2">
+      <Input
+        class="flex-1"
+        placeholder="Type your message..."
+        bind:value={inputMessage}
+      />
+      <Button on:click={handleSend}>Send</Button>
+    </div>
   </div>
 </div>
