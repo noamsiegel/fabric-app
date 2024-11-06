@@ -1,142 +1,228 @@
 <script lang="ts">
-  import { Button } from "$lib/components/ui/button";
-  import { Input } from "$lib/components/ui/input";
+  // shadcn components
   import * as Card from "$lib/components/ui/card";
-  import { SendHorizontal } from "lucide-svelte";
+  import * as Drawer from "$lib/components/ui/drawer";
+  import * as ContextMenu from "$lib/components/ui/context-menu/index.js";
+  import * as Select from "$lib/components/ui/select";
+  import { Input } from "$lib/components/ui/input";
+  import { Button } from "$lib/components/ui/button";
+  import { buttonVariants } from "$lib/components/ui/button";
+  import {
+    Settings,
+    Text,
+    Link,
+    Youtube,
+    MessageCircleQuestion,
+  } from "lucide-svelte/icons";
+  // lib components
+  import ModelParameters from "$lib/components/cards/ModelParameters.svelte";
+  // tauri
+  import { writeText } from "@tauri-apps/plugin-clipboard-manager";
+  import { create, BaseDirectory } from "@tauri-apps/plugin-fs";
 
-  let messages: any[] = [];
-  let inputMessage = "";
-  let chatContainer: any;
-
-  // Auto scroll to bottom when new messages arrive
-  $: if (chatContainer && messages) {
-    setTimeout(() => {
-      chatContainer.scrollTop = chatContainer.scrollHeight;
-    }, 0);
+  // Define the interface
+  interface InputType {
+    value: string;
+    label: string;
+    icon: any; // You could make this more specific based on your icon types
+    flag: string;
   }
 
-  async function handleSubmit() {
-    if (!inputMessage.trim()) return;
+  // Input type options
+  const inputTypes: InputType[] = [
+    { value: "text", label: "Text", icon: Text, flag: "paste" },
+    { value: "url", label: "URL", icon: Link, flag: "-u" },
+    { value: "youtube", label: "YouTube", icon: Youtube, flag: "-y" },
+    {
+      value: "question",
+      label: "Question",
+      icon: MessageCircleQuestion,
+      flag: "-q",
+    },
+  ];
 
-    // Add user message
-    messages = [...messages, { role: "user", content: inputMessage }];
+  let messageType = $state(inputTypes[0]);
 
-    // Clear input
-    const messageToSend = inputMessage;
-    inputMessage = "";
+  // Define message type
+  interface Message {
+    role: "user" | "assistant";
+    content: string;
+    flag?: string;
+    type?: string; // Optional since assistant messages won't have a type
+  }
 
+  // State management
+  let messages = $state<Message[]>([
+    { role: "assistant", content: "Hello! How can I help you today?" },
+  ]);
+  let inputMessage = $state("");
+  let showSettings = $state(false);
+
+  async function handleCopy(content: string) {
     try {
-      // Add loading message
-      messages = [
-        ...messages,
-        { role: "assistant", content: "...", loading: true },
-      ];
-
-      // Send message to API
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: messageToSend }),
-      });
-
-      const data = await response.json();
-
-      // Replace loading message with actual response
-      messages = messages.slice(0, -1);
-      messages = [...messages, { role: "assistant", content: data.message }];
+      console.log("Copying to clipboard:", content);
+      await writeText(content);
     } catch (error) {
-      console.error("Error:", error);
-      messages = messages.slice(0, -1);
+      console.error("Failed to copy to clipboard:", error);
+    }
+  }
+
+  async function handleDownload(content: string) {
+    try {
+      // Generate timestamp for unique filename
+      const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+      const filename = `fabric-chat-${timestamp}.txt`;
+
+      // Create and write to file in Downloads directory
+      const file = await create(filename, { baseDir: BaseDirectory.Download });
+      await file.write(new TextEncoder().encode(content));
+      await file.close();
+    } catch (error) {
+      console.error("Failed to download message:", error);
+    }
+  }
+
+  // Update message display to show input type
+  function getMessageClass(message: any) {
+    const baseClass =
+      message.role === "user"
+        ? "ml-auto bg-primary/10 max-w-[80%]"
+        : "mr-auto bg-muted max-w-[80%]";
+    return baseClass;
+  }
+
+  // Update handleSend to properly manage message state
+  function handleSend() {
+    console.log("handleSend called");
+    console.log("Current input:", inputMessage);
+    if (inputMessage.trim()) {
+      // Add user message
       messages = [
         ...messages,
-        { role: "assistant", content: "Sorry, something went wrong." },
+        {
+          role: "user",
+          content: inputMessage,
+          type: messageType.value,
+          flag: messageType.flag,
+        },
       ];
+
+      // Add mock assistant response
+      messages = [
+        ...messages,
+        {
+          role: "assistant",
+          content: "This is a mock response. Replace with actual AI response.",
+        },
+      ];
+
+      // Clear input after sending
+      inputMessage = "";
     }
   }
 </script>
 
 <div class="container mx-auto max-w-4xl p-4 space-y-4">
-  <Card.Root class="h-[80vh]">
-    <Card.Header>
-      <Card.Title>Chat</Card.Title>
-      <Card.Description>Chat with the AI assistant</Card.Description>
-    </Card.Header>
-    <Card.Content class="h-full pb-24 relative">
-      <div
-        class="messages h-full overflow-y-auto pr-4"
-        bind:this={chatContainer}
-      >
-        {#each messages as message}
-          <div class="message {message.role} mb-4">
-            <div
-              class="rounded-lg p-4 {message.role === 'user'
-                ? 'bg-primary text-primary-foreground ml-auto'
-                : 'bg-muted'} max-w-[80%] w-fit"
-            >
-              {#if message.loading}
-                <div class="loading-dots">
-                  <span>.</span><span>.</span><span>.</span>
+  <!-- Message Log -->
+  <div class="space-y-4 h-[60vh] overflow-y-auto p-4 rounded-lg border">
+    {#each messages as message}
+      <ContextMenu.Root>
+        <ContextMenu.Trigger>
+          <Card.Root class={getMessageClass(message)}>
+            <Card.Content class="p-3">
+              {#if message.role === "user" && message.type}
+                <div
+                  class="flex items-center gap-2 mb-1 text-xs text-muted-foreground"
+                >
+                  {#if inputTypes.find((t) => t.value === message.type)?.icon}
+                    {@const Icon = inputTypes.find(
+                      (t) => t.value === message.type,
+                    )?.icon}
+                    <Icon class="size-3" />
+                  {/if}
+                  <span
+                    >{inputTypes.find((t) => t.value === message.type)
+                      ?.label}</span
+                  >
                 </div>
-              {:else}
-                {message.content}
               {/if}
+              <p class="text-sm">{message.content}</p>
+            </Card.Content>
+          </Card.Root>
+        </ContextMenu.Trigger>
+        <ContextMenu.Content>
+          <ContextMenu.Item on:click={() => handleCopy(message.content)}>
+            Copy
+          </ContextMenu.Item>
+          <ContextMenu.Item on:click={() => handleDownload(message.content)}>
+            Download
+          </ContextMenu.Item>
+        </ContextMenu.Content>
+      </ContextMenu.Root>
+    {/each}
+  </div>
+
+  <!-- Input Area -->
+  <div class="flex gap-2">
+    <Select.Root bind:selected={messageType}>
+      <Select.Trigger class="w-[140px]">
+        <div class="flex items-center gap-2">
+          {#if messageType.icon}
+            {@const Icon = messageType.icon}
+            <Icon class="size-4" />
+          {/if}
+          <Select.Value>{messageType.label}</Select.Value>
+        </div>
+      </Select.Trigger>
+      <Select.Content>
+        {#each inputTypes as type}
+          <Select.Item value={type}>
+            <div class="flex items-center gap-2">
+              {#if type.icon}
+                {@const Icon = type.icon}
+                <Icon class="size-4" />
+              {/if}
+              {type.label}
             </div>
-          </div>
+          </Select.Item>
         {/each}
-      </div>
+      </Select.Content>
+    </Select.Root>
 
-      <div class="absolute bottom-0 left-0 right-0 p-4 bg-card">
-        <form on:submit|preventDefault={handleSubmit} class="flex gap-2">
-          <Input
-            type="text"
-            bind:value={inputMessage}
-            placeholder="Type your message..."
-            class="flex-1"
-          />
-          <Button type="submit">
-            <SendHorizontal class="h-4 w-4 mr-2" />
-            Pattern
-          </Button>
-          <Button type="submit">
-            <SendHorizontal class="h-4 w-4 mr-2" />
-            Send
-          </Button>
-        </form>
-      </div>
-    </Card.Content>
-  </Card.Root>
+    <!-- input -->
+    <Input
+      class="flex-1"
+      placeholder="Type your message..."
+      bind:value={inputMessage}
+    />
+
+    <!-- send button -->
+    <Button on:click={handleSend}>Send</Button>
+
+    <!-- settings drawer  -->
+    <Drawer.Root bind:open={showSettings}>
+      <Drawer.Trigger
+        class={buttonVariants({ variant: "outline", size: "icon" })}
+      >
+        <Settings class="size-4" />
+        <span class="sr-only">Model settings</span>
+      </Drawer.Trigger>
+      <Drawer.Content>
+        <div class="mx-auto w-full max-w-sm">
+          <Drawer.Header>
+            <Drawer.Title>Model Parameters</Drawer.Title>
+            <Drawer.Description>
+              Adjust the AI model's behavior parameters.
+            </Drawer.Description>
+          </Drawer.Header>
+          <ModelParameters />
+          <Drawer.Footer>
+            <Drawer.Close class={buttonVariants({ variant: "outline" })}>
+              Close
+            </Drawer.Close>
+          </Drawer.Footer>
+        </div>
+      </Drawer.Content>
+    </Drawer.Root>
+  </div>
 </div>
-
-<style>
-  .message.user {
-    display: flex;
-    justify-content: flex-end;
-  }
-
-  .loading-dots {
-    display: flex;
-    gap: 0.2rem;
-  }
-
-  .loading-dots span {
-    animation: bounce 1s infinite;
-  }
-
-  .loading-dots span:nth-child(2) {
-    animation-delay: 0.2s;
-  }
-
-  .loading-dots span:nth-child(3) {
-    animation-delay: 0.4s;
-  }
-
-  @keyframes bounce {
-    0%,
-    100% {
-      transform: translateY(0);
-    }
-    50% {
-      transform: translateY(-5px);
-    }
-  }
-</style>
