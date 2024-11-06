@@ -3,7 +3,6 @@
   import { Input } from "$lib/components/ui/input";
   import * as Card from "$lib/components/ui/card";
   import { SendHorizontal } from "lucide-svelte";
-  import Sidebar from "$lib/components/Sidebar.svelte"; // Add this import
 
   let messages: any[] = [];
   let inputMessage = "";
@@ -57,7 +56,6 @@
 </script>
 
 <div class="container mx-auto max-w-4xl p-4 space-y-4">
-  <Sidebar />
   <Card.Root class="h-[80vh]">
     <Card.Header>
       <Card.Title>Chat</Card.Title>

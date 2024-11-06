@@ -1,51 +1,20 @@
 <script lang="ts">
-  import {
-    Settings,
-    FileText,
-    Database,
-    Home,
-    Layers,
-    MessageCircle,
-  } from "lucide-svelte";
+  import { Settings } from "lucide-svelte";
   import { settingsOpen } from "$lib/stores/settings";
-  import { page } from "$app/stores";
-  import NavbarItem from "./navbar/nav-item.svelte";
   import FabricLogoPng from "$lib/static/icons/fabric-logo-png.png";
-
-  const navItems = [
-    { href: "/", icon: Home },
-    { href: "/patterns", icon: FileText },
-    { href: "/models", icon: Database },
-    { href: "/contexts", icon: Layers },
-    { href: "/chat", icon: MessageCircle },
-  ];
 </script>
 
-<!-- TODO make sure that the position of the icons does not shift on page change -->
-<!-- Issue URL: https://github.com/noamsiegel/fabric-app/issues/99 -->
-<!-- Issue URL: https://github.com/noamsiegel/fabric-app/issues/97 -->
-
 <header class="flex justify-between items-center p-4 border-b h-16">
-  <!-- Left section with fixed width -->
-  <div class="flex items-center w-[100px]">
+  <div class="flex items-center">
     <a
       href="https://github.com/danielmiessler/fabric"
       class="flex items-center"
     >
       <img src={FabricLogoPng} alt="Fabric Logo" class="h-8 w-8 mr-2" />
-      <!-- <h1 class="text-2xl font-bold">Fabric</h1> -->
     </a>
   </div>
 
-  <!-- Center section -->
-  <nav class="flex justify-center space-x-8">
-    {#each navItems as { href, icon }}
-      <NavbarItem {href} {icon} active={$page.url.pathname === href} />
-    {/each}
-  </nav>
-
-  <!-- Right section with fixed width -->
-  <div class="flex justify-end w-[100px]">
+  <div class="flex justify-end">
     <button
       class="text-gray-600 hover:text-gray-900"
       on:click={() => ($settingsOpen = true)}
