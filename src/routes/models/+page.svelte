@@ -1,7 +1,7 @@
 <script lang="ts">
   // Update imports to explicitly include .svelte extension
-  import ModelSettings from "./cards/ModelSettings.svelte";
-  import ModelParameters from "./cards/ModelParameters.svelte";
+  import ModelSettings from "$lib/components/cards/ModelSettings.svelte";
+  import ModelParameters from "$lib/components/cards/ModelParameters.svelte";
   import Table from "./table/table.svelte";
 </script>
 
