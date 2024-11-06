@@ -26,7 +26,7 @@
 
   // table components
   import Actions from "./actions.svelte";
-  import RefreshButton from "../buttons/refresh-models.svelte";
+  import RefreshButton from "$lib/components/buttons/refresh-models.svelte";
 
   // tauri
   import { invoke } from "@tauri-apps/api/core";
@@ -62,7 +62,7 @@
     const filteredData = originalModelsData.filter(
       (model) =>
         selectedVendor.value === "all" ||
-        model.provider === selectedVendor.value
+        model.provider === selectedVendor.value,
     );
     modelsData.set(filteredData);
   }
@@ -126,7 +126,7 @@
     const filteredData = originalModelsData.filter(
       (model) =>
         selectedVendor.value === "all" ||
-        model.provider === selectedVendor.value
+        model.provider === selectedVendor.value,
     );
     modelsData.set(filteredData);
     loadTimes.filter = performance.now() - startTime;
