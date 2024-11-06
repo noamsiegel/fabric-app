@@ -1,9 +1,15 @@
 <script lang="ts">
-  import { Settings, FileText, Database, Home, Layers } from "lucide-svelte";
+  import {
+    Settings,
+    FileText,
+    Database,
+    Home,
+    Layers,
+    MessageCircle,
+  } from "lucide-svelte";
   import { settingsOpen } from "$lib/stores/settings";
   import { page } from "$app/stores";
   import NavbarItem from "./navbar/nav-item.svelte";
-  import FabricLogoGif from "$lib/static/icons/fabric-logo-gif.gif";
   import FabricLogoPng from "$lib/static/icons/fabric-logo-png.png";
 
   const navItems = [
@@ -11,6 +17,7 @@
     { href: "/patterns", icon: FileText },
     { href: "/models", icon: Database },
     { href: "/contexts", icon: Layers },
+    { href: "/chat", icon: MessageCircle },
   ];
 </script>
 
