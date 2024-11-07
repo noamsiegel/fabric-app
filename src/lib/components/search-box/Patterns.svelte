@@ -97,6 +97,7 @@
 									value={pattern.value}
 									onSelect={() => {
 										value = pattern.value;
+										onPatternSelected(pattern.value);
 										closeAndFocusTrigger();
 									}}
 								>
