@@ -18,6 +18,7 @@
   import ModelParameters from "$lib/components/cards/ModelParameters.svelte";
   import PatternSearchBox from "$lib/components/search-box/Patterns.svelte";
   import ContextSearchBox from "$lib/components/search-box/Contexts.svelte";
+  import ModelsSearchBox from "$lib/components/search-box/Models.svelte";
 
   // tauri
   import { writeText } from "@tauri-apps/plugin-clipboard-manager";
@@ -125,7 +126,7 @@
   }
 </script>
 
-<div class="container mx-auto max-w-4xl p-4 space-y-4">
+<div>
   <!-- Message Log -->
   <div class="space-y-4 h-[60vh] overflow-y-auto p-4 rounded-lg border">
     {#each messages as message}
@@ -168,34 +169,16 @@
   <!-- Input Area -->
   <div class="flex flex-col gap-2">
     <!-- First row: Input type, pattern search, and settings -->
-    <div class="flex gap-2">
-      <Select.Root bind:selected={messageType}>
-        <Select.Trigger class="w-[140px]">
-          <div class="flex items-center gap-2">
-            {#if messageType.icon}
-              {@const Icon = messageType.icon}
-              <Icon class="size-4" />
-            {/if}
-            <Select.Value>{messageType.label}</Select.Value>
-          </div>
-        </Select.Trigger>
-        <Select.Content>
-          {#each inputTypes as type}
-            <Select.Item value={type}>
-              <div class="flex items-center gap-2">
-                {#if type.icon}
-                  {@const Icon = type.icon}
-                  <Icon class="size-4" />
-                {/if}
-                {type.label}
-              </div>
-            </Select.Item>
-          {/each}
-        </Select.Content>
-      </Select.Root>
-      <PatternSearchBox />
-      <ContextSearchBox />
-
+    <div class="flex gap-2 w-full">
+      <div class="flex-1">
+        <PatternSearchBox />
+      </div>
+      <div class="flex-1">
+        <ContextSearchBox />
+      </div>
+      <div class="flex-1">
+        <ModelsSearchBox />
+      </div>
       <!-- settings drawer  -->
       <Drawer.Root bind:open={showSettings}>
         <Drawer.Trigger
@@ -223,12 +206,42 @@
       </Drawer.Root>
     </div>
     <!-- Second row: Input and send button -->
+
     <div class="flex gap-2">
+      <!-- input type selector -->
+      <Select.Root bind:selected={messageType}>
+        <Select.Trigger class="w-[140px]">
+          <div class="flex items-center gap-2">
+            {#if messageType.icon}
+              {@const Icon = messageType.icon}
+              <Icon class="size-4" />
+            {/if}
+            <Select.Value>{messageType.label}</Select.Value>
+          </div>
+        </Select.Trigger>
+        <Select.Content>
+          {#each inputTypes as type}
+            <Select.Item value={type}>
+              <div class="flex items-center gap-2">
+                {#if type.icon}
+                  {@const Icon = type.icon}
+                  <Icon class="size-4" />
+                {/if}
+                {type.label}
+              </div>
+            </Select.Item>
+          {/each}
+        </Select.Content>
+      </Select.Root>
+
+      <!-- input -->
       <Input
         class="flex-1"
         placeholder="Type your message..."
         bind:value={inputMessage}
       />
+
+      <!-- send button -->
       <Button on:click={handleSend}>Send</Button>
     </div>
   </div>
