@@ -19,6 +19,7 @@
   import PatternSearchBox from "$lib/components/search-box/Patterns.svelte";
   import ContextSearchBox from "$lib/components/search-box/Contexts.svelte";
   import ModelsSearchBox from "$lib/components/search-box/Models.svelte";
+  import InputType from "$lib/components/search-box/InputType.svelte";
 
   // tauri
   import { writeText } from "@tauri-apps/plugin-clipboard-manager";
@@ -97,8 +98,11 @@
 
   // Update handleSend to properly manage message state
   function handleSend() {
-    console.log("handleSend called");
-    console.log("Current input:", inputMessage);
+    console.log({
+      message: inputMessage,
+      type: messageType.value,
+      flag: messageType.flag,
+    });
     if (inputMessage.trim()) {
       // Add user message
       messages = [
@@ -124,9 +128,21 @@
       inputMessage = "";
     }
   }
+
+  function handleTypeChange(value: string) {
+    console.log("handleTypeChange", value);
+    const newType = inputTypes.find((t) => t.value === value) ?? inputTypes[0];
+    messageType = newType;
+    console.log("Message type changed:", {
+      type: newType.value,
+      label: newType.label,
+      flag: newType.flag,
+      currentMessage: inputMessage,
+    });
+  }
 </script>
 
-<div>
+<div class="container mx-auto max-w-4xl p-4 space-y-4">
   <!-- Message Log -->
   <div class="space-y-4 h-[60vh] overflow-y-auto p-4 rounded-lg border">
     {#each messages as message}
@@ -209,30 +225,7 @@
 
     <div class="flex gap-2">
       <!-- input type selector -->
-      <Select.Root bind:selected={messageType}>
-        <Select.Trigger class="w-[140px]">
-          <div class="flex items-center gap-2">
-            {#if messageType.icon}
-              {@const Icon = messageType.icon}
-              <Icon class="size-4" />
-            {/if}
-            <Select.Value>{messageType.label}</Select.Value>
-          </div>
-        </Select.Trigger>
-        <Select.Content>
-          {#each inputTypes as type}
-            <Select.Item value={type}>
-              <div class="flex items-center gap-2">
-                {#if type.icon}
-                  {@const Icon = type.icon}
-                  <Icon class="size-4" />
-                {/if}
-                {type.label}
-              </div>
-            </Select.Item>
-          {/each}
-        </Select.Content>
-      </Select.Root>
+      <InputType onInputTypeSelected={handleTypeChange} />
 
       <!-- input -->
       <Input
