@@ -10,8 +10,12 @@
 	import { onMount } from "svelte";
 
 	// Make onContextsListed optional with a default no-op function
-	let { onContextsListed = (contexts: string) => {} } = $props<{
-		onContextsListed?: (contexts: string) => void;
+	// let { onContextsListed = () => {} } = $props<{
+	// 	onContextsListed?: (contexts: string) => void;
+	// }>();
+
+	let { onContextSelected = () => {} } = $props<{
+		onContextSelected?: (context: string) => void;
 	}>();
 
 	interface Context {
@@ -24,24 +28,40 @@
 	let value = $state("");
 	let search = $state("");
 	let triggerRef = $state<HTMLButtonElement>(null!);
+	let defaultContext = $state<string | null>(null);
 
-	const selectedValue = $derived(
-		contexts.find((c) => c.value === value)?.label ?? "Select a context...",
+	const selectedContext = $derived(
+		contexts.find((c) => c.value === value)?.label ??
+			defaultContext ??
+			"Select a context...",
 	);
 
 	async function getContexts() {
 		try {
 			const result = await invoke("list_contexts");
-			console.log("contexts:", result);
-			// Split the string into an array by newlines and filter out empty strings
 			const contextArray = (result as string).split("\n").filter(Boolean);
 			contexts = contextArray.map((context) => ({
 				value: context,
 				label: context,
 			}));
-			onContextsListed(result as string);
+			// onContextsListed(result as string);
 		} catch (error) {
 			console.error("Failed to list contexts:", error);
+		}
+	}
+
+	async function getDefaultContext() {
+		try {
+			const defaultValue = await invoke("get_secret", {
+				key: "CURRENT_CONTEXT",
+			});
+			defaultContext = defaultValue as string;
+			if (defaultContext) {
+				// value = defaultContext;
+				onContextSelected(defaultContext);
+			}
+		} catch (error) {
+			console.error("Failed to get default context:", error);
 		}
 	}
 
@@ -54,6 +74,7 @@
 
 	onMount(() => {
 		getContexts();
+		getDefaultContext();
 	});
 </script>
 
@@ -66,7 +87,7 @@
 				aria-expanded={open}
 				class="w-[300px] justify-between"
 			>
-				{selectedValue}
+				{selectedContext}
 				<ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
 			</Button>
 		</Popover.Trigger>
@@ -86,7 +107,8 @@
 								<Command.Item
 									value={context.value}
 									onSelect={() => {
-										value = context.value;
+										// value = context.value;
+										onContextSelected(context.value);
 										closeAndFocusTrigger();
 									}}
 								>

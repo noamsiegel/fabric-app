@@ -62,6 +62,9 @@
   ]);
   let inputMessage = $state("");
   let showSettings = $state(false);
+  let currentPattern = $state("");
+  let currentContext = $state("");
+  let currentModel = $state("");
 
   async function handleCopy(content: string) {
     try {
@@ -102,6 +105,9 @@
       message: inputMessage,
       type: messageType.value,
       flag: messageType.flag,
+      pattern: currentPattern,
+      context: currentContext,
+      model: currentModel,
     });
     if (inputMessage.trim()) {
       // Add user message
@@ -187,13 +193,17 @@
     <!-- First row: Input type, pattern search, and settings -->
     <div class="flex gap-2 w-full">
       <div class="flex-1">
-        <PatternSearchBox />
+        <PatternSearchBox
+          onPatternSelected={(pattern) => (currentPattern = pattern)}
+        />
       </div>
       <div class="flex-1">
-        <ContextSearchBox />
+        <ContextSearchBox
+          onContextSelected={(context) => (currentContext = context)}
+        />
       </div>
       <div class="flex-1">
-        <ModelsSearchBox />
+        <ModelsSearchBox onModelSelected={(model) => (currentModel = model)} />
       </div>
       <!-- settings drawer  -->
       <Drawer.Root bind:open={showSettings}>

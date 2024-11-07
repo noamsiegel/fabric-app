@@ -24,9 +24,12 @@
 	let value = $state("");
 	let search = $state("");
 	let triggerRef = $state<HTMLButtonElement>(null!);
+	let defaultModel = $state<string | null>(null);
 
-	const selectedValue = $derived(
-		models.find((m) => m.value === value)?.label ?? "Select a model...",
+	const selectedModel = $derived(
+		models.find((m) => m.value === value)?.label ??
+			defaultModel ??
+			"Select a model...",
 	);
 
 	async function getModels() {
@@ -42,6 +45,21 @@
 		}
 	}
 
+	async function getDefaultModel() {
+		try {
+			const defaultValue = await invoke("get_secret", {
+				key: "DEFAULT_MODEL",
+			});
+			defaultModel = defaultValue as string;
+			if (defaultModel) {
+				// value = defaultModel;
+				onModelSelected(defaultModel);
+			}
+		} catch (error) {
+			console.error("Failed to get default model:", error);
+		}
+	}
+
 	function closeAndFocusTrigger() {
 		open = false;
 		tick().then(() => {
@@ -49,8 +67,9 @@
 		});
 	}
 
-	onMount(() => {
-		getModels();
+	onMount(async () => {
+		await getModels();
+		await getDefaultModel();
 	});
 </script>
 
@@ -63,7 +82,7 @@
 				aria-expanded={open}
 				class="w-[300px] justify-between"
 			>
-				{selectedValue}
+				{selectedModel}
 				<ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
 			</Button>
 		</Popover.Trigger>
