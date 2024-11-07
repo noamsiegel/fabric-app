@@ -6,6 +6,9 @@ import { platform } from "@tauri-apps/plugin-os";
 
 export async function runFabric(flag: string, message: string, model: string, pattern: string, context?: string) {
   try {
+    // Fix the order in the log string to match the actual command structure
+    console.log("pattern", pattern);
+    console.log("Running fabric command:", `fabric ${flag} ${message} | fabric --pattern ${pattern} --model ${model}${context && context.trim() ? ` --context ${context}` : ""}`);
 
     // Second command: fabric with pattern and model
     const result = await Command.create("fabric", [
@@ -17,7 +20,7 @@ export async function runFabric(flag: string, message: string, model: string, pa
       pattern,
       "--model",
       model,
-      ...(context ? ["--context", context] : []),
+      ...(context && context.trim() ? ["--context", context] : []),
     ]).execute();
 
     return result.stdout;
