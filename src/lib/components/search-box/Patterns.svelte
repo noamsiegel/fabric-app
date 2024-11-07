@@ -9,6 +9,10 @@
 	import { tick } from "svelte";
 	import { onMount } from "svelte";
 
+	let { onPatternSelected = () => {} } = $props<{
+		onPatternSelected?: (pattern: string) => void;
+	}>();
+
 	interface Pattern {
 		value: string;
 		label: string;
@@ -19,9 +23,12 @@
 	let value = $state("");
 	let search = $state("");
 	let triggerRef = $state<HTMLButtonElement>(null!);
+	let defaultPattern = $state<string | null>(null);
 
-	const selectedValue = $derived(
-		patterns.find((p) => p.value === value)?.label ?? "Select a pattern...",
+	const selectedPattern = $derived(
+		patterns.find((p) => p.value === value)?.label ??
+			defaultPattern ??
+			"Select a pattern...",
 	);
 
 	async function getPatterns() {
@@ -32,6 +39,21 @@
 		}));
 	}
 
+	async function getDefaultPattern() {
+		try {
+			const defaultValue = await invoke("get_secret", {
+				key: "DEFAULT_PATTERN",
+			});
+			defaultPattern = defaultValue as string;
+			if (defaultPattern) {
+				// value = defaultPattern;
+				onPatternSelected(defaultPattern);
+			}
+		} catch (error) {
+			console.error("Failed to get default model:", error);
+		}
+	}
+
 	function closeAndFocusTrigger() {
 		open = false;
 		tick().then(() => {
@@ -39,8 +61,9 @@
 		});
 	}
 
-	onMount(() => {
-		getPatterns();
+	onMount(async () => {
+		await getPatterns();
+		await getDefaultPattern();
 	});
 </script>
 
@@ -53,7 +76,7 @@
 				aria-expanded={open}
 				class="w-[300px] justify-between"
 			>
-				{selectedValue}
+				{selectedPattern}
 				<ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
 			</Button>
 		</Popover.Trigger>
