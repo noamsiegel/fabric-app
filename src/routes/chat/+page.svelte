@@ -25,6 +25,9 @@
   import { writeText } from "@tauri-apps/plugin-clipboard-manager";
   import { create, BaseDirectory } from "@tauri-apps/plugin-fs";
 
+  // lib
+  import { runFabric } from "$lib/fabricCommands";
+
   // Define the interface
   interface InputType {
     value: string;
@@ -100,7 +103,7 @@
   }
 
   // Update handleSend to properly manage message state
-  function handleSend() {
+  async function handleSend() {
     console.log({
       message: inputMessage,
       type: messageType.value,
@@ -109,6 +112,10 @@
       context: currentContext,
       model: currentModel,
     });
+    console.log(
+      "fabric command:",
+      `${messageType.flag} ${inputMessage} | fabric -p ${currentPattern} -c ${currentContext} -m ${currentModel}`,
+    );
     if (inputMessage.trim()) {
       // Add user message
       messages = [
@@ -121,12 +128,27 @@
         },
       ];
 
+      // run fabric command
+      console.log(
+        "fabric command:",
+        `fabric ${messageType.flag} ${inputMessage} | fabric -p ${currentPattern} -m ${currentModel}`,
+      );
+
+      const result = await runFabric(
+        messageType.flag,
+        inputMessage,
+        currentModel,
+        currentContext,
+        currentPattern,
+      );
+      console.log("fabric result:", result);
+
       // Add mock assistant response
       messages = [
         ...messages,
         {
           role: "assistant",
-          content: "This is a mock response. Replace with actual AI response.",
+          content: result,
         },
       ];
 
