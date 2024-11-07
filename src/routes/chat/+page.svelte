@@ -25,6 +25,9 @@
   import { writeText } from "@tauri-apps/plugin-clipboard-manager";
   import { create, BaseDirectory } from "@tauri-apps/plugin-fs";
 
+  // lib
+  import { runFabric } from "$lib/fabricCommands";
+
   // Define the interface
   interface InputType {
     value: string;
@@ -62,6 +65,9 @@
   ]);
   let inputMessage = $state("");
   let showSettings = $state(false);
+  let currentPattern = $state("");
+  let currentContext = $state("");
+  let currentModel = $state("");
 
   async function handleCopy(content: string) {
     try {
@@ -97,12 +103,19 @@
   }
 
   // Update handleSend to properly manage message state
-  function handleSend() {
+  async function handleSend() {
     console.log({
       message: inputMessage,
       type: messageType.value,
       flag: messageType.flag,
+      pattern: currentPattern,
+      context: currentContext,
+      model: currentModel,
     });
+    console.log(
+      "fabric command:",
+      `${messageType.flag} ${inputMessage} | fabric -p ${currentPattern} -c ${currentContext} -m ${currentModel}`,
+    );
     if (inputMessage.trim()) {
       // Add user message
       messages = [
@@ -115,12 +128,27 @@
         },
       ];
 
+      // run fabric command
+      console.log(
+        "fabric command:",
+        `fabric ${messageType.flag} ${inputMessage} | fabric -p ${currentPattern} -m ${currentModel}`,
+      );
+
+      const result = await runFabric(
+        messageType.flag,
+        inputMessage,
+        currentModel,
+        currentContext,
+        currentPattern,
+      );
+      console.log("fabric result:", result);
+
       // Add mock assistant response
       messages = [
         ...messages,
         {
           role: "assistant",
-          content: "This is a mock response. Replace with actual AI response.",
+          content: result,
         },
       ];
 
@@ -187,13 +215,17 @@
     <!-- First row: Input type, pattern search, and settings -->
     <div class="flex gap-2 w-full">
       <div class="flex-1">
-        <PatternSearchBox />
+        <PatternSearchBox
+          onPatternSelected={(pattern) => (currentPattern = pattern)}
+        />
       </div>
       <div class="flex-1">
-        <ContextSearchBox />
+        <ContextSearchBox
+          onContextSelected={(context) => (currentContext = context)}
+        />
       </div>
       <div class="flex-1">
-        <ModelsSearchBox />
+        <ModelsSearchBox onModelSelected={(model) => (currentModel = model)} />
       </div>
       <!-- settings drawer  -->
       <Drawer.Root bind:open={showSettings}>

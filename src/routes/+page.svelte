@@ -10,9 +10,6 @@
   import { Label } from "$lib/components/ui/label";
   import { Textarea } from "$lib/components/ui/textarea";
 
-  // custom svelte components
-  import PatternCombobox from "$lib/components/PatternCombobox.svelte";
-
   // fabric commands
   import {
     scrapeUrlAndRunPattern,
@@ -72,11 +69,6 @@
       <div class="mb-6">
         <Label for="pattern-select">Select Pattern</Label>
         <!-- TODO make this  auto refresh the drop down items -->
-        <PatternCombobox
-          {patterns}
-          selectedPattern={$selected.value}
-          on:select={handlePatternSelect}
-        />
       </div>
       <div class="mb-6">
         <Label for="url-input">Enter URL to Scrape</Label>
