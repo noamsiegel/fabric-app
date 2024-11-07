@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@tanstack/table-core':
+        specifier: ^8.20.5
+        version: 8.20.5
       '@tauri-apps/api':
         specifier: ^2.0.3
         version: 2.0.3
@@ -64,8 +67,8 @@ importers:
         specifier: ^0.4.1
         version: 0.4.1(svelte@5.1.12)
       paneforge:
-        specifier: ^0.0.6
-        version: 0.0.6(svelte@5.1.12)
+        specifier: 1.0.0-next.1
+        version: 1.0.0-next.1(svelte@5.1.12)
       svelte:
         specifier: ^5.1.12
         version: 5.1.12
@@ -94,8 +97,8 @@ importers:
         specifier: ^5.6.3
         version: 5.6.3
       vaul-svelte:
-        specifier: ^0.3.2
-        version: 0.3.2(svelte@5.1.12)
+        specifier: 1.0.0-next.2
+        version: 1.0.0-next.2(svelte@5.1.12)
       vite:
         specifier: ^5.4.10
         version: 5.4.10
@@ -433,6 +436,10 @@ packages:
     peerDependencies:
       tailwindcss: '>=3.0.0 || insiders || >=4.0.0-alpha.20'
 
+  '@tanstack/table-core@8.20.5':
+    resolution: {integrity: sha512-P9dF7XbibHph2PFRz8gfBKEXEY/HJPOhym8CHmjF8y3q5mWpKx9xtZapXQUWCgkqvsK0R46Azuz+VaxD4Xl+Tg==}
+    engines: {node: '>=12'}
+
   '@tauri-apps/api@2.0.3':
     resolution: {integrity: sha512-840qk6n8rbXBXMA5/aAgTYsg5JAubKO0nXw5wf7IzGnUuYKGbB4oFBIZtXOIWy+E0kNTDI3qhq5iqsoMJfwp8g==}
 
@@ -642,8 +649,8 @@ packages:
     resolution: {integrity: sha512-U71cyTamuh1CRNCfpGY6to28lxvNwPG4Guz/EVjgf3Jmzv0vlDp1atT9eS5dDjMYHucpHbWns6Lwf3BKz6svdw==}
     engines: {node: '>= 0.6'}
 
-  cross-spawn@7.0.3:
-    resolution: {integrity: sha512-iRDPJKUPVEND7dHPO8rkbOnPpyDygcDFtWjpeWNCgy8WP2rXcxXL8TskReQl6OrB2G7+UJrags1q15Fudc7G6w==}
+  cross-spawn@7.0.5:
+    resolution: {integrity: sha512-ZVJrKKYunU38/76t0RMOulHOnUcbU9GbpWKAOZ0mhjr7CX6FVrH+4FrAapSOekrgFQ3f/8gwMEuIft0aKq6Hug==}
     engines: {node: '>= 8'}
 
   cssesc@3.0.0:
@@ -680,8 +687,8 @@ packages:
   eastasianwidth@0.2.0:
     resolution: {integrity: sha512-I88TYZWc9XiYHRQ4/3c5rjjfgkjhLyW2luGIheGERbNQ6OY7yTybanSpDXZa8y7VUP9YmDcYa+eyq4ca7iLqWA==}
 
-  electron-to-chromium@1.5.52:
-    resolution: {integrity: sha512-xtoijJTZ+qeucLBDNztDOuQBE1ksqjvNjvqFoST3nGC7fSpqJ+X6BdTBaY5BHG+IhWWmpc6b/KfpeuEDupEPOQ==}
+  electron-to-chromium@1.5.54:
+    resolution: {integrity: sha512-TX6vHleisn5i/4pekTyy1sdoLXQNy8VFvBK/fJRXSyp7GUO27KioLTG0Qo5wFjM3ZF4ryKinDo4m+IJ+rwUWSw==}
 
   emoji-regex@8.0.0:
     resolution: {integrity: sha512-MSjYzcWNOA0ewAHpz0MxpYFvwg6yjy1NG3xteoqz644VCo/RPgnr1/GGt+ic3iJTzQ8Eu3TdM14SawnVUmGE6A==}
@@ -915,10 +922,10 @@ packages:
   package-json-from-dist@1.0.1:
     resolution: {integrity: sha512-UEZIS3/by4OC8vL3P2dTXRETpebLI2NiI5vIrjaD/5UtrkFX/tNbwjTSRAGC/+7CAo2pIcBaRgWmcBBHcsaCIw==}
 
-  paneforge@0.0.6:
-    resolution: {integrity: sha512-jYeN/wdREihja5c6nK3S5jritDQ+EbCqC5NrDo97qCZzZ9GkmEcN5C0ZCjF4nmhBwkDKr6tLIgz4QUKWxLXjAw==}
+  paneforge@1.0.0-next.1:
+    resolution: {integrity: sha512-K28RZ/KLqnZJeuZ7TZNv5C51NrQ3UPggf2sIhIXjTd4brpRZpmCA9C2SL2o4CC0U2Ox75KxUFwEXq2A/iDBuZg==}
     peerDependencies:
-      svelte: ^4.0.0 || ^5.0.0-next.1
+      svelte: ^5.0.0-next.1
 
   path-key@3.1.1:
     resolution: {integrity: sha512-ojmeN0qd+y0jszEtoY48r0Peq5dwMEkIlCOu6Q5f41lfkswXuKtYrhgoTpLnyIcHm24Uhqx+5Tqm2InSwLhE6Q==}
@@ -1185,10 +1192,11 @@ packages:
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
 
-  vaul-svelte@0.3.2:
-    resolution: {integrity: sha512-X4OGWttSTVUl417qGDsSFgOvIx24DoiMRY/jaP9z0v9FL8LQQJ0RQ1ZM0QpdyQPRlNd24ewjNQHh5EgYDtfNpw==}
+  vaul-svelte@1.0.0-next.2:
+    resolution: {integrity: sha512-/SjvMvStOMwTnGsQAn+yP0bbQUufb3ZXu8MdnLeQCB33wCZ1ilCPa92DHx1EDhIlVTbiOitwhWp/zaHw/U3OqA==}
+    engines: {node: '>=18', pnpm: '>=8.7.0'}
     peerDependencies:
-      svelte: ^4.0.0 || ^5.0.0-next.1
+      svelte: ^5.0.0
 
   vite@5.4.10:
     resolution: {integrity: sha512-1hvaPshuPUtxeQ0hsVH3Mud0ZanOLwVTneA1EgbAM5LhaZEqyPWGRQ7BtaMvUrTDeEaC8pxtj6a6jku3x4z6SQ==}
@@ -1507,6 +1515,8 @@ snapshots:
       postcss-selector-parser: 6.0.10
       tailwindcss: 3.4.14
 
+  '@tanstack/table-core@8.20.5': {}
+
   '@tauri-apps/api@2.0.3': {}
 
   '@tauri-apps/cli-darwin-arm64@2.0.4':
@@ -1647,7 +1657,7 @@ snapshots:
   browserslist@4.24.2:
     dependencies:
       caniuse-lite: 1.0.30001678
-      electron-to-chromium: 1.5.52
+      electron-to-chromium: 1.5.54
       node-releases: 2.0.18
       update-browserslist-db: 1.1.1(browserslist@4.24.2)
 
@@ -1689,7 +1699,7 @@ snapshots:
 
   cookie@0.6.0: {}
 
-  cross-spawn@7.0.3:
+  cross-spawn@7.0.5:
     dependencies:
       path-key: 3.1.1
       shebang-command: 2.0.0
@@ -1713,7 +1723,7 @@ snapshots:
 
   eastasianwidth@0.2.0: {}
 
-  electron-to-chromium@1.5.52: {}
+  electron-to-chromium@1.5.54: {}
 
   emoji-regex@8.0.0: {}
 
@@ -1780,7 +1790,7 @@ snapshots:
 
   foreground-child@3.3.0:
     dependencies:
-      cross-spawn: 7.0.3
+      cross-spawn: 7.0.5
       signal-exit: 4.1.0
 
   fraction.js@4.3.7: {}
@@ -1922,10 +1932,10 @@ snapshots:
 
   package-json-from-dist@1.0.1: {}
 
-  paneforge@0.0.6(svelte@5.1.12):
+  paneforge@1.0.0-next.1(svelte@5.1.12):
     dependencies:
-      nanoid: 5.0.8
       svelte: 5.1.12
+      svelte-toolbelt: 0.4.6(svelte@5.1.12)
 
   path-key@3.1.1: {}
 
@@ -2228,10 +2238,11 @@ snapshots:
 
   util-deprecate@1.0.2: {}
 
-  vaul-svelte@0.3.2(svelte@5.1.12):
+  vaul-svelte@1.0.0-next.2(svelte@5.1.12):
     dependencies:
-      bits-ui: 0.21.16(svelte@5.1.12)
+      bits-ui: 1.0.0-next.46(svelte@5.1.12)
       svelte: 5.1.12
+      svelte-toolbelt: 0.4.6(svelte@5.1.12)
 
   vite@5.4.10:
     dependencies:
