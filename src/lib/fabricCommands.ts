@@ -4,6 +4,29 @@ import { platform } from "@tauri-apps/plugin-os";
 
 // base fabric settings
 
+export async function runFabric(flag: string, message: string, model: string, pattern: string, context?: string) {
+  try {
+
+    // Second command: fabric with pattern and model
+    const result = await Command.create("fabric", [
+      flag,
+      message,
+      "|",
+      "fabric",
+      "--pattern",
+      pattern,
+      "--model",
+      model,
+      ...(context ? ["--context", context] : []),
+    ]).execute();
+
+    return result.stdout;
+  } catch (error) {
+    console.error("Error running fabric command:", error);
+    return `Error: ${error instanceof Error ? error.message : String(error)}`;
+  }
+}
+
 // JinaAI functions
 
 export async function scrapeUrl(urlToScrape: string) {
@@ -53,7 +76,9 @@ async function runFabricCommand(
 ): Promise<string> {
   try {
     await invoke("set_is_running", { value: true });
-    const selectedPattern = await invoke("get_selected_pattern");
+    // const selectedPattern = await invoke("get_selected_pattern");
+    // TODO: Configure current pattern to be in store
+    const selectedPattern = "summarize";
     if (!selectedPattern) {
       return "Please select a pattern first.";
     }

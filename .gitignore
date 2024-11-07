@@ -10,3 +10,4 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vscode/extensions.json
 fabric-app.code-workspace
+**/.OLD/**
