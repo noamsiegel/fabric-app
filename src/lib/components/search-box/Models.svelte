@@ -9,7 +9,7 @@
 	import { tick } from "svelte";
 	import { onMount } from "svelte";
 
-	let { onModelSelected = (model: string) => {} } = $props<{
+	let { onModelSelected = () => {} } = $props<{
 		onModelSelected?: (model: string) => void;
 	}>();
 

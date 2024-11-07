@@ -32,8 +32,8 @@
 		},
 	];
 
-	let { onInputTypeSelected = (type: string) => {} } = $props<{
-		onInputTypeSelected?: (type: string) => void;
+	let { onInputTypeSelected = () => {} } = $props<{
+		onInputTypeSelected?: (flag: string) => void;
 	}>();
 
 	// Use state for open/value/search
@@ -92,7 +92,7 @@
 									value={type.value}
 									onSelect={() => {
 										value = type.value;
-										onInputTypeSelected(type.value);
+										onInputTypeSelected(type.flag);
 										closeAndFocusTrigger();
 									}}
 								>
