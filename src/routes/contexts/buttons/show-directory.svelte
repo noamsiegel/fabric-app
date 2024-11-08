@@ -14,6 +14,6 @@
   }
 </script>
 
-<Button variant="outline" on:click={getContextsDir}
+<Button variant="outline" onclick={getContextsDir}
   >Show Contexts Directory</Button
 >

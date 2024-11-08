@@ -90,7 +90,7 @@
     </div>
     <Button
       variant="outline"
-      on:click={handleUpdatePatterns}
+      onclick={handleUpdatePatterns}
       disabled={isUpdating}
     >
       {isUpdating ? "Updating..." : "Update Patterns"}
@@ -105,7 +105,7 @@
         readonly
         disabled={false}
         class="bg-white font-medium text-black cursor-help"
-        on:click={handleInputClick}
+        onclick={handleInputClick}
       />
     </div>
     <div class="space-y-2">
@@ -122,6 +122,6 @@
     </div>
   </CardContent>
   <CardFooter class="flex gap-2">
-    <Button on:click={saveGitSettings}>Save Settings</Button>
+    <Button onclick={saveGitSettings}>Save Settings</Button>
   </CardFooter>
 </Card>

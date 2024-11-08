@@ -53,7 +53,7 @@
             variant="outline"
             class="flex items-center gap-2"
             disabled={isInstalling}
-            on:click={async () => {
+            onclick={async () => {
               try {
                 isInstalling = true;
                 const result = await invoke("install_fabric");

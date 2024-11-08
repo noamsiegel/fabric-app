@@ -42,7 +42,7 @@
   </Card.Header>
   <Card.Content class="flex flex-col gap-4">
     <div>
-      <Button variant="outline" on:click={handleGetHomeDir}
+      <Button variant="outline" onclick={handleGetHomeDir}
         >Get Home Directory</Button
       >
       {#if homePath}
@@ -53,7 +53,7 @@
     </div>
 
     <div>
-      <Button variant="outline" on:click={handleGetFabricConfigDir}
+      <Button variant="outline" onclick={handleGetFabricConfigDir}
         >Get Fabric Config Directory</Button
       >
       {#if fabricConfigPath}
@@ -64,7 +64,7 @@
     </div>
 
     <div>
-      <Button variant="outline" on:click={handleGetFabricBinPath}
+      <Button variant="outline" onclick={handleGetFabricBinPath}
         >Get Fabric Bin Path</Button
       >
       {#if fabricBinPath}
