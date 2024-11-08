@@ -10,8 +10,8 @@
 
   // tables
   // import ModelsTable from "$lib/components/ModelsTable.svelte";
-  import SecretsTable from "./ApiKeysTable.svelte";
-  import BaseUrlTable from "./BaseUrlTable.svelte";
+  import SecretsTable from "../../lib/components/tables/api-keys.svelte";
+  import BaseUrlTable from "../../lib/components/tables/base-urls.svelte";
 
   // tauri plugins
   import { invoke } from "@tauri-apps/api/core";
@@ -53,7 +53,7 @@
             variant="outline"
             class="flex items-center gap-2"
             disabled={isInstalling}
-            on:click={async () => {
+            onclick={async () => {
               try {
                 isInstalling = true;
                 const result = await invoke("install_fabric");
@@ -97,9 +97,9 @@
         </Tabs.Content>
       </Tabs.Root>
       <Drawer.Footer class="pt-2">
-        <!-- <Drawer.Close asChild let:builder>
-          <Button variant="outline" builders={[builder]}>Close</Button>
-        </Drawer.Close> -->
+        <Drawer.Close>
+          <Button variant="outline">Close</Button>
+        </Drawer.Close>
       </Drawer.Footer>
     </div>
   </Drawer.Content>

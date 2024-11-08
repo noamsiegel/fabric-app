@@ -5,7 +5,7 @@
   import * as ContextMenu from "$lib/components/ui/context-menu/index.js";
   import * as Select from "$lib/components/ui/select";
   import { Input } from "$lib/components/ui/input";
-  import { Button } from "$lib/components/ui/button";
+  import { Button } from "$lib/components/ui/button/index.js";
   import { buttonVariants } from "$lib/components/ui/button";
   import {
     Settings,
@@ -15,48 +15,26 @@
     MessageCircleQuestion,
   } from "lucide-svelte/icons";
   // lib components
-  import ModelParameters from "$lib/components/cards/ModelParameters.svelte";
-  import PatternSearchBox from "$lib/components/search-box/Patterns.svelte";
-  import ContextSearchBox from "$lib/components/search-box/Contexts.svelte";
-  import ModelsSearchBox from "$lib/components/search-box/Models.svelte";
-  import InputType from "$lib/components/search-box/InputType.svelte";
+  import ModelParameters from "$lib/components/cards/model-parameters.svelte";
+  import PatternSearchBox from "$lib/components/search-box/patterns.svelte";
+  import ContextSearchBox from "$lib/components/search-box/contexts.svelte";
+  import ModelsSearchBox from "$lib/components/search-box/models.svelte";
+  import InputTypeSearchBox from "$lib/components/search-box/input-type.svelte";
 
   // tauri
   import { writeText } from "@tauri-apps/plugin-clipboard-manager";
   import { create, BaseDirectory } from "@tauri-apps/plugin-fs";
 
   // lib
-  import { runFabric } from "$lib/fabricCommands";
+  import { runFabric } from "$lib/utils/fabric";
 
   // Define the interface
-  interface InputType {
-    value: string;
-    label: string;
-    icon: any; // You could make this more specific based on your icon types
-    flag: string;
-  }
-
-  // Input type options
-  const inputTypes: InputType[] = [
-    { value: "text", label: "Text", icon: Text, flag: "paste" },
-    { value: "url", label: "URL", icon: Link, flag: "-u" },
-    { value: "youtube", label: "YouTube", icon: Youtube, flag: "-y" },
-    {
-      value: "question",
-      label: "Question",
-      icon: MessageCircleQuestion,
-      flag: "-q",
-    },
-  ];
-
-  let messageType = $state(inputTypes[0]);
 
   // Define message type
   interface Message {
     role: "user" | "assistant";
     content: string;
     flag?: string;
-    type?: string; // Optional since assistant messages won't have a type
   }
 
   // State management
@@ -68,6 +46,8 @@
   let currentPattern = $state("");
   let currentContext = $state("");
   let currentModel = $state("");
+  let currentFlag = $state("");
+
 
   async function handleCopy(content: string) {
     try {
@@ -103,71 +83,49 @@
   }
 
   // Update handleSend to properly manage message state
-  async function handleSend() {
+  async function handleSend(): Promise<void> {
     console.log({
+      flag: currentFlag,
       message: inputMessage,
-      type: messageType.value,
-      flag: messageType.flag,
       pattern: currentPattern,
       context: currentContext,
       model: currentModel,
     });
-    console.log(
-      "fabric command:",
-      `${messageType.flag} ${inputMessage} | fabric -p ${currentPattern} -c ${currentContext} -m ${currentModel}`,
-    );
-    if (inputMessage.trim()) {
-      // Add user message
-      messages = [
-        ...messages,
-        {
-          role: "user",
-          content: inputMessage,
-          type: messageType.value,
-          flag: messageType.flag,
-        },
-      ];
 
-      // run fabric command
-      console.log(
-        "fabric command:",
-        `fabric ${messageType.flag} ${inputMessage} | fabric -p ${currentPattern} -m ${currentModel}`,
-      );
-
-      const result = await runFabric(
-        messageType.flag,
-        inputMessage,
-        currentModel,
-        currentContext,
-        currentPattern,
-      );
-      console.log("fabric result:", result);
-
-      // Add mock assistant response
-      messages = [
-        ...messages,
-        {
-          role: "assistant",
-          content: result,
-        },
-      ];
-
-      // Clear input after sending
-      inputMessage = "";
+    if (!inputMessage.trim()) {
+      return;
     }
-  }
 
-  function handleTypeChange(value: string) {
-    console.log("handleTypeChange", value);
-    const newType = inputTypes.find((t) => t.value === value) ?? inputTypes[0];
-    messageType = newType;
-    console.log("Message type changed:", {
-      type: newType.value,
-      label: newType.label,
-      flag: newType.flag,
-      currentMessage: inputMessage,
-    });
-  }
+    // Add user message
+    messages = [
+      ...messages,
+      {
+      role: "user",
+      content: inputMessage,
+      flag: currentFlag,
+    },
+  ];
+
+  const result = await runFabric(
+    currentFlag,
+    inputMessage,
+    currentModel,
+    currentPattern,
+    currentContext,
+  );
+
+  // Add assistant response
+  messages = [
+    ...messages,
+    {
+      role: "assistant",
+      content: result,
+    },
+  ];
+
+  // Clear input after sending
+  inputMessage = "";
+}
 </script>
 
 <div class="container mx-auto max-w-4xl p-4 space-y-4">
@@ -199,10 +157,10 @@
           </Card.Root>
         </ContextMenu.Trigger>
         <ContextMenu.Content>
-          <ContextMenu.Item on:click={() => handleCopy(message.content)}>
+          <ContextMenu.Item onclick={() => handleCopy(message.content)}>
             Copy
           </ContextMenu.Item>
-          <ContextMenu.Item on:click={() => handleDownload(message.content)}>
+          <ContextMenu.Item onclick={() => handleDownload(message.content)}>
             Download
           </ContextMenu.Item>
         </ContextMenu.Content>
@@ -216,16 +174,16 @@
     <div class="flex gap-2 w-full">
       <div class="flex-1">
         <PatternSearchBox
-          onPatternSelected={(pattern) => (currentPattern = pattern)}
+          onPatternSelected={(pattern:string) => (currentPattern = pattern)}
         />
       </div>
       <div class="flex-1">
         <ContextSearchBox
-          onContextSelected={(context) => (currentContext = context)}
+          onContextSelected={(context:string) => (currentContext = context)}
         />
       </div>
       <div class="flex-1">
-        <ModelsSearchBox onModelSelected={(model) => (currentModel = model)} />
+        <ModelsSearchBox onModelSelected={(model:string) => (currentModel = model)} />
       </div>
       <!-- settings drawer  -->
       <Drawer.Root bind:open={showSettings}>
@@ -257,7 +215,8 @@
 
     <div class="flex gap-2">
       <!-- input type selector -->
-      <InputType onInputTypeSelected={handleTypeChange} />
+      <!-- <InputType onInputTypeSelected={handleTypeChange} /> -->
+      <InputTypeSearchBox onInputTypeSelected={(flag: string) => (currentFlag = flag)} />
 
       <!-- input -->
       <Input
@@ -267,7 +226,7 @@
       />
 
       <!-- send button -->
-      <Button on:click={handleSend}>Send</Button>
+      <Button onclick={handleSend}>Send</Button>
     </div>
   </div>
 </div>

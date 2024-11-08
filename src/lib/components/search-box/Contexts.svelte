@@ -8,11 +8,7 @@
 	import { cn } from "$lib/utils";
 	import { tick } from "svelte";
 	import { onMount } from "svelte";
-
-	// Make onContextsListed optional with a default no-op function
-	// let { onContextsListed = () => {} } = $props<{
-	// 	onContextsListed?: (contexts: string) => void;
-	// }>();
+	import X from "lucide-svelte/icons/x";
 
 	let { onContextSelected = () => {} } = $props<{
 		onContextSelected?: (context: string) => void;
@@ -48,6 +44,13 @@
 		} catch (error) {
 			console.error("Failed to list contexts:", error);
 		}
+	}
+
+	function clearContext(e: Event) {
+		e.stopPropagation(); // Prevent opening the popover
+		value = "";
+		defaultContext = null;
+		onContextSelected("");
 	}
 
 	async function getDefaultContext() {
@@ -88,7 +91,18 @@
 				class="w-[300px] justify-between"
 			>
 				{selectedContext}
-				<ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
+				<div class="flex items-center">
+					{#if value || defaultContext}
+						<button
+							onclick={clearContext}
+							class="mr-2 h-4 w-4 shrink-0 opacity-50 hover:opacity-100"
+							aria-label="Clear context"
+						>
+							<X class="h-4 w-4" />
+						</button>
+					{/if}
+					<ChevronsUpDown class="h-4 w-4 shrink-0 opacity-50" />
+				</div>
 			</Button>
 		</Popover.Trigger>
 		<Popover.Content class="w-[300px] p-0">
