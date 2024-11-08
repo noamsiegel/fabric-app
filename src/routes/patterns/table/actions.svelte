@@ -17,10 +17,20 @@
   // props
   export let defaultPattern: string;
 
+  function formatPatternForBackend(name: string): string {
+    return name
+      .split(" ")
+      .map((word) => word.toLowerCase())
+      .join("_");
+  }
+
   async function setDefaultPattern() {
-    console.log("setting default pattern", defaultPattern);
+    const backendPattern = formatPatternForBackend(defaultPattern);
     try {
-      await invoke("set_default_pattern", { pattern: defaultPattern });
+      await invoke("update_secret", {
+        key: "DEFAULT_PATTERN",
+        value: backendPattern,
+      });
       defaultPatternStore.set(defaultPattern);
       toast.success("Default pattern updated", {
         description: `${defaultPattern} has been set as the default pattern`,

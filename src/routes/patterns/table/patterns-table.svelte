@@ -27,6 +27,9 @@
   // tauri
   import { invoke } from "@tauri-apps/api/core";
 
+  // stores
+  import { defaultPatternStore } from "$lib/stores/pattern";
+
   interface Pattern {
     id: number;
     name: string;
@@ -86,6 +89,10 @@
         name: formatPatternName(pattern),
       }));
       patternsData.set(formattedPatterns);
+
+      // Add this: Get and set default pattern when patterns are loaded
+      const defaultPattern = (await invoke("get_default_pattern")) as string;
+      defaultPatternStore.set(defaultPattern);
     } catch (err) {
       console.error("Failed to fetch patterns:", err);
     }

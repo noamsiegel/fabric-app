@@ -24,7 +24,7 @@
   let defaultPattern = "n";
   let isUpdating = false;
 
-  defaultPatternStore.subscribe(async (newPattern) => {
+  defaultPatternStore.subscribe((newPattern) => {
     if (newPattern) {
       defaultPattern = newPattern;
     }
@@ -44,8 +44,7 @@
       gitFolder = await invoke("get_patterns_git_folder");
       const pattern = (await invoke("get_default_pattern")) as string;
       defaultPattern = pattern;
-      defaultPattern = await invoke("get_default_pattern");
-      defaultPatternStore.set(pattern); // Initialize the store
+      defaultPatternStore.set(pattern);
     } catch (err) {
       console.error("Failed to load git settings:", err);
     }
