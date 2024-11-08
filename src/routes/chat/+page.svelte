@@ -15,18 +15,18 @@
     MessageCircleQuestion,
   } from "lucide-svelte/icons";
   // lib components
-  import ModelParameters from "$lib/components/cards/ModelParameters.svelte";
-  import PatternSearchBox from "$lib/components/search-box/Patterns.svelte";
-  import ContextSearchBox from "$lib/components/search-box/Contexts.svelte";
-  import ModelsSearchBox from "$lib/components/search-box/Models.svelte";
-  import InputTypeSearchBox from "$lib/components/search-box/InputType.svelte";
+  import ModelParameters from "$lib/components/cards/model-parameters.svelte";
+  import PatternSearchBox from "$lib/components/search-box/patterns.svelte";
+  import ContextSearchBox from "$lib/components/search-box/contexts.svelte";
+  import ModelsSearchBox from "$lib/components/search-box/models.svelte";
+  import InputTypeSearchBox from "$lib/components/search-box/input-type.svelte";
 
   // tauri
   import { writeText } from "@tauri-apps/plugin-clipboard-manager";
   import { create, BaseDirectory } from "@tauri-apps/plugin-fs";
 
   // lib
-  import { runFabric } from "$lib/fabricCommands";
+  import { runFabric } from "$lib/utils/fabric";
 
   // Define the interface
 

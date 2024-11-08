@@ -14,8 +14,8 @@
   import {
     scrapeUrlAndRunPattern,
     scrapeQuestionAndRunPattern,
-  } from "$lib/fabricCommands";
-  import { clipboard_contents_and_run_pattern } from "$lib/tauriCommands";
+  } from "$lib/utils/fabric";
+  import { clipboard_contents_and_run_pattern } from "$lib/utils/tauri";
 
   // state
   let isRunning = false;

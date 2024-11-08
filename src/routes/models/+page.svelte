@@ -1,7 +1,7 @@
 <script lang="ts">
   // Update imports to explicitly include .svelte extension
-  import ModelSettings from "$lib/components/cards/ModelSettings.svelte";
-  import Table from "./table/models-table.svelte";
+  import ModelSettings from "$lib/components/cards/model-settings.svelte";
+  import Table from "../../lib/components/tables/models.svelte";
 </script>
 
 <!-- TODO load faster by storing models in file and having a refresh button -->

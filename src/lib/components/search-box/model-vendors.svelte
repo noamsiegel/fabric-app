@@ -9,7 +9,7 @@
 	import { tick } from "svelte";
 	import { onMount } from "svelte";
 	import { defaultVendorStore } from "$lib/stores/models";
-	import { ModelSettingsManager } from "$lib/managers/ModelManager";
+	import { ModelSettingsManager } from "$lib/managers/models";
 
 	let { onVendorSelected = () => {} } = $props<{
 		onVendorSelected?: (vendor: string) => void;

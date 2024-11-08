@@ -1,5 +1,5 @@
 <script lang="ts">
-  // svelte headless table
+  // svelte headless components
   import {
     createTable,
     Render,
@@ -12,7 +12,7 @@
     addPagination,
   } from "svelte-headless-table/plugins";
 
-  // svelte components
+  //svelte components
   import * as Table from "$lib/components/ui/table";
   import { Button } from "$lib/components/ui/button";
   import { Input } from "$lib/components/ui/input";
@@ -21,22 +21,28 @@
   import { onMount } from "svelte";
   import { writable, type Writable } from "svelte/store";
 
-  // table components
-  import Actions from "./actions.svelte";
-  import RefreshButton from "$lib/components/buttons/refresh-models.svelte";
+  // buttons
+  import CreateContext from "../buttons/context-create.svelte";
+  export let selectedContent: Writable<string>;
+  export let selectedTitle: Writable<string>;
+  export let onContextsChange: (fn: () => Promise<void>) => void;
+
+  // cards
+  import CurrentContext from "../cards/context-current.svelte";
 
   // tauri
   import { invoke } from "@tauri-apps/api/core";
 
-  interface Model {
-    id: number;
+  // actions
+  import Actions from "./actions/context-actions.svelte";
+
+  interface Context {
     name: string;
-    provider: string;
   }
 
-  let modelsData: Writable<Model[]> = writable([]);
+  let contextsData: Writable<Context[]> = writable([]);
 
-  const table = createTable(modelsData, {
+  const table = createTable(contextsData, {
     sort: addSortBy({ disableMultiSort: true }),
     filter: addTableFilter({
       fn: ({ filterValue, value }) =>
@@ -45,14 +51,32 @@
     page: addPagination({ initialPageSize: 10 }),
   });
 
+  // clicking row -> puts context markdown in textbox
+  const handleRowClick = async (title: string) => {
+    try {
+      const content = await invoke("read_context_file", { title });
+      if (typeof content === "string") {
+        selectedContent.set(content);
+        selectedTitle.set(title);
+        console.log("Context file contents:", content);
+      }
+    } catch (error) {
+      console.error("Error reading context file:", error);
+    }
+  };
+
   const columns = table.createColumns([
     table.column({
       accessor: ({ name }) => name,
       header: "",
       cell: ({ value }) => {
-        return createRender(Actions, {
-          name: value,
-        });
+        return createRender(Actions, { name: value });
+      },
+      plugins: {
+        resize: {
+          initialWidth: 24, // Set fixed width for actions column
+          disable: true, // Prevent resizing
+        },
       },
     }),
     table.column({
@@ -65,76 +89,61 @@
         },
       },
     }),
-    table.column({
-      header: "Provider",
-      accessor: "provider",
-      plugins: {
-        sort: { disable: false },
-        filter: {
-          exclude: true,
-        },
-      },
-    }),
   ]);
+
+  $: console.log("contextsData value:", $contextsData);
+  $: console.log("pageRows value:", $pageRows);
 
   const { headerRows, pageRows, tableAttrs, tableBodyAttrs, pluginStates } =
     table.createViewModel(columns);
-  const { pageIndex, hasNextPage, hasPreviousPage } = pluginStates.page;
+  const { hasNextPage, hasPreviousPage, pageIndex } = pluginStates.page;
   const { filterValue } = pluginStates.filter;
 
-  async function fetchModels() {
+  function formatContextName(name: string): string {
+    return name.replace(".md", "");
+  }
+
+  async function fetchContexts() {
     try {
-      const data: Model[] = await invoke("get_models");
-      modelsData.set(data);
+      const data = await invoke("list_contexts");
+      if (typeof data === "string") {
+        const contextsList = data
+          .split("\n")
+          .filter((context) => context.trim());
+
+        const formattedContexts: Context[] = contextsList.map((context) => ({
+          name: formatContextName(context),
+        }));
+
+        console.log("formattedContexts:", formattedContexts);
+        contextsData.set(formattedContexts);
+      } else {
+        console.error("Invalid data format received:", data);
+        contextsData.set([]);
+      }
     } catch (err) {
-      console.error("Failed to fetch models:", err);
+      console.error("Failed to fetch contexts:", err);
     }
   }
 
   onMount(async () => {
-    await fetchModels();
+    await fetchContexts();
+    onContextsChange(fetchContexts);
+    console.log("Table rows:", $pageRows);
   });
 </script>
 
-<!-- 
-  TODO maybe make it so that users can no see some of the models depending on the keys they have
-  Issue URL: https://github.com/noamsiegel/fabric-app/issues/45
-  -->
-<!-- Add loading indicator and timing info -->
 <div>
+  <CurrentContext />
   <div class="flex items-center justify-between py-4">
-    <div class="flex items-center gap-4">
-      <Input
-        class="max-w-sm"
-        placeholder="Filter models..."
-        type="text"
-        bind:value={$filterValue}
-      />
-      <RefreshButton on:refreshComplete={fetchModels} />
-    </div>
-    <div class="flex items-center gap-4">
-      <!-- TODO add vendor filter to models table -->
-      <!-- <Select.Root
-        type="single"
-        value={selectedVendor}
-        onValueChange={onVendorSelect}
-      >
-        <Select.Trigger>
-          <span class="block truncate">
-            {selectedVendor === "all" ? "All Vendors" : selectedVendor}
-          </span>
-        </Select.Trigger>
-        <Select.Content>
-          <Select.Item value="all">All Vendors</Select.Item>
-          {#each vendors as vendor}
-            <Select.Item value={vendor}>{vendor}</Select.Item>
-          {/each}
-        </Select.Content>
-      </Select.Root> -->
-    </div>
+    <Input
+      class="max-w-sm"
+      placeholder="Filter contexts..."
+      type="text"
+      bind:value={$filterValue}
+    />
+    <CreateContext onContextCreated={fetchContexts} />
   </div>
-
-  <!-- table -->
   <div class="rounded-md border">
     <Table.Root {...$tableAttrs}>
       <Table.Header>
@@ -155,7 +164,11 @@
       <Table.Body {...$tableBodyAttrs}>
         {#each $pageRows as row (row.id)}
           <Subscribe rowAttrs={row.attrs()} let:rowAttrs>
-            <Table.Row {...rowAttrs}>
+            <Table.Row
+              {...rowAttrs}
+              onclick={() => handleRowClick(row.original.name)}
+              class="cursor-pointer"
+            >
               {#each row.cells as cell (cell.id)}
                 <Subscribe attrs={cell.attrs()} let:attrs>
                   <Table.Cell {...attrs}>
@@ -169,8 +182,6 @@
       </Table.Body>
     </Table.Root>
   </div>
-
-  <!-- pagination -->
   <div class="flex items-center justify-end space-x-4 py-4">
     <Button
       variant="outline"

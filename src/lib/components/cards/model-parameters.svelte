@@ -2,7 +2,7 @@
   import { Button } from "$lib/components/ui/button";
   import { invoke } from "@tauri-apps/api/core";
   import { onMount } from "svelte";
-  import SliderComponent from "../input/ParameterSlider.svelte";
+  import SliderComponent from "../sliders/model-parameter.svelte";
   import { Loader2 } from "lucide-svelte";
 
   // Add default constants
