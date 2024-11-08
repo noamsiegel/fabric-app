@@ -1,7 +1,7 @@
 <script lang="ts">
   // imported components
   import PatternSettings from "./cards/PatternSettings.svelte";
-  import Table from "./table/table.svelte";
+  import Table from "./table/patterns-table.svelte";
 </script>
 
 <div>

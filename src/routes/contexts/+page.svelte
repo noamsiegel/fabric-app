@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Table from "./table/table.svelte";
+  import Table from "./table/context-table.svelte";
   import TextBox from "./edit/text-box.svelte";
   import * as Resizable from "$lib/components/ui/resizable";
   import { writable } from "svelte/store";

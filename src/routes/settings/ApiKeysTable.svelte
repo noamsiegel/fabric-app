@@ -130,7 +130,7 @@
                   <Button
                     variant="ghost"
                     class="justify-start w-full"
-                    on:click={props.sort.toggle}
+                    onclick={props.sort.toggle}
                   >
                     <Render of={cell.render()} />
                     <ArrowUpDown
@@ -164,7 +164,7 @@
                         variant="ghost"
                         size="icon"
                         class="h-8 w-8"
-                        on:click={() =>
+                        onclick={() =>
                           toggleSecretVisibility(row.cells[0].value)}
                       >
                         {#if visibleSecrets.has(row.cells[0].value)}
@@ -224,7 +224,7 @@
                         >Cancel</Button
                       >
                     </Dialog.Close>
-                    <Button on:click={() => handleEdit(row)}
+                    <Button onclick={() => handleEdit(row)}
                       >Save changes</Button
                     >
                   </Dialog.Footer>

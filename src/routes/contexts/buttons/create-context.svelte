@@ -28,8 +28,8 @@
 </script>
 
 <Dialog.Root bind:open>
-  <Dialog.Trigger asChild let:builder>
-    <Button variant="outline" size="icon" builders={[builder]}>
+  <Dialog.Trigger>
+    <Button variant="outline" size="icon">
       <Plus class="h-4 w-4" />
       <span class="sr-only">Create Context</span>
     </Button>
@@ -51,8 +51,8 @@
       </div>
     </div>
     <Dialog.Footer>
-      <Button variant="outline" on:click={() => (open = false)}>Cancel</Button>
-      <Button on:click={createContext}>Create</Button>
+      <Button variant="outline" onclick={() => (open = false)}>Cancel</Button>
+      <Button onclick={createContext}>Create</Button>
     </Dialog.Footer>
   </Dialog.Content>
 </Dialog.Root>

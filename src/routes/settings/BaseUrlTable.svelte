@@ -113,7 +113,7 @@
                 let:props
               >
                 <Table.Head {...attrs}>
-                  <Button variant="ghost" on:click={props.sort.toggle}>
+                  <Button variant="ghost" onclick={props.sort.toggle}>
                     <Render of={cell.render()} />
                     <ArrowUpDown
                       class={`ml-2 h-4 w-4 ${$sortKeys[0]?.id === cell.id ? "text-foreground" : ""}`}
@@ -178,7 +178,7 @@
                         >Cancel</Button
                       >
                     </Dialog.Close>
-                    <Button on:click={() => handleEdit(row)}
+                    <Button onclick={() => handleEdit(row)}
                       >Save changes</Button
                     >
                   </Dialog.Footer>

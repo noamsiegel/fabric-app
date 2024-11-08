@@ -15,14 +15,25 @@
   import { invoke } from "@tauri-apps/api/core";
 
   // props
-  export let name: string;
+  export let defaultPattern: string;
+
+  function formatPatternForBackend(name: string): string {
+    return name
+      .split(" ")
+      .map((word) => word.toLowerCase())
+      .join("_");
+  }
 
   async function setDefaultPattern() {
+    const backendPattern = formatPatternForBackend(defaultPattern);
     try {
-      await invoke("set_default_pattern", { pattern: name });
-      defaultPatternStore.set(name);
+      await invoke("update_secret", {
+        key: "DEFAULT_PATTERN",
+        value: backendPattern,
+      });
+      defaultPatternStore.set(defaultPattern);
       toast.success("Default pattern updated", {
-        description: `${name} has been set as the default pattern`,
+        description: `${defaultPattern} has been set as the default pattern`,
         duration: 2000,
       });
     } catch (error) {
@@ -37,21 +48,21 @@
 <div class="flex gap-2">
   <Button variant="ghost" size="icon" class="h-8 w-8 p-0">
     <Edit class="h-4 w-4" />
-    <span class="sr-only">Edit {name}</span>
+    <span class="sr-only">Edit {defaultPattern}</span>
   </Button>
 
   <Button variant="ghost" size="icon" class="h-8 w-8 p-0">
     <Eye class="h-4 w-4" />
-    <span class="sr-only">View {name}</span>
+    <span class="sr-only">View {defaultPattern}</span>
   </Button>
 
   <Button
     variant="ghost"
     size="icon"
     class="h-8 w-8 p-0"
-    on:click={setDefaultPattern}
+    onclick={setDefaultPattern}
   >
     <Star class="h-4 w-4" />
-    <span class="sr-only">Set {name} as default</span>
+    <span class="sr-only">Set {defaultPattern} as default</span>
   </Button>
 </div>

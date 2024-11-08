@@ -16,4 +16,4 @@
   }
 </script>
 
-<Button variant="outline" on:click={listContexts}>List All Contexts</Button>
+<Button variant="outline" onclick={listContexts}>List All Contexts</Button>

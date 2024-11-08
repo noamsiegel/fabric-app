@@ -79,7 +79,7 @@
   <div class="flex justify-end">
     <Button
       variant="outline"
-      on:click={resetModelParameters}
+      onclick={resetModelParameters}
       disabled={isLoading}
     >
       {#if isLoading}

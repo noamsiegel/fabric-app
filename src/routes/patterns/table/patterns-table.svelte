@@ -1,5 +1,5 @@
 <script lang="ts">
-  // svelte headless components
+  // svelte headless table
   import {
     createTable,
     Render,
@@ -26,6 +26,9 @@
 
   // tauri
   import { invoke } from "@tauri-apps/api/core";
+
+  // stores
+  import { defaultPatternStore } from "$lib/stores/pattern";
 
   interface Pattern {
     id: number;
@@ -68,7 +71,7 @@
       accessor: ({ name }) => name,
       header: "",
       cell: ({ value }) => {
-        return createRender(Actions, { name: value });
+        return createRender(Actions, { defaultPattern: value });
       },
     }),
   ]);
@@ -86,6 +89,10 @@
         name: formatPatternName(pattern),
       }));
       patternsData.set(formattedPatterns);
+
+      // Add this: Get and set default pattern when patterns are loaded
+      const defaultPattern = (await invoke("get_default_pattern")) as string;
+      defaultPatternStore.set(defaultPattern);
     } catch (err) {
       console.error("Failed to fetch patterns:", err);
     }
@@ -150,14 +157,14 @@
     <Button
       variant="outline"
       size="sm"
-      on:click={() => ($pageIndex = $pageIndex - 1)}
+      onclick={() => ($pageIndex = $pageIndex - 1)}
       disabled={!$hasPreviousPage}>Previous</Button
     >
     <Button
       variant="outline"
       size="sm"
       disabled={!$hasNextPage}
-      on:click={() => ($pageIndex = $pageIndex + 1)}>Next</Button
+      onclick={() => ($pageIndex = $pageIndex + 1)}>Next</Button
     >
   </div>
 </div>

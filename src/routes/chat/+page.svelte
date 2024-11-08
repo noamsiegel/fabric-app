@@ -157,10 +157,10 @@
           </Card.Root>
         </ContextMenu.Trigger>
         <ContextMenu.Content>
-          <ContextMenu.Item on:click={() => handleCopy(message.content)}>
+          <ContextMenu.Item onclick={() => handleCopy(message.content)}>
             Copy
           </ContextMenu.Item>
-          <ContextMenu.Item on:click={() => handleDownload(message.content)}>
+          <ContextMenu.Item onclick={() => handleDownload(message.content)}>
             Download
           </ContextMenu.Item>
         </ContextMenu.Content>

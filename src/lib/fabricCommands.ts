@@ -79,9 +79,9 @@ async function runFabricCommand(
 ): Promise<string> {
   try {
     await invoke("set_is_running", { value: true });
-    // const selectedPattern = await invoke("get_selected_pattern");
+    const selectedPattern = await invoke("get_secret", { key: "DEFAULT_PATTERN" });
     // TODO: Configure current pattern to be in store
-    const selectedPattern = "summarize";
+    // const selectedPattern = "summarize";
     if (!selectedPattern) {
       return "Please select a pattern first.";
     }

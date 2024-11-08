@@ -21,7 +21,7 @@
 <Button
   variant="outline"
   size="sm"
-  on:click={handleSave}
+  onclick={handleSave}
   disabled={!selectedTitle}
 >
   Save

@@ -1,18 +1,19 @@
-import { writable } from "svelte/store";
 import { invoke } from "@tauri-apps/api/core";
 import { timer } from "execution-time-decorators";
 import { defaultModelStore, defaultVendorStore } from "$lib/stores/models";
 
-export interface VendorOption {
-  value: string;
-  label: string;
-}
 
-export const selectedVendor = writable<VendorOption>({ value: "", label: "" });
+// export interface VendorOption {
+//   value: string;
+//   label: string;
+// }
+
 
 export class ModelSettingsManager {
-  private currentVendor = "";
   vendors: string[] = [];
+  currentVendor: string = '';
+  defaultVendor: string = '';
+  selectedVendor: string = '';
 
   @timer()
   async loadVendors() {
@@ -28,7 +29,6 @@ export class ModelSettingsManager {
   async loadDefaultModel() {
     try {
       const model = await invoke("get_secret", { key: "DEFAULT_MODEL" });
-      console.log("default model", model);
       defaultModelStore.set(model as string);
     } catch (err) {
       console.error("Failed to load default model:", err);
@@ -39,8 +39,8 @@ export class ModelSettingsManager {
   async loadDefaultVendor() {
     try {
       const vendor = await invoke("get_secret", { key: "DEFAULT_VENDOR" });
-      this.currentVendor = vendor as string; // Add this line
-      selectedVendor.set({ value: vendor as string, label: vendor as string });
+      this.currentVendor = vendor as string;
+      this.selectedVendor = vendor as string ;
     } catch (err) {
       console.error("Failed to load default vendor:", err);
     }
@@ -61,27 +61,27 @@ export class ModelSettingsManager {
 
   @timer()
   async saveDefaultVendor(vendor: string) {
-    if (vendor === this.currentVendor) return; // Skip if no change
+    if (vendor === this.currentVendor) return;
     try {
-      await invoke("update_secret", {
-        key: "DEFAULT_VENDOR",
-        value: vendor,
-      });
-      this.currentVendor = vendor; // Update tracked value
-      selectedVendor.set({ value: vendor, label: vendor });
+        await invoke("update_secret", {
+            key: "DEFAULT_VENDOR",
+            value: vendor,
+        });
+        this.currentVendor = vendor;
+        defaultVendorStore.set(vendor);
     } catch (err) {
-      console.error("Failed to save default vendor:", err);
+        console.error("Failed to save default vendor:", err);
     }
-  }
+}
 
   @timer()
   async resetDefaults() {
     try {
       await invoke("update_secret", { key: "DEFAULT_MODEL", value: "" });
       await invoke("update_secret", { key: "DEFAULT_VENDOR", value: "" });
-      this.currentVendor = ""; // Add this line
-      defaultModelStore.set("");
-      selectedVendor.set({ value: "", label: "" });
+      this.currentVendor = "";
+      this.defaultVendor = ("");
+      this.selectedVendor = "" ;
     } catch (err) {
       console.error("Failed to reset defaults:", err);
     }

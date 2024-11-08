@@ -17,7 +17,7 @@
   <div class="flex justify-end">
     <button
       class="text-gray-600 hover:text-gray-900"
-      on:click={() => ($settingsOpen = true)}
+      onclick={() => ($settingsOpen = true)}
     >
       <Settings size={24} />
     </button>
