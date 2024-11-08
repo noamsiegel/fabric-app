@@ -1,5 +1,5 @@
 <script lang="ts">
-  // svelte headless components
+  // svelte headless table
   import {
     createTable,
     Render,
@@ -68,7 +68,7 @@
       accessor: ({ name }) => name,
       header: "",
       cell: ({ value }) => {
-        return createRender(Actions, { name: value });
+        return createRender(Actions, { defaultPattern: value });
       },
     }),
   ]);
@@ -150,14 +150,14 @@
     <Button
       variant="outline"
       size="sm"
-      on:click={() => ($pageIndex = $pageIndex - 1)}
+      onclick={() => ($pageIndex = $pageIndex - 1)}
       disabled={!$hasPreviousPage}>Previous</Button
     >
     <Button
       variant="outline"
       size="sm"
       disabled={!$hasNextPage}
-      on:click={() => ($pageIndex = $pageIndex + 1)}>Next</Button
+      onclick={() => ($pageIndex = $pageIndex + 1)}>Next</Button
     >
   </div>
 </div>
