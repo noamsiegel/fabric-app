@@ -27,6 +27,11 @@
         },
         {
           "path": "/**"
+        },
+        {
+          "path": "$HOME/go/bin/fabric",
+          "read": true,
+          "run": true
         }
       ]
     },
@@ -50,11 +55,6 @@
       "identifier": "shell:allow-execute",
       "allow": [
         {
-          "name": "fabric",
-          "cmd": "fabric",
-          "args": true
-        },
-        {
           "name": "sh",
           "cmd": "sh",
           "args": true
@@ -72,6 +72,11 @@
         {
           "name": "xclip",
           "cmd": "xclip",
+          "args": true
+        },
+        {
+          "name": "fabric",
+          "cmd": "fabric", 
           "args": true
         }
       ]

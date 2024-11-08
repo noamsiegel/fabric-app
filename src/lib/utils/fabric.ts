@@ -1,27 +1,26 @@
 import { Command } from "@tauri-apps/plugin-shell";
 import { invoke } from "@tauri-apps/api/core";
-import { platform } from "@tauri-apps/plugin-os";
 
 // base fabric settings
 
 export async function runFabric(flag: string, message: string, model: string, pattern: string, context?: string) {
   try {
-    // Fix the order in the log string to match the actual command structure
-    console.log("pattern", pattern);
-    console.log("Running fabric command:", `fabric ${flag} ${message} | fabric --pattern ${pattern} --model ${model}${context && context.trim() ? ` --context ${context}` : ""}`);
-
-    // Second command: fabric with pattern and model
-    const result = await Command.create("fabric", [
+    // Build command arguments array
+    const args = [
       flag,
       message,
-      "|",
-      "fabric",
       "--pattern",
       pattern,
       "--model",
       model,
-      ...(context && context.trim() ? ["--context", context] : []),
-    ]).execute();
+    ];
+
+    if (context && context.trim()) {
+      args.push("--context", context);
+    }
+
+    // Execute command using just 'fabric' instead of full path
+    const result = await Command.create("fabric", args).execute();
 
     return result.stdout;
   } catch (error) {
