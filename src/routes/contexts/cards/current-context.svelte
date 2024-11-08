@@ -34,7 +34,7 @@
     <Button
       variant="secondary"
       size="default"
-      on:click={async () => {
+      onclick={async () => {
         await invoke("reset_secret", { key: "CURRENT_CONTEXT" });
         await loadCurrentContext();
       }}

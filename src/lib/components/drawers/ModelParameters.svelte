@@ -104,7 +104,7 @@
       </div>
 
       <Drawer.Footer>
-        <Button on:click={handleSubmit}>Save Changes</Button>
+        <Button onclick={handleSubmit}>Save Changes</Button>
         <Drawer.Close class={buttonVariants({ variant: "outline" })}>
           Cancel
         </Drawer.Close>

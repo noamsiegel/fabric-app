@@ -80,7 +80,7 @@
             placeholder="https://example.com"
           />
           <Button
-            on:click={async () => {
+            onclick={async () => {
               if (!$selected.value) {
                 alert("Please select a pattern first");
                 return;
@@ -109,7 +109,7 @@
             placeholder="What is the capital of France?"
           />
           <Button
-            on:click={() =>
+            onclick={() =>
               (result = scrapeQuestionAndRunPattern(questionToSearch))}
             disabled={isRunning}
           >
@@ -122,7 +122,7 @@
         <Label for="clipboard-button">Run Pattern on Clipboard Contents</Label>
         <div class="flex space-x-2">
           <Button
-            on:click={() => (result = clipboard_contents_and_run_pattern())}
+            onclick={() => (result = clipboard_contents_and_run_pattern())}
             disabled={isRunning}
           >
             Run Pattern on Clipboard

@@ -24,7 +24,7 @@
   let defaultPattern = "n";
   let isUpdating = false;
 
-  defaultPatternStore.subscribe(async (newPattern) => {
+  defaultPatternStore.subscribe((newPattern) => {
     if (newPattern) {
       defaultPattern = newPattern;
     }
@@ -44,8 +44,7 @@
       gitFolder = await invoke("get_patterns_git_folder");
       const pattern = (await invoke("get_default_pattern")) as string;
       defaultPattern = pattern;
-      defaultPattern = await invoke("get_default_pattern");
-      defaultPatternStore.set(pattern); // Initialize the store
+      defaultPatternStore.set(pattern);
     } catch (err) {
       console.error("Failed to load git settings:", err);
     }
@@ -90,7 +89,7 @@
     </div>
     <Button
       variant="outline"
-      on:click={handleUpdatePatterns}
+      onclick={handleUpdatePatterns}
       disabled={isUpdating}
     >
       {isUpdating ? "Updating..." : "Update Patterns"}
@@ -105,7 +104,7 @@
         readonly
         disabled={false}
         class="bg-white font-medium text-black cursor-help"
-        on:click={handleInputClick}
+        onclick={handleInputClick}
       />
     </div>
     <div class="space-y-2">
@@ -122,6 +121,6 @@
     </div>
   </CardContent>
   <CardFooter class="flex gap-2">
-    <Button on:click={saveGitSettings}>Save Settings</Button>
+    <Button onclick={saveGitSettings}>Save Settings</Button>
   </CardFooter>
 </Card>

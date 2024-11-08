@@ -37,7 +37,7 @@
     variant="ghost"
     size="icon"
     class="h-8 w-8 p-0"
-    on:click={setCurrentContext}
+    onclick={setCurrentContext}
   >
     <CircleCheck class="h-4 w-4" />
     <span class="sr-only">Set {name} as current context</span>

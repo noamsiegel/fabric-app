@@ -6,7 +6,7 @@
   }
 </script>
 
-<button on:click={goBack}> Back </button>
+<button onclick={goBack}> Back </button>
 
 <style>
   button {

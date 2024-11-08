@@ -5,7 +5,7 @@
 
   // stores
   import { defaultModelStore } from "$lib/stores/models";
-  import { Loader2 } from "lucide-svelte"; // Add loader icon
+  import { Loader2 } from "lucide-svelte";
 
   // icons
   import Star from "lucide-svelte/icons/star";
@@ -22,7 +22,7 @@
   async function setDefaultModel() {
     isLoading = true;
     const startTime = performance.now();
-
+    console.log("Setting default model to:", name);
     try {
       await invoke("update_secret", {
         key: "DEFAULT_MODEL",
@@ -50,7 +50,7 @@
     variant="ghost"
     size="icon"
     class="h-8 w-8 p-0"
-    on:click={setDefaultModel}
+    onclick={setDefaultModel}
     disabled={isLoading}
   >
     {#if isLoading}

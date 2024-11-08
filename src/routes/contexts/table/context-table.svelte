@@ -166,7 +166,7 @@
           <Subscribe rowAttrs={row.attrs()} let:rowAttrs>
             <Table.Row
               {...rowAttrs}
-              on:click={() => handleRowClick(row.original.name)}
+              onclick={() => handleRowClick(row.original.name)}
               class="cursor-pointer"
             >
               {#each row.cells as cell (cell.id)}
@@ -186,14 +186,14 @@
     <Button
       variant="outline"
       size="sm"
-      on:click={() => ($pageIndex = $pageIndex - 1)}
+      onclick={() => ($pageIndex = $pageIndex - 1)}
       disabled={!$hasPreviousPage}>Previous</Button
     >
     <Button
       variant="outline"
       size="sm"
       disabled={!$hasNextPage}
-      on:click={() => ($pageIndex = $pageIndex + 1)}>Next</Button
+      onclick={() => ($pageIndex = $pageIndex + 1)}>Next</Button
     >
   </div>
 </div>

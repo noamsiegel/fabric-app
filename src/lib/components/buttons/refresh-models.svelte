@@ -23,7 +23,7 @@
 <Button
   variant="outline"
   size="sm"
-  on:click={handleRefresh}
+  onclick={handleRefresh}
   disabled={loading || disabled}
 >
   {loading ? "Refreshing..." : "Refresh Models"}
