@@ -15,3 +15,5 @@
     </main>
   </div>
 </div>
+
+<Settings />
