@@ -3,7 +3,6 @@
   import * as Card from "$lib/components/ui/card";
   import * as Drawer from "$lib/components/ui/drawer";
   import * as ContextMenu from "$lib/components/ui/context-menu/index.js";
-  import * as Select from "$lib/components/ui/select";
   import { Input } from "$lib/components/ui/input";
   import { Button } from "$lib/components/ui/button/index.js";
   import { buttonVariants } from "$lib/components/ui/button";
