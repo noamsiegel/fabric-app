@@ -97,9 +97,9 @@
         </Tabs.Content>
       </Tabs.Root>
       <Drawer.Footer class="pt-2">
-        <!-- <Drawer.Close asChild let:builder>
-          <Button variant="outline" builders={[builder]}>Close</Button>
-        </Drawer.Close> -->
+        <Drawer.Close>
+          <Button variant="outline">Close</Button>
+        </Drawer.Close>
       </Drawer.Footer>
     </div>
   </Drawer.Content>

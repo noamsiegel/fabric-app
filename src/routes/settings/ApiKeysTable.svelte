@@ -28,7 +28,7 @@
   let editedValue = "";
   let secretsData: Writable<Secret[]> = writable([]);
   let dialogOpen = false;
-  let visibleSecrets = new Set<string>();
+  let visibleSecrets: Writable<Set<string>> = writable(new Set());
 
   const table = createTable(secretsData, {
     sort: addSortBy({ disableMultiSort: true }),
@@ -48,6 +48,10 @@
     }),
   ]);
 
+  // Add this near other state declarations
+  let editingRow: any = null;
+
+  // Update handleEdit function
   async function handleEdit(row: any) {
     const secret = {
       name: row.cells[0].value,
@@ -62,10 +66,14 @@
 
       secretsData.update((secrets) =>
         secrets.map((s) =>
-          s.name === secret.name ? { ...s, secret: secret.secret } : s
-        )
+          s.name === secret.name ? { ...s, secret: secret.secret } : s,
+        ),
       );
+
+      // Reset state
       dialogOpen = false;
+      editingRow = null;
+      editedValue = "";
     } catch (err) {
       console.error("Failed to update secret:", err);
     }
@@ -79,6 +87,7 @@
   async function fetchApiKeys() {
     try {
       const data = await invoke<Secret[]>("get_api_keys");
+      console.log("API keys:", data);
       secretsData.set(data);
     } catch (err) {
       console.error("Failed to fetch secrets:", err);
@@ -94,12 +103,15 @@
   }
 
   function toggleSecretVisibility(name: string) {
-    if (visibleSecrets.has(name)) {
-      visibleSecrets.delete(name);
-    } else {
-      visibleSecrets.add(name);
-    }
-    visibleSecrets = visibleSecrets; // Trigger reactivity
+    visibleSecrets.update((set) => {
+      const newSet = new Set(set);
+      if (newSet.has(name)) {
+        newSet.delete(name);
+      } else {
+        newSet.add(name);
+      }
+      return newSet;
+    });
   }
 
   onMount(fetchApiKeys);
@@ -156,7 +168,7 @@
                   {#if cell.id === "secret"}
                     <div class="flex items-left gap-2">
                       <span class="font-mono">
-                        {visibleSecrets.has(row.cells[0].value)
+                        {$visibleSecrets.has(row.cells[0].value)
                           ? cell.value
                           : "••••••••••••••••"}
                       </span>
@@ -167,13 +179,13 @@
                         onclick={() =>
                           toggleSecretVisibility(row.cells[0].value)}
                       >
-                        {#if visibleSecrets.has(row.cells[0].value)}
+                        {#if $visibleSecrets.has(row.cells[0].value)}
                           <EyeOff class="h-4 w-4" />
                         {:else}
                           <Eye class="h-4 w-4" />
                         {/if}
                         <span class="sr-only">
-                          {visibleSecrets.has(row.cells[0].value)
+                          {$visibleSecrets.has(row.cells[0].value)
                             ? "Hide"
                             : "Show"} API key
                         </span>
@@ -187,9 +199,20 @@
             {/each}
             <!-- Button in each row -->
             <Table.Cell>
-              <Dialog.Root bind:open={dialogOpen}>
-                <Dialog.Trigger asChild let:builder>
-                  <Button variant="outline" builders={[builder]}>
+              <Dialog.Root
+                bind:open={dialogOpen}
+                onOpenChange={(open) => {
+                  if (open) {
+                    editingRow = row;
+                    editedValue = row.cells[1].value;
+                  } else {
+                    editingRow = null;
+                    editedValue = "";
+                  }
+                }}
+              >
+                <Dialog.Trigger>
+                  <Button variant="outline">
                     <Pencil class="h-4 w-4 mr-2" />
                     Edit
                   </Button>
@@ -205,7 +228,7 @@
                     <div class="grid grid-cols-4 items-center gap-4">
                       <Label class="text-right">Name</Label>
                       <div class="col-span-3">
-                        {row.cells[0].value}
+                        {editingRow?.cells[0].value ?? ""}
                       </div>
                     </div>
                     <div class="grid grid-cols-4 items-center gap-4">
@@ -219,14 +242,15 @@
                     </div>
                   </div>
                   <Dialog.Footer>
-                    <Dialog.Close asChild let:builder>
-                      <Button variant="outline" builders={[builder]}
-                        >Cancel</Button
-                      >
-                    </Dialog.Close>
-                    <Button onclick={() => handleEdit(row)}
-                      >Save changes</Button
+                    <Button
+                      variant="outline"
+                      onclick={() => (dialogOpen = false)}
                     >
+                      Cancel
+                    </Button>
+                    <Button onclick={() => handleEdit(editingRow)}>
+                      Save changes
+                    </Button>
                   </Dialog.Footer>
                 </Dialog.Content>
               </Dialog.Root>
