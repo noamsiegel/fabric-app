@@ -51,6 +51,8 @@
     }),
   ]);
 
+  let editingRow: any = null;
+
   async function handleEdit(row: any) {
     const secret = {
       name: row.cells[0].value,
@@ -65,10 +67,14 @@
 
       secretsData.update((secrets) =>
         secrets.map((s) =>
-          s.name === secret.name ? { ...s, secret: secret.secret } : s
-        )
+          s.name === secret.name ? { ...s, secret: secret.secret } : s,
+        ),
       );
+
+      // Reset state
       dialogOpen = false;
+      editingRow = null;
+      editedValue = "";
     } catch (err) {
       console.error("Failed to update secret:", err);
     }
@@ -140,50 +146,64 @@
             {/each}
             <!-- Button in each row -->
             <Table.Cell>
-              <Dialog.Root bind:open={dialogOpen}>
-                <Dialog.Trigger asChild let:builder>
-                  <Button variant="outline" builders={[builder]}>
-                    <Pencil class="h-4 w-4 mr-2" />
-                    Edit
-                  </Button>
-                </Dialog.Trigger>
-                <Dialog.Content class="sm:max-w-[425px]">
-                  <Dialog.Header>
-                    <Dialog.Title>Edit Base URL</Dialog.Title>
-                    <Dialog.Description>
-                      Update the base url key value. Click save when you're
-                      done.
-                    </Dialog.Description>
-                  </Dialog.Header>
-                  <div class="grid gap-4 py-4">
-                    <div class="grid grid-cols-4 items-center gap-4">
-                      <Label class="text-right">Name</Label>
-                      <div class="col-span-3">
-                        {row.cells[0].value}
+              <Table.Cell>
+                <Dialog.Root
+                  bind:open={dialogOpen}
+                  onOpenChange={(open) => {
+                    if (open) {
+                      editingRow = row;
+                      editedValue = row.cells[1].value;
+                    } else {
+                      editingRow = null;
+                      editedValue = "";
+                    }
+                  }}
+                >
+                  <Dialog.Trigger>
+                    <Button variant="outline">
+                      <Pencil class="h-4 w-4 mr-2" />
+                      Edit
+                    </Button>
+                  </Dialog.Trigger>
+                  <Dialog.Content class="sm:max-w-[425px]">
+                    <Dialog.Header>
+                      <Dialog.Title>Edit Base URL</Dialog.Title>
+                      <Dialog.Description>
+                        Update the base url key value. Click save when you're
+                        done.
+                      </Dialog.Description>
+                    </Dialog.Header>
+                    <div class="grid gap-4 py-4">
+                      <div class="grid grid-cols-4 items-center gap-4">
+                        <Label class="text-right">Name</Label>
+                        <div class="col-span-3">
+                          {editingRow?.cells[0].value ?? ""}
+                        </div>
+                      </div>
+                      <div class="grid grid-cols-4 items-center gap-4">
+                        <Label for="secret" class="text-right">Base URL</Label>
+                        <Input
+                          id="secret"
+                          bind:value={editedValue}
+                          class="col-span-3"
+                          placeholder="Enter new base url value"
+                        />
                       </div>
                     </div>
-                    <div class="grid grid-cols-4 items-center gap-4">
-                      <Label for="secret" class="text-right">Base URL</Label>
-                      <Input
-                        id="secret"
-                        bind:value={editedValue}
-                        class="col-span-3"
-                        placeholder="Enter new base url value"
-                      />
-                    </div>
-                  </div>
-                  <Dialog.Footer>
-                    <Dialog.Close asChild let:builder>
-                      <Button variant="outline" builders={[builder]}
-                        >Cancel</Button
+                    <Dialog.Footer>
+                      <Button
+                        variant="outline"
+                        onclick={() => (dialogOpen = false)}
                       >
-                    </Dialog.Close>
-                    <Button onclick={() => handleEdit(row)}
-                      >Save changes</Button
-                    >
-                  </Dialog.Footer>
-                </Dialog.Content>
-              </Dialog.Root>
+                        Cancel
+                      </Button>
+                      <Button onclick={() => handleEdit(editingRow)}>
+                        Save changes
+                      </Button>
+                    </Dialog.Footer>
+                  </Dialog.Content>
+                </Dialog.Root>
+              </Table.Cell>
             </Table.Cell>
           </Table.Row>
         </Subscribe>
