@@ -26,13 +26,8 @@
 </script>
 
 <AlertDialog.Root>
-  <AlertDialog.Trigger asChild let:builder>
-    <Button
-      variant="destructive"
-      size="sm"
-      builders={[builder]}
-      disabled={!selectedTitle}
-    >
+  <AlertDialog.Trigger>
+    <Button variant="destructive" size="sm" disabled={!selectedTitle}>
       Delete
     </Button>
   </AlertDialog.Trigger>
@@ -46,7 +41,7 @@
     </AlertDialog.Header>
     <AlertDialog.Footer>
       <AlertDialog.Cancel>Cancel</AlertDialog.Cancel>
-      <AlertDialog.Action on:click={handleDelete}>Delete</AlertDialog.Action>
+      <AlertDialog.Action onclick={handleDelete}>Delete</AlertDialog.Action>
     </AlertDialog.Footer>
   </AlertDialog.Content>
 </AlertDialog.Root>
