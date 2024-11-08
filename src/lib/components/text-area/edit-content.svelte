@@ -2,8 +2,8 @@
   import { Textarea } from "$lib/components/ui/textarea";
 
   // buttons
-  import DeleteContextButton from "../buttons/delete-context.svelte";
-  import SaveContextButton from "../buttons/save-context.svelte";
+  import DeleteContextButton from "../buttons/context-delete.svelte";
+  import SaveContextButton from "../buttons/context-save.svelte";
 
   export let content: string = "";
   export let selectedTitle: string = "";

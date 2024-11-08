@@ -7,9 +7,9 @@
   } from "$lib/components/ui/card";
   import { Button } from "$lib/components/ui/button";
   import { Input } from "$lib/components/ui/input";
-  import { ModelSettingsManager } from "$lib/managers/ModelManager";
+  import { ModelSettingsManager } from "$lib/managers/models";
   import { defaultModelStore, defaultVendorStore } from "$lib/stores/models";
-  import ModelVendors from "$lib/components/search-box/ModelVendors.svelte";
+  import ModelVendors from "$lib/components/search-box/model-vendors.svelte";
 
   const manager = new ModelSettingsManager();
 
