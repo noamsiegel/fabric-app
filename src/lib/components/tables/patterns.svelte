@@ -22,7 +22,7 @@
   import { writable, type Writable } from "svelte/store";
 
   // table components
-  import Actions from "./actions.svelte";
+  import Actions from "./actions/pattern-actions.svelte";
 
   // tauri
   import { invoke } from "@tauri-apps/api/core";

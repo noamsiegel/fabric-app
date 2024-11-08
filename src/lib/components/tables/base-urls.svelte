@@ -14,7 +14,7 @@
   import * as Table from "$lib/components/ui/table";
   import * as Dialog from "$lib/components/ui/dialog";
   import { Input } from "$lib/components/ui/input";
-  import { Button } from "../../lib/components/ui/button";
+  import { Button } from "../ui/button";
   import { Label } from "$lib/components/ui/label";
 
   import { ArrowUpDown, Pencil } from "lucide-svelte";
