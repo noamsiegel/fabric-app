@@ -1,4 +1,3 @@
-<!-- ModelsTable.svelte -->
 <script lang="ts">
   // svelte headless table
   import {
@@ -17,12 +16,10 @@
   import * as Table from "$lib/components/ui/table";
   import { Button } from "$lib/components/ui/button";
   import { Input } from "$lib/components/ui/input";
-  import * as Select from "$lib/components/ui/select";
 
   // svelte
   import { onMount } from "svelte";
   import { writable, type Writable } from "svelte/store";
-  import { Loader2 } from "lucide-svelte";
 
   // table components
   import Actions from "./actions.svelte";
@@ -36,16 +33,8 @@
     name: string;
     provider: string;
   }
-  let originalModelsData: Model[] = [];
-  let modelsData: Writable<Model[]> = writable([]);
-  let selectedVendor = { value: "all", label: "All Vendors" };
 
-  // loading
-  let isLoading = false;
-  let loadTimes = {
-    initial: 0,
-    filter: 0,
-  };
+  let modelsData: Writable<Model[]> = writable([]);
 
   const table = createTable(modelsData, {
     sort: addSortBy({ disableMultiSort: true }),
@@ -55,17 +44,6 @@
     }),
     page: addPagination({ initialPageSize: 10 }),
   });
-
-  // Add this to track unique vendors and filter data
-  $: vendors = [...new Set($modelsData.map((model) => model.provider))];
-  $: {
-    const filteredData = originalModelsData.filter(
-      (model) =>
-        selectedVendor.value === "all" ||
-        model.provider === selectedVendor.value,
-    );
-    modelsData.set(filteredData);
-  }
 
   const columns = table.createColumns([
     table.column({
@@ -105,31 +83,13 @@
   const { filterValue } = pluginStates.filter;
 
   async function fetchModels() {
-    isLoading = true;
-    const startTime = performance.now();
-
+    console.log("fetching models");
     try {
-      const formattedModels: Model[] = await invoke("get_models");
-      originalModelsData = formattedModels;
-      modelsData.set(formattedModels);
+      const data: Model[] = await invoke("get_models");
+      modelsData.set(data);
     } catch (err) {
       console.error("Failed to fetch models:", err);
-    } finally {
-      loadTimes.initial = performance.now() - startTime;
-      isLoading = false;
     }
-  }
-
-  // Track filter timing
-  $: {
-    const startTime = performance.now();
-    const filteredData = originalModelsData.filter(
-      (model) =>
-        selectedVendor.value === "all" ||
-        model.provider === selectedVendor.value,
-    );
-    modelsData.set(filteredData);
-    loadTimes.filter = performance.now() - startTime;
   }
 
   onMount(async () => {
@@ -151,22 +111,19 @@
         type="text"
         bind:value={$filterValue}
       />
-      <RefreshButton on:refreshComplete={fetchModels} disabled={isLoading} />
-      {#if loadTimes.initial > 0}
-        <span class="text-xs text-muted-foreground">
-          Loaded in {loadTimes.initial.toFixed(2)}ms
-        </span>
-      {/if}
+      <RefreshButton on:refreshComplete={fetchModels} />
     </div>
     <div class="flex items-center gap-4">
-      {#if loadTimes.filter > 0}
-        <span class="text-xs text-muted-foreground">
-          Filtered in {loadTimes.filter.toFixed(2)}ms
-        </span>
-      {/if}
-      <Select.Root bind:selected={selectedVendor}>
-        <Select.Trigger class="w-[180px]">
-          <Select.Value placeholder="Select Vendor" />
+      <!-- TODO add vendor filter to models table -->
+      <!-- <Select.Root
+        type="single"
+        value={selectedVendor}
+        onValueChange={onVendorSelect}
+      >
+        <Select.Trigger>
+          <span class="block truncate">
+            {selectedVendor === "all" ? "All Vendors" : selectedVendor}
+          </span>
         </Select.Trigger>
         <Select.Content>
           <Select.Item value="all">All Vendors</Select.Item>
@@ -174,19 +131,12 @@
             <Select.Item value={vendor}>{vendor}</Select.Item>
           {/each}
         </Select.Content>
-      </Select.Root>
+      </Select.Root> -->
     </div>
   </div>
 
   <!-- table -->
   <div class="rounded-md border">
-    {#if isLoading}
-      <div
-        class="absolute inset-0 flex items-center justify-center bg-background/50 z-50"
-      >
-        <Loader2 class="h-8 w-8 animate-spin" />
-      </div>
-    {/if}
     <Table.Root {...$tableAttrs}>
       <Table.Header>
         {#each $headerRows as headerRow}
@@ -226,14 +176,14 @@
     <Button
       variant="outline"
       size="sm"
-      on:click={() => ($pageIndex = $pageIndex - 1)}
+      onclick={() => ($pageIndex = $pageIndex - 1)}
       disabled={!$hasPreviousPage}>Previous</Button
     >
     <Button
       variant="outline"
       size="sm"
       disabled={!$hasNextPage}
-      on:click={() => ($pageIndex = $pageIndex + 1)}>Next</Button
+      onclick={() => ($pageIndex = $pageIndex + 1)}>Next</Button
     >
   </div>
 </div>

@@ -5,7 +5,7 @@
 
   // stores
   import { defaultModelStore } from "$lib/stores/models";
-  import { Loader2 } from "lucide-svelte"; // Add loader icon
+  import { Loader2 } from "lucide-svelte";
 
   // icons
   import Star from "lucide-svelte/icons/star";
