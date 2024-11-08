@@ -29,7 +29,6 @@ export class ModelSettingsManager {
   async loadDefaultModel() {
     try {
       const model = await invoke("get_secret", { key: "DEFAULT_MODEL" });
-      console.log("default model", model);
       defaultModelStore.set(model as string);
     } catch (err) {
       console.error("Failed to load default model:", err);

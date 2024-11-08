@@ -83,7 +83,6 @@
   const { filterValue } = pluginStates.filter;
 
   async function fetchModels() {
-    console.log("fetching models");
     try {
       const data: Model[] = await invoke("get_models");
       modelsData.set(data);
