@@ -2,13 +2,14 @@ import { Command } from "@tauri-apps/plugin-shell";
 import { invoke } from "@tauri-apps/api/core";
 
 // base fabric settings
-
 export async function runFabric(flag: string, message: string, model: string, pattern: string, context?: string) {
   try {
     // Build command arguments array
     const args = [
       flag,
       message,
+      "|",
+      "fabric",
       "--pattern",
       pattern,
       "--model",
@@ -19,7 +20,7 @@ export async function runFabric(flag: string, message: string, model: string, pa
       args.push("--context", context);
     }
 
-    // Execute command using just 'fabric' instead of full path
+    // Execute command using 'fabric'
     const result = await Command.create("fabric", args).execute();
 
     return result.stdout;

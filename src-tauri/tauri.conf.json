@@ -1,7 +1,7 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "fabric-app",
-  "version": "0.1.0",
+  "productName": "Fabric",
+  "version": "0.2.0",
   "identifier": "com.fabric-app.app",
   "build": {
     "beforeDevCommand": "pnpm dev",
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "fabric-app",
+        "title": "Fabric",
         "width": 800,
         "height": 600
       }
