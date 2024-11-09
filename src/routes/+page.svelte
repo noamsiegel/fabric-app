@@ -1,148 +1,231 @@
 <script lang="ts">
-  // svelte stores
-  import { onMount } from "svelte";
-  import { invoke } from "@tauri-apps/api/core";
-  import { writable, type Writable } from "svelte/store";
-
-  // svelte components
+  // shadcn components
+  import * as Card from "$lib/components/ui/card";
+  import * as Drawer from "$lib/components/ui/drawer";
+  import * as ContextMenu from "$lib/components/ui/context-menu/index.js";
   import { Input } from "$lib/components/ui/input";
-  import { Button } from "$lib/components/ui/button";
-  import { Label } from "$lib/components/ui/label";
-  import { Textarea } from "$lib/components/ui/textarea";
-
-  // fabric commands
+  import { Button } from "$lib/components/ui/button/index.js";
+  import { buttonVariants } from "$lib/components/ui/button";
   import {
-    scrapeUrlAndRunPattern,
-    scrapeQuestionAndRunPattern,
-  } from "$lib/utils/fabric";
-  import { clipboard_contents_and_run_pattern } from "$lib/utils/tauri";
+    Settings,
+    Text,
+    Link,
+    Youtube,
+    MessageCircleQuestion,
+  } from "lucide-svelte/icons";
+  // lib components
+  import ModelParameters from "$lib/components/cards/model-parameters.svelte";
+  import PatternSearchBox from "$lib/components/search-box/patterns.svelte";
+  import ContextSearchBox from "$lib/components/search-box/contexts.svelte";
+  import ModelsSearchBox from "$lib/components/search-box/models.svelte";
+  import InputTypeSearchBox from "$lib/components/search-box/input-type.svelte";
 
-  // state
-  let isRunning = false;
-  let urlToScrape = "";
-  let questionToSearch = "";
-  let patterns: string[] = [];
-  let result: Promise<string> | null = null;
-  let selected: Writable<{ value: string; label: string }> = writable({
-    value: "",
-    label: "",
-  });
+  // tauri
+  import { writeText } from "@tauri-apps/plugin-clipboard-manager";
+  import { create, BaseDirectory } from "@tauri-apps/plugin-fs";
 
-  function handlePatternSelect(event: CustomEvent<string>) {
-    selected.set({ value: event.detail, label: event.detail });
-    console.log("Selected pattern:", event.detail);
+  // lib
+  import { runFabric } from "$lib/utils/fabric";
+
+  // Define the interface
+
+  // Define message type
+  interface Message {
+    role: "user" | "assistant";
+    content: string;
+    flag?: string;
   }
 
-  onMount(async () => {
+  // State management
+  let messages = $state<Message[]>([
+    { role: "assistant", content: "Hello! How can I help you today?" },
+  ]);
+  let inputMessage = $state("");
+  let showSettings = $state(false);
+  let currentPattern = $state("");
+  let currentContext = $state("");
+  let currentModel = $state("");
+  let currentFlag = $state("");
+
+
+  async function handleCopy(content: string) {
     try {
-      patterns = await invoke("get_patterns");
-      const savedPattern = await invoke("get_selected_pattern");
-      if (typeof savedPattern === "string" && savedPattern) {
-        selected.set({ value: savedPattern, label: savedPattern });
-      }
+      console.log("Copying to clipboard:", content);
+      await writeText(content);
     } catch (error) {
-      console.error("Error fetching patterns or selected pattern:", error);
-    }
-  });
-
-  onMount(() => {
-    const checkRunningStatus = async () => {
-      isRunning = await invoke("get_is_running");
-      setTimeout(checkRunningStatus, 1000); // Check every 1 second
-    };
-    checkRunningStatus();
-  });
-
-  $: {
-    if ($selected.value) {
-      invoke("set_selected_pattern", { pattern: $selected.value });
-      console.log("Selected pattern:", $selected.value);
+      console.error("Failed to copy to clipboard:", error);
     }
   }
+
+  async function handleDownload(content: string) {
+    try {
+      // Generate timestamp for unique filename
+      const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+      const filename = `fabric-chat-${timestamp}.txt`;
+
+      // Create and write to file in Downloads directory
+      const file = await create(filename, { baseDir: BaseDirectory.Download });
+      await file.write(new TextEncoder().encode(content));
+      await file.close();
+    } catch (error) {
+      console.error("Failed to download message:", error);
+    }
+  }
+
+  // Update message display to show input type
+  function getMessageClass(message: any) {
+    const baseClass =
+      message.role === "user"
+        ? "ml-auto bg-primary/10 max-w-[80%]"
+        : "mr-auto bg-muted max-w-[80%]";
+    return baseClass;
+  }
+
+  // Update handleSend to properly manage message state
+  async function handleSend(): Promise<void> {
+    console.log({
+      flag: currentFlag,
+      message: inputMessage,
+      pattern: currentPattern,
+      context: currentContext,
+      model: currentModel,
+    });
+
+    if (!inputMessage.trim()) {
+      return;
+    }
+
+    // Add user message
+    messages = [
+      ...messages,
+      {
+      role: "user",
+      content: inputMessage,
+      flag: currentFlag,
+    },
+  ];
+
+  const result = await runFabric(
+    currentFlag,
+    inputMessage,
+    currentModel,
+    currentPattern,
+    currentContext,
+  );
+
+  // Add assistant response
+  messages = [
+    ...messages,
+    {
+      role: "assistant",
+      content: result,
+    },
+  ];
+
+  // Clear input after sending
+  inputMessage = "";
+}
 </script>
 
-<div class="flex flex-col h-screen">
-  <!-- <SettingsDrawer /> -->
+<div class="container mx-auto max-w-4xl p-4 space-y-4">
+  <!-- Message Log -->
+  <div class="space-y-4 h-[60vh] overflow-y-auto p-4 rounded-lg border">
+    {#each messages as message}
+      <ContextMenu.Root>
+        <ContextMenu.Trigger>
+          <Card.Root class={getMessageClass(message)}>
+            <Card.Content class="p-3">
+              {#if message.role === "user" && message.type}
+                <div
+                  class="flex items-center gap-2 mb-1 text-xs text-muted-foreground"
+                >
+                  {#if inputTypes.find((t) => t.value === message.type)?.icon}
+                    {@const Icon = inputTypes.find(
+                      (t) => t.value === message.type,
+                    )?.icon}
+                    <Icon class="size-3" />
+                  {/if}
+                  <span
+                    >{inputTypes.find((t) => t.value === message.type)
+                      ?.label}</span
+                  >
+                </div>
+              {/if}
+              <p class="text-sm">{message.content}</p>
+            </Card.Content>
+          </Card.Root>
+        </ContextMenu.Trigger>
+        <ContextMenu.Content>
+          <ContextMenu.Item onclick={() => handleCopy(message.content)}>
+            Copy
+          </ContextMenu.Item>
+          <ContextMenu.Item onclick={() => handleDownload(message.content)}>
+            Download
+          </ContextMenu.Item>
+        </ContextMenu.Content>
+      </ContextMenu.Root>
+    {/each}
+  </div>
 
-  <main class="flex-grow p-6">
-    <div class="max-w-3xl mx-auto">
-      <div class="mb-6">
-        <Label for="pattern-select">Select Pattern</Label>
-        <!-- TODO make this  auto refresh the drop down items -->
+  <!-- Input Area -->
+  <div class="flex flex-col gap-2">
+    <!-- First row: Input type, pattern search, and settings -->
+    <div class="flex gap-2 w-full">
+      <div class="flex-1">
+        <PatternSearchBox
+          onPatternSelected={(pattern:string) => (currentPattern = pattern)}
+        />
       </div>
-      <div class="mb-6">
-        <Label for="url-input">Enter URL to Scrape</Label>
-        <div class="flex space-x-2">
-          <Input
-            id="url-input"
-            type="text"
-            bind:value={urlToScrape}
-            placeholder="https://example.com"
-          />
-          <Button
-            onclick={async () => {
-              if (!$selected.value) {
-                alert("Please select a pattern first");
-                return;
-              }
-              try {
-                result = scrapeUrlAndRunPattern(urlToScrape);
-                console.log("Started scraping URL:", urlToScrape);
-              } catch (error) {
-                console.error("Error in scrape_url_and_run_pattern:", error);
-              }
-            }}
-            disabled={isRunning}
-          >
-            Scrape and Run Pattern
-          </Button>
-        </div>
+      <div class="flex-1">
+        <ContextSearchBox
+          onContextSelected={(context:string) => (currentContext = context)}
+        />
       </div>
-
-      <div class="mb-6">
-        <Label for="question-input">Enter Question to Search</Label>
-        <div class="flex space-x-2">
-          <Input
-            id="question-input"
-            type="text"
-            bind:value={questionToSearch}
-            placeholder="What is the capital of France?"
-          />
-          <Button
-            onclick={() =>
-              (result = scrapeQuestionAndRunPattern(questionToSearch))}
-            disabled={isRunning}
-          >
-            Search and Run Pattern
-          </Button>
-        </div>
+      <div class="flex-1">
+        <ModelsSearchBox onModelSelected={(model:string) => (currentModel = model)} />
       </div>
-
-      <div class="mb-6">
-        <Label for="clipboard-button">Run Pattern on Clipboard Contents</Label>
-        <div class="flex space-x-2">
-          <Button
-            onclick={() => (result = clipboard_contents_and_run_pattern())}
-            disabled={isRunning}
-          >
-            Run Pattern on Clipboard
-          </Button>
-        </div>
-      </div>
-
-      {#if result}
-        {#await result}
-          <p>Loading...</p>
-        {:then value}
-          <div class="mt-4">
-            <h3>Result:</h3>
-            <Textarea {value} readonly rows={30} class="w-full" />
+      <!-- settings drawer  -->
+      <Drawer.Root bind:open={showSettings}>
+        <Drawer.Trigger
+          class={buttonVariants({ variant: "outline", size: "icon" })}
+        >
+          <Settings class="size-4" />
+          <span class="sr-only">Model settings</span>
+        </Drawer.Trigger>
+        <Drawer.Content>
+          <div class="mx-auto w-full max-w-sm">
+            <Drawer.Header>
+              <Drawer.Title>Model Parameters</Drawer.Title>
+              <Drawer.Description>
+                Adjust the AI model's behavior parameters.
+              </Drawer.Description>
+            </Drawer.Header>
+            <ModelParameters />
+            <Drawer.Footer>
+              <Drawer.Close class={buttonVariants({ variant: "outline" })}>
+                Close
+              </Drawer.Close>
+            </Drawer.Footer>
           </div>
-        {:catch error}
-          <p>Error: {error.message}</p>
-          <pre>{JSON.stringify(error, null, 2)}</pre>
-        {/await}
-      {/if}
+        </Drawer.Content>
+      </Drawer.Root>
     </div>
-  </main>
+    <!-- Second row: Input and send button -->
+
+    <div class="flex gap-2">
+      <!-- input type selector -->
+      <!-- <InputType onInputTypeSelected={handleTypeChange} /> -->
+      <InputTypeSearchBox onInputTypeSelected={(flag: string) => (currentFlag = flag)} />
+
+      <!-- input -->
+      <Input
+        class="flex-1"
+        placeholder="Type your message..."
+        bind:value={inputMessage}
+      />
+
+      <!-- send button -->
+      <Button onclick={handleSend}>Send</Button>
+    </div>
+  </div>
 </div>
