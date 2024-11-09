@@ -76,7 +76,7 @@
         },
         {
           "name": "fabric",
-          "cmd": "fabric", 
+          "cmd": "$HOME/go/bin/fabric", 
           "args": true
         }
       ]
