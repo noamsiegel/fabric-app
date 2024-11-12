@@ -1,4 +1,5 @@
-#  https://github.com/tauri-apps/tauri-action/tree/dev
+
+# https://github.com/tauri-apps/tauri-action/tree/dev
 name: "publish"
 
 on:
