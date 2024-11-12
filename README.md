@@ -13,6 +13,7 @@ This is a front end application for [fabric](https://github.com/danielmiessler/f
 - Custom window controls
 
 ## How to install
+[![How to install the Fabric app](https://github.com/user-attachments/assets/bd55f2b2-185c-4b23-815d-6b96a60f742e)](https://www.loom.com/share/e833153a18ab4b1f843f812255e53dd3)
 
 
 ## 🛠️ Tech Stack
