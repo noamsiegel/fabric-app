@@ -3,7 +3,7 @@ use std::sync::Mutex;
 use tauri::Manager;
 
 pub mod fabric;
-use crate::fabric::install::install_fabric;
+use crate::fabric::install::{install_fabric, check_fabric_installation};
 use crate::fabric::patterns::{
     get_default_pattern, get_fabric_dir, get_patterns, get_patterns_git_folder,
     get_patterns_git_repo, get_selected_pattern, set_default_pattern, set_patterns_git_folder,
@@ -69,6 +69,7 @@ pub fn run() {
         .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![
             install_fabric,
+            check_fabric_installation,
             get_fabric_dir,
             // runs
             scrape_url_and_run_pattern,
