@@ -125,7 +125,7 @@ pub async fn update_patterns(app: tauri::AppHandle) -> Result<String, Error> {
 
     let shell = app.shell();
     let output = shell
-        .command("fabric")
+        .command("/usr/local/bin/fabric")
         .args(["-U"])
         .output()
         .await
@@ -149,12 +149,20 @@ pub async fn update_patterns(app: tauri::AppHandle) -> Result<String, Error> {
 
 #[tauri::command]
 pub fn run_fabric(_app_handle: tauri::AppHandle, flag: String) -> Result<String, Error> {
-    let output = Command::new("fabric")
+    let output = Command::new("/usr/local/bin/fabric")
         .arg(&flag)
         .output()
-        .map_err(|_| Error::FailedToReceiveMessage)?;
+        .map_err(|e| {
+            // Log the error if the command fails to start
+            println!("Failed to start fabric command for flag '{}'. Error: {}", flag, e);
+            Error::FailedToReceiveMessage
+        })?;
 
     if !output.status.success() {
+        // Log the stderr to the console when the command fails
+        let stderr_output = String::from_utf8_lossy(&output.stderr);
+        let stdout_output = String::from_utf8_lossy(&output.stdout);
+        println!("Fabric command for flag '{}' failed. Status: {:?}. Stderr: {}. Stdout: {}", flag, output.status, stderr_output, stdout_output);
         return Err(Error::FailedToReceiveMessage);
     }
 

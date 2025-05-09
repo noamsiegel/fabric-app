@@ -7,7 +7,7 @@ use std::process::Command;
 #[tauri::command]
 pub async fn refresh_models(app_handle: tauri::AppHandle) -> Result<Vec<String>, String> {
     // Get the output from fabric command
-    let output = Command::new("fabric")
+    let output = Command::new("/usr/local/bin/fabric")
         .arg("--listmodels")
         .output()
         .map_err(|e| format!("Failed to execute fabric command: {}", e))?;
