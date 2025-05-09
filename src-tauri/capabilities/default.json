@@ -1,91 +1,31 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
-  "identifier": "default",
-  "description": "Capability for the main window",
+  "identifier": "default-shell-test-echo",
+  "description": "Minimal capability for specifically testing echo shell execution.",
   "windows": [
     "main"
   ],
   "permissions": [
     "core:default",
-    "shell:allow-open",
-    "shell:allow-spawn",
-    "fs:default",
-    "fs:read-files",
-    "fs:write-files",
-    "fs:read-app-specific-dirs-recursive",
-    {
-      "identifier": "fs:scope",
-      "allow": [
-        {
-          "path": "$HOME/**"
-        },
-        {
-          "path": "$DOCUMENT/**"
-        },
-        {
-          "path": "$DESKTOP/**"
-        },
-        {
-          "path": "/**"
-        },
-        {
-          "path": "$HOME/go/bin/fabric",
-          "read": true,
-          "run": true
-        }
-      ]
-    },
-    {
-      "identifier": "fs:allow-write-text-file",
-      "allow": [
-        {
-          "path": "$HOME/test.txt"
-        }
-      ]
-    },
-    {
-      "identifier": "fs:allow-read-text-file",
-      "allow": [
-        {
-          "path": "$APPCONFIG/**"
-        }
-      ]
-    },
     {
       "identifier": "shell:allow-execute",
       "allow": [
         {
-          "name": "sh",
-          "cmd": "sh",
+          "name": "echo",
+          "cmd": "echo",
           "args": true
         },
         {
-          "name": "powershell",
-          "cmd": "powershell.exe",
-          "args": true
-        },
-        {
-          "name": "pbpaste",
-          "cmd": "pbpaste",
-          "args": true
-        },
-        {
-          "name": "xclip",
-          "cmd": "xclip",
+          "name": "fabric-patterns",
+          "cmd": "fabric-patterns",
           "args": true
         },
         {
           "name": "fabric",
-          "cmd": "$HOME/go/bin/fabric", 
+          "cmd": "fabric",
           "args": true
         }
       ]
-    },
-    "shell:default",
-    "dialog:default",
-    "clipboard-manager:default",
-    "clipboard-manager:allow-read-text",
-    "clipboard-manager:allow-write-text",
-    "os:default"
+    }
   ]
 }
